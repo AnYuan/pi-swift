@@ -177,12 +177,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-3: JSON / event-stream / validation utility functions
-- Status: TODO
+- Status: DONE
 - Depends On: P2-2
 - Scope:
   - Stream parsing, partial JSON, validation helpers, overflow handling
 - Test Plan:
   - Match equivalent `pi-mono` edge cases
+- Verification:
+  - Tests: `swift test` passed (28 tests total, including `PiAIUtilitiesTests`) on 2026-02-22
+  - Build: `swift build` passed on 2026-02-22
+  - Regression: Utility edge cases covered for chunked SSE parsing, partial JSON recovery, tool validation, and overflow detection
+  - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-4: OpenAI Responses adapter (first provider)
 - Status: TODO
@@ -449,4 +454,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P2-3` (`PiAI` JSON / event-stream / validation utility functions). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P2-4` (OpenAI Responses adapter as the first provider). Continue following the strict test-first implementation cadence and atomic-commit rule.

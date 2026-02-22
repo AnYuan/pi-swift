@@ -104,17 +104,55 @@ Notes / decisions:
 - `PiAI` reuses `PiCoreTypes` foundational schema/JSON types (`PiToolDefinition`, `PiToolParameterSchema`, `JSONValue`) via a public `PiAITool` typealias.
 - Event and content unions use explicit custom `Codable` to keep the wire shape stable and fixture-friendly.
 
+### P2-3: Utility foundations (`JSON`, event-stream, validation, overflow)
+
+Files:
+
+- `Sources/PiAI/Utils/SSEParser.swift`
+- `Sources/PiAI/Utils/JSONParsing.swift`
+- `Sources/PiAI/Utils/Validation.swift`
+- `Sources/PiAI/Utils/Overflow.swift`
+- `Tests/PiAITests/PiAIUtilitiesTests.swift`
+
+Implemented utilities:
+
+- `PiAISSEParser`
+  - Incremental SSE parsing across chunk boundaries
+  - Supports `event`, `data`, and `id` fields
+  - Multi-line `data:` aggregation
+- `PiAIJSON.parseStreamingJSON`
+  - Parses complete JSON into `JSONValue`
+  - Best-effort partial JSON repair by appending missing closers / truncating invalid tail
+  - Returns empty object (`{}`) for invalid or empty input
+- `PiAIValidation`
+  - Tool lookup by name
+  - Recursive schema validation for common schema types:
+    - object / array / string / number / integer / boolean / null
+  - Supports `required`, `properties`, `items`, `enum`, and `additionalProperties: false`
+- `PiAIOverflow.isContextOverflow`
+  - Error-pattern detection for context overflow responses
+  - Silent-overflow detection via usage vs contextWindow (z.ai-style behavior)
+
+Tests added for P2-3:
+
+- SSE parser single/chunked parsing
+- complete + partial + invalid streaming JSON parsing
+- valid and invalid tool-argument validation paths
+- context overflow detection (error-based and silent-overflow cases)
+
 ## Parity Status vs `pi-mono`
 
 - Partial
-- Implemented foundational `PiAI` model registry plus context/message/event type system
-- Streaming/network/provider adapters are still pending (`P2-3+`)
+- Implemented foundational `PiAI` model registry plus context/message/event type system and utility foundations
+- Streaming/network/provider adapters are still pending (`P2-4+`)
+  - Provider adapters are now the next major step (`P2-4+`)
 
 ## Verification Evidence
 
 - `swift test` passed (includes `PiAIModelRegistryTests` and `PiAITypesTests`)
+- `swift test` passed (includes `PiAIUtilitiesTests`)
 - `swift build` passed
 
 ## Next Step
 
-- `P2-3`: `PiAI` JSON / event-stream / validation utility functions
+- `P2-4`: OpenAI Responses adapter (first provider)
