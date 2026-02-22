@@ -140,19 +140,62 @@ Tests added for P2-3:
 - valid and invalid tool-argument validation paths
 - context overflow detection (error-based and silent-overflow cases)
 
+### P2-4: First provider adapter (`OpenAI Responses`, mock-driven)
+
+Files:
+
+- `Sources/PiAI/Utils/AssistantMessageEventStream.swift`
+- `Sources/PiAI/Providers/OpenAIResponsesAdapter.swift`
+- `Tests/PiAITests/PiAIOpenAIResponsesProviderTests.swift`
+
+Implemented behavior:
+
+- `PiAIAssistantMessageEventStream`
+  - AsyncSequence stream of `PiAIAssistantMessageEvent`
+  - terminal result retrieval via `result()`
+  - terminal handling for `.done` and `.error`
+- `PiAIOpenAIResponsesProvider` (mock-driven adapter entry)
+  - `streamMock(...)` executes an async mock event source
+  - emits `start` / incremental events / terminal `done` or `error`
+- `PiAIOpenAIResponsesEventProcessor` (internal)
+  - maps a subset of OpenAI Responses-style events to `PiAIAssistantMessageEvent`
+  - supports:
+    - text item added + text deltas
+    - function-call item added + argument deltas + function-call completion
+    - response completion with usage + stop reason
+  - uses `PiAIJSON.parseStreamingJSON` to incrementally parse tool-call arguments
+
+Mock raw event coverage (current subset):
+
+- `response.output_item.added` (`message`, `function_call`)
+- `response.output_text.delta`
+- `response.function_call_arguments.delta`
+- `response.function_call_arguments.done`
+- `response.completed`
+
+Tests added for P2-4:
+
+- event ordering for text + tool-call lifecycle from a mock source
+- terminal error event/result when mock source throws
+
+Notes / decisions:
+
+- This task implements the provider adapter core and event mapping with a mock event source first (test-first and deterministic).
+- Real HTTP transport/OpenAI SDK integration is deferred to later provider work; the current shape keeps the mapping logic isolated and testable.
+
 ## Parity Status vs `pi-mono`
 
 - Partial
-- Implemented foundational `PiAI` model registry plus context/message/event type system and utility foundations
-- Streaming/network/provider adapters are still pending (`P2-4+`)
-  - Provider adapters are now the next major step (`P2-4+`)
+- Implemented foundational `PiAI` model registry, context/message/event types, utility foundations, and a first provider adapter core (OpenAI Responses, mock-driven)
+- Real provider transport integrations and additional providers are still pending (`P2-5+`)
 
 ## Verification Evidence
 
 - `swift test` passed (includes `PiAIModelRegistryTests` and `PiAITypesTests`)
 - `swift test` passed (includes `PiAIUtilitiesTests`)
+- `swift test` passed (includes `PiAIOpenAIResponsesProviderTests`)
 - `swift build` passed
 
 ## Next Step
 
-- `P2-4`: OpenAI Responses adapter (first provider)
+- `P2-5`: Anthropic adapter

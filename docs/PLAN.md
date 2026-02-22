@@ -190,13 +190,18 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-4: OpenAI Responses adapter (first provider)
-- Status: TODO
+- Status: DONE
 - Depends On: P2-2, P2-3
 - Scope:
   - First provider adapter with working tool calling and streaming text
 - Test Plan:
   - Mock provider tests
   - Event-stream ordering tests
+- Verification:
+  - Tests: `swift test` passed (30 tests total, including `PiAIOpenAIResponsesProviderTests`) on 2026-02-22
+  - Build: `swift build` passed on 2026-02-22
+  - Regression: Mock-driven event-order and terminal error behavior validated for streaming text + tool call lifecycle
+  - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-5: Anthropic adapter
 - Status: TODO
@@ -454,4 +459,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P2-4` (OpenAI Responses adapter as the first provider). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P2-5` (Anthropic adapter). Continue following the strict test-first implementation cadence and atomic-commit rule.
