@@ -163,13 +163,18 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-2: Unified message context and stream event model
-- Status: TODO
+- Status: DONE
 - Depends On: P2-1
 - Scope:
   - Context/messages/tool call/result/thinking event structures
 - Test Plan:
   - Event sequence serialization/deserialization tests
   - Boundary-field tests
+- Verification:
+  - Tests: `swift test` passed (24 tests total, including `PiAITypesTests`) on 2026-02-22
+  - Build: `swift build` passed on 2026-02-22
+  - Regression: N/A (new type-model surface; stable event JSON encoding checked via golden fixture)
+  - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-3: JSON / event-stream / validation utility functions
 - Status: TODO
@@ -444,4 +449,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P2-2` (unified message context and stream event model in `PiAI`). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P2-3` (`PiAI` JSON / event-stream / validation utility functions). Continue following the strict test-first implementation cadence and atomic-commit rule.

@@ -61,7 +61,60 @@ Matching behavior (current baseline):
 - `swift test` passed (includes `PiAIModelRegistryTests`)
 - `swift build` passed
 
+### P2-2: Unified context/message/event type model
+
+Files:
+
+- `Sources/PiAI/Types.swift`
+- `Tests/PiAITests/PiAITypesTests.swift`
+- `Tests/Fixtures/pi-ai/assistant-message-events.json`
+
+Implemented types and behavior:
+
+- `PiAIContext`
+  - optional `systemPrompt`
+  - `messages: [PiAIMessage]`
+  - optional `tools: [PiAITool]`
+- `PiAIMessage` (role-tagged union)
+  - `.user(PiAIUserMessage)`
+  - `.assistant(PiAIAssistantMessage)`
+  - `.toolResult(PiAIToolResultMessage)`
+- Content block types
+  - text / thinking / image / tool-call content blocks
+  - user content union (`string` or array of typed parts)
+- Usage / cost model
+  - `PiAIUsage`
+  - `PiAIUsageCost`
+  - `.zero` helpers for both
+- Stop reason enum
+  - `PiAIStopReason` (`stop`, `length`, `toolUse`, `error`, `aborted`)
+- Assistant stream event union
+  - start/text/thinking/toolcall lifecycle events
+  - `done` and `error` terminal events
+  - custom tagged `Codable` encoding using snake_case event names matching the tested wire shape
+
+Tests added for P2-2:
+
+- Context round-trip encoding/decoding across user + assistant + tool-result messages
+- Assistant message event sequence round-trip
+- Golden fixture for stable event JSON encoding
+
+Notes / decisions:
+
+- `PiAI` reuses `PiCoreTypes` foundational schema/JSON types (`PiToolDefinition`, `PiToolParameterSchema`, `JSONValue`) via a public `PiAITool` typealias.
+- Event and content unions use explicit custom `Codable` to keep the wire shape stable and fixture-friendly.
+
+## Parity Status vs `pi-mono`
+
+- Partial
+- Implemented foundational `PiAI` model registry plus context/message/event type system
+- Streaming/network/provider adapters are still pending (`P2-3+`)
+
+## Verification Evidence
+
+- `swift test` passed (includes `PiAIModelRegistryTests` and `PiAITypesTests`)
+- `swift build` passed
+
 ## Next Step
 
-- `P2-2`: unified message context and stream event model in `PiAI`
-
+- `P2-3`: `PiAI` JSON / event-stream / validation utility functions
