@@ -204,12 +204,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-5: Anthropic adapter
-- Status: TODO
+- Status: DONE
 - Depends On: P2-4
 - Scope:
   - Message/tool/thinking mapping
 - Test Plan:
   - Regression tests for tool-name and argument normalization
+- Verification:
+  - Tests: `swift test` passed (33 tests total, including `PiAIAnthropicProviderTests`) on 2026-02-22
+  - Build: `swift build` passed on 2026-02-22
+  - Regression: Mock-driven Anthropic thinking/text/tool-use mapping verified, including OAuth tool-name normalization round-trip and `find != Glob` regression guard
+  - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-6: Google/Vertex family adapters
 - Status: TODO
@@ -459,4 +464,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P2-5` (Anthropic adapter). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P2-6` (Google/Vertex family adapters). Continue following the strict test-first implementation cadence and atomic-commit rule.

@@ -62,5 +62,6 @@ Project bootstrapping/planning docs are in place, and `P1` groundwork is underwa
 - `P2-2` `pi-ai` unified context/message/event types: implemented and verified
 - `P2-3` `pi-ai` utility foundations (SSE parsing, JSON parsing, validation, overflow detection): implemented and verified
 - `P2-4` first provider adapter (`OpenAI Responses`, mock-driven event processor): implemented and verified
+- `P2-5` Anthropic adapter (mock-driven thinking/text/tool mapping + OAuth tool-name normalization regression tests): implemented and verified
 
-Next step: `P2-5` (Anthropic adapter) in `docs/PLAN.md`.
+Next step: `P2-6` (Google/Vertex family adapters) in `docs/PLAN.md`.

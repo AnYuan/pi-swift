@@ -183,19 +183,62 @@ Notes / decisions:
 - This task implements the provider adapter core and event mapping with a mock event source first (test-first and deterministic).
 - Real HTTP transport/OpenAI SDK integration is deferred to later provider work; the current shape keeps the mapping logic isolated and testable.
 
+### P2-5: Anthropic adapter (`anthropic-messages`, mock-driven)
+
+Files:
+
+- `Sources/PiAI/Providers/AnthropicMessagesAdapter.swift`
+- `Tests/PiAITests/PiAIAnthropicProviderTests.swift`
+
+Implemented behavior:
+
+- `PiAIAnthropicMessagesProvider` (mock-driven adapter entry)
+  - `streamMock(...)` executes an async mock Anthropic event source
+  - emits `start` / incremental events / terminal `done` or `error`
+- `PiAIAnthropicMessagesEventProcessor` (internal)
+  - maps Anthropic Messages-style events into `PiAIAssistantMessageEvent`
+  - supports:
+    - `message_start` usage initialization
+    - text block start/delta/stop
+    - thinking block start/delta/signature/stop
+    - `tool_use` block start + `input_json_delta` parsing + stop
+    - `message_delta` stop reason + usage updates
+    - `message_stop` terminal completion
+- OAuth tool-name normalization helpers (Claude Code canonical casing compatible subset)
+  - outbound canonicalization (`read` -> `Read`, `todowrite` -> `TodoWrite`)
+  - inbound round-trip restoration against `context.tools` (case-insensitive match)
+  - regression guard for `find != Glob` (no incorrect semantic mapping)
+
+Mock raw event coverage (current subset):
+
+- `message_start`
+- `content_block_start` (`text`, `thinking`, `tool_use`)
+- `content_block_delta` (`text_delta`, `thinking_delta`, `signature_delta`, `input_json_delta`)
+- `content_block_stop`
+- `message_delta`
+- `message_stop`
+
+Tests added for P2-5:
+
+- event ordering and final message content for thinking + text + tool-use streaming from a mock source
+- partial JSON tool-argument normalization across deltas
+- OAuth tool-name normalization round-trip regression coverage (`find` remains `find`, not `Glob`)
+- terminal error event/result when mock source throws
+
 ## Parity Status vs `pi-mono`
 
 - Partial
-- Implemented foundational `PiAI` model registry, context/message/event types, utility foundations, and a first provider adapter core (OpenAI Responses, mock-driven)
-- Real provider transport integrations and additional providers are still pending (`P2-5+`)
+- Implemented foundational `PiAI` model registry, context/message/event types, utility foundations, and two provider adapter cores (OpenAI Responses + Anthropic Messages, both mock-driven)
+- Real provider transport integrations and additional providers are still pending (`P2-6+`)
 
 ## Verification Evidence
 
 - `swift test` passed (includes `PiAIModelRegistryTests` and `PiAITypesTests`)
 - `swift test` passed (includes `PiAIUtilitiesTests`)
 - `swift test` passed (includes `PiAIOpenAIResponsesProviderTests`)
+- `swift test` passed (includes `PiAIAnthropicProviderTests`)
 - `swift build` passed
 
 ## Next Step
 
-- `P2-5`: Anthropic adapter
+- `P2-6`: Google/Vertex family adapters
