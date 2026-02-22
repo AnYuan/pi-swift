@@ -15,10 +15,12 @@ let package = Package(
         .library(name: "PiMom", targets: ["PiMom"]),
         .library(name: "PiPods", targets: ["PiPods"]),
         .library(name: "PiWebUIBridge", targets: ["PiWebUIBridge"]),
+        .library(name: "PiTestSupport", targets: ["PiTestSupport"]),
         .executable(name: "pi-swift", targets: ["PiSwiftCLI"]),
     ],
     targets: [
         .target(name: "PiCoreTypes"),
+        .target(name: "PiTestSupport"),
         .target(
             name: "PiAI",
             dependencies: ["PiCoreTypes"]
@@ -51,13 +53,14 @@ let package = Package(
             name: "PiSwiftCLI",
             dependencies: ["PiCodingAgent"]
         ),
-        .testTarget(name: "PiCoreTypesTests", dependencies: ["PiCoreTypes"]),
-        .testTarget(name: "PiAITests", dependencies: ["PiAI"]),
-        .testTarget(name: "PiAgentCoreTests", dependencies: ["PiAgentCore"]),
-        .testTarget(name: "PiTUITests", dependencies: ["PiTUI"]),
-        .testTarget(name: "PiCodingAgentTests", dependencies: ["PiCodingAgent"]),
-        .testTarget(name: "PiMomTests", dependencies: ["PiMom"]),
-        .testTarget(name: "PiPodsTests", dependencies: ["PiPods"]),
-        .testTarget(name: "PiWebUIBridgeTests", dependencies: ["PiWebUIBridge"]),
+        .testTarget(name: "PiCoreTypesTests", dependencies: ["PiCoreTypes", "PiTestSupport"]),
+        .testTarget(name: "PiAITests", dependencies: ["PiAI", "PiTestSupport"]),
+        .testTarget(name: "PiAgentCoreTests", dependencies: ["PiAgentCore", "PiTestSupport"]),
+        .testTarget(name: "PiTUITests", dependencies: ["PiTUI", "PiTestSupport"]),
+        .testTarget(name: "PiCodingAgentTests", dependencies: ["PiCodingAgent", "PiTestSupport"]),
+        .testTarget(name: "PiMomTests", dependencies: ["PiMom", "PiTestSupport"]),
+        .testTarget(name: "PiPodsTests", dependencies: ["PiPods", "PiTestSupport"]),
+        .testTarget(name: "PiWebUIBridgeTests", dependencies: ["PiWebUIBridge", "PiTestSupport"]),
+        .testTarget(name: "PiTestSupportTests", dependencies: ["PiTestSupport"]),
     ]
 )
