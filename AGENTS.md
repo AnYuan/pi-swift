@@ -1,85 +1,87 @@
 # pi-swift AGENTS.md
 
-## 项目目标
+## Project Goal
 
-本仓库的主目标是以 Swift 重新实现 `../pi-mono` 中的 TypeScript 实现，并在功能行为上保持一致。
+The primary goal of this repository is to reimplement the TypeScript implementation in `../pi-mono` using Swift while preserving functional behavior.
 
-核心要求：
+Core requirements:
 
-- 功能完整对齐（feature parity）
-- 不引入 regression（行为回归）
-- 以测试作为验收依据
-- 文档与实现同步更新
+- Full feature parity
+- No regressions (behavioral regressions)
+- Tests are the source of truth for acceptance
+- Documentation must be updated together with implementation
 
-`../pi-mono` 是当前阶段的功能基线与参考实现（source of truth）。
+`../pi-mono` is the current functional baseline and reference implementation (source of truth).
 
-## 工作原则（必须遵守）
+## Working Principles (Required)
 
-1. 先看 `docs/PLAN.md` 中未完成任务，选择一个最小可执行任务（pick one）。
-2. 先写测试（或先补可执行的验收用例/fixture），再写实现。
-3. 完成实现后必须运行对应测试，并记录验证结果。
-4. 测试通过、编译通过后，才允许更新任务状态。
-5. 每完成一个任务，更新 `docs/` 下对应模块文档（至少变更点、行为、测试覆盖说明）。
-6. 做完一次改动后先自检（review 自己的修改），再进入下一个任务。
+1. Start by checking unfinished tasks in `docs/PLAN.md` and pick one smallest executable task.
+2. Write tests first (or create executable acceptance fixtures/golden cases first), then implement.
+3. After implementation, run the relevant tests and record verification results.
+4. Only update task status after tests pass and compilation passes.
+5. For every completed task, update the related module docs under `docs/` (at minimum: changes, behavior, test coverage).
+6. Review your own changes before moving to the next task.
+7. Commit changes atomically: each commit should represent one coherent, independently reviewable change.
 
-## 任务状态更新规则（严格）
+## Task Status Update Rules (Strict)
 
-- 不要在代码尚未通过验证时提前更新任务状态。
-- 只有在以下条件同时满足后，才能把任务从未完成状态改为已完成：
-  - 对应测试通过
-  - 相关编译通过
-  - 回归检查通过（至少覆盖本次变更影响面）
-  - 文档已更新
-- 若无法测试或暂时缺少环境，任务状态不能标记为完成；应标记为阻塞或待验证，并写明原因。
+- Do not update a task to completed before verification passes.
+- A task can only move to completed when all of the following are true:
+  - Relevant tests pass
+  - Relevant build/compilation passes
+  - Regression checks pass (covering the impacted surface area)
+  - Documentation is updated
+- If testing cannot be run or the environment is missing, the task must not be marked completed; mark it blocked or pending verification and document the reason.
 
-## 质量门禁（Definition of Done）
+## Quality Gate (Definition of Done)
 
-一个任务被视为完成，至少满足：
+A task is considered done only if it satisfies at least:
 
-- 行为与 `../pi-mono` 对应功能一致（输入/输出/错误行为）
-- 新增或更新测试覆盖该任务的核心路径与边界条件
-- 覆盖率尽量接近 100%（尤其是核心逻辑层）
-- 编译通过（SwiftPM / Xcode 对应目标）
-- 无明显代码异味、重复逻辑或未处理错误路径
-- `docs/` 对应模块文档已更新
+- Behavior matches the corresponding functionality in `../pi-mono` (inputs/outputs/errors)
+- New or updated tests cover core paths and edge cases for the task
+- Coverage is as close to 100% as practical (especially core logic)
+- Compilation passes (SwiftPM / Xcode target as applicable)
+- No obvious code smell, duplicated logic, or unhandled error paths
+- Related module docs under `docs/` are updated
 
-## 推荐执行循环（标准节奏）
+## Recommended Execution Loop (Standard Cadence)
 
-1. 阅读 `docs/PRD.md` 和 `docs/ARCHITECTURE.md`，确认目标行为与模块边界。
-2. 从 `docs/PLAN.md` 选择一个 `TODO` 且依赖已满足的最小任务。
-3. 对照 `../pi-mono` 的对应模块、测试、README、源码实现，提炼验收样例。
-4. 先写 Swift 测试（单元测试优先，必要时集成测试）。
-5. 写实现代码直到测试通过。
-6. 运行测试与编译检查。
-7. 自我 review（命名、边界、错误处理、并发、性能、文档）。
-8. 更新 `docs/` 中对应模块文档。
-9. 记录验证证据后，更新 `docs/PLAN.md` 的任务状态。
-10. 返回步骤 2。
+1. Read `docs/PRD.md` and `docs/ARCHITECTURE.md` to confirm target behavior and module boundaries.
+2. Pick one `TODO` task from `docs/PLAN.md` whose dependencies are satisfied.
+3. Review the corresponding module in `../pi-mono` (source, tests, README) and extract acceptance examples.
+4. Write Swift tests first (unit tests preferred; integration tests when needed).
+5. Implement until tests pass.
+6. Run tests and compile checks.
+7. Self-review (naming, boundaries, error handling, concurrency, performance, documentation).
+8. Update the relevant module docs under `docs/`.
+9. Record verification evidence, then update task status in `docs/PLAN.md`.
+10. Return to step 2.
 
-## 文档约定
+## Documentation Conventions
 
-- `docs/PRD.md`：功能清单、验收目标、非目标、约束。
-- `docs/PLAN.md`：phase 拆解、任务列表、依赖、状态、验证证据。
-- `docs/ARCHITECTURE.md`：整体架构图、模块映射、边界与依赖关系。
-- 后续模块文档建议放在 `docs/modules/<module>.md`（例如 `docs/modules/pi-ai.md`）。
+- `docs/PRD.md`: feature inventory, acceptance goals, non-goals, constraints.
+- `docs/PLAN.md`: phase breakdown, task list, dependencies, status, verification evidence.
+- `docs/ARCHITECTURE.md`: high-level architecture diagram, module mapping, boundaries, dependency relationships.
+- Future module docs should live in `docs/modules/<module>.md` (for example, `docs/modules/pi-ai.md`).
+- All project documentation must be written in English.
 
-## 实现策略（当前约束）
+## Implementation Strategy (Current Constraint)
 
-- 默认优先实现核心能力链路：`pi-ai` -> `pi-agent-core` -> `pi-tui` -> `pi-coding-agent`
-- 再扩展到 `mom`、`pods`、`web-ui` 等外围能力
-- 若发现 `pi-mono` 新功能变更影响已完成模块，应补充回归测试并更新 PRD/PLAN
+- Prioritize the core capability chain first: `pi-ai` -> `pi-agent-core` -> `pi-tui` -> `pi-coding-agent`
+- Then expand to peripheral capabilities such as `mom`, `pods`, and `web-ui`
+- If new `pi-mono` features affect already-implemented modules, add regression tests and update PRD/PLAN first
 
-## 禁止事项
+## Prohibited Shortcuts
 
-- 未跑测试就标记任务完成
-- 为“先推进进度”跳过行为一致性验证
-- 在没有记录依据的情况下声称“已兼容”
-- 修改任务状态时不写验证方式/结果
+- Marking a task done without running tests
+- Skipping behavior-parity verification just to move faster
+- Claiming compatibility without recorded evidence
+- Updating task status without documenting verification method/results
+- Mixing unrelated changes into a single commit
 
-## 提交前最小检查（每次任务）
+## Minimum Pre-Completion Checklist (Per Task)
 
-- 相关测试通过
-- 相关目标编译通过
-- 文档已更新
-- 任务状态仅在验证后更新
-
+- Relevant tests pass
+- Relevant targets compile successfully
+- Documentation is updated
+- Task status is updated only after verification

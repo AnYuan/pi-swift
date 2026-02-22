@@ -1,39 +1,41 @@
-# PLAN: pi-swift 迁移执行计划（基于 PRD）
+# PLAN: pi-swift Migration Execution Plan (Based on PRD)
 
-## 1. 使用规则（必须先读）
+## 1. Usage Rules (Read First)
 
-本计划用于拆解最小可执行任务，并管理状态与验证证据。
+This plan is used to break work into the smallest executable tasks and track status plus verification evidence.
 
-状态更新规则（强制）：
+Mandatory status update rule:
 
-- 不要自己提前更新任务完成状态。
-- 只有在“测试通过 + 编译通过 + 文档更新完成”后，才能把任务标记为完成。
-- 如果未验证，状态必须保持 `TODO` / `BLOCKED` / `READY_FOR_VERIFY`，不能标记 `DONE`。
+- Do not update task completion status in advance.
+- A task may be marked complete only after tests pass, compilation passes, and documentation updates are done.
+- If not verified, status must remain `TODO`, `BLOCKED`, or `READY_FOR_VERIFY` and must not be marked `DONE`.
+- All implemented changes must be committed atomically (one coherent change per commit).
 
-## 2. 状态定义
+## 2. Status Definitions
 
-- `TODO`：未开始
-- `IN_PROGRESS`：正在实现（仅实际开始编码后使用）
-- `READY_FOR_VERIFY`：实现完成，等待测试/编译/回归验证
-- `DONE`：已验证通过（测试 + 编译 + 文档已更新）
-- `BLOCKED`：被依赖、环境或外部条件阻塞
+- `TODO`: not started
+- `IN_PROGRESS`: implementation is actively underway (use only after coding begins)
+- `READY_FOR_VERIFY`: implementation is done, waiting for test/build/regression verification
+- `DONE`: verification passed (tests + build + docs updated)
+- `BLOCKED`: blocked by dependency, environment, or external condition
 
-说明：默认只允许同时有一个 `IN_PROGRESS` 任务，避免并行改动扩大回归面。
+Note: By default only one task should be `IN_PROGRESS` at a time to reduce regression risk from parallel changes.
 
-## 3. 标准工作流（每个任务都一样）
+## 3. Standard Workflow (Same for Every Task)
 
-1. 查看未完成任务（`TODO` / `BLOCKED` 解除后）并 pick one。
-2. 先阅读 `../pi-mono` 对应代码、README、测试。
-3. 先写测试（或先建立对照 fixture / golden）。
-4. 写 Swift 实现。
-5. 跑测试。
-6. 跑编译检查。
-7. 自我 review（逻辑、错误处理、命名、性能、并发）。
-8. 更新 `docs/` 对应模块文档。
-9. 记录验证证据。
-10. 仅此时更新任务状态为 `DONE`。
+1. Review unfinished tasks (`TODO`, or unblocked items) and pick one.
+2. Read the corresponding code, README, and tests in `../pi-mono`.
+3. Write tests first (or establish comparison fixtures/goldens first).
+4. Implement in Swift.
+5. Run tests.
+6. Run compile checks.
+7. Self-review (logic, error handling, naming, performance, concurrency).
+8. Update the corresponding module docs under `docs/`.
+9. Record verification evidence.
+10. Only then update the task status to `DONE`.
+11. Create an atomic commit for the completed change (do not bundle unrelated work).
 
-## 4. 任务记录模板（复制使用）
+## 4. Task Record Template (Copy/Use)
 
 ```md
 ### TASK-ID: <short-name>
@@ -51,351 +53,351 @@
   - Docs updated:
 ```
 
-## 5. Phase 拆解（初版）
+## 5. Phase Breakdown (Initial)
 
-## P0 文档与基线冻结（先完成文档，再开始编码）
+## P0 Documentation and Baseline Freeze (Complete docs before coding)
 
-### P0-1: 建立项目执行规范（AGENTS）
+### P0-1: Establish project execution rules (AGENTS)
 - Status: TODO
 - Depends On: none
 - Scope:
-  - 创建项目级 `AGENTS.md`
-  - 固化任务状态更新门禁与执行循环
+  - Create project-level `AGENTS.md`
+  - Lock task-status gate rules and execution loop
 - Test Plan:
-  - 文档审阅（无代码测试）
+  - Document review (no code test)
 
-### P0-2: 建立 PRD（功能清单）
+### P0-2: Create PRD (feature inventory)
 - Status: TODO
 - Depends On: none
 - Scope:
-  - 基于 `../pi-mono` 梳理 package 级功能清单
-  - 标记核心/外围能力与回归要求
+  - Build package-level feature inventory from `../pi-mono`
+  - Mark core vs peripheral capabilities and regression requirements
 - Test Plan:
-  - 文档审阅（无代码测试）
+  - Document review (no code test)
 
-### P0-3: 建立整体架构文档（含架构图）
+### P0-3: Create architecture doc (with diagram)
 - Status: TODO
 - Depends On: none
 - Scope:
-  - 建立目标 Swift 模块映射
-  - 输出整体架构图与依赖边界
+  - Define target Swift module mapping
+  - Produce high-level architecture diagram and dependency boundaries
 - Test Plan:
-  - 文档审阅（无代码测试）
+  - Document review (no code test)
 
-### P0-4: 建立迁移计划与任务状态规则
+### P0-4: Create migration plan and task status rules
 - Status: TODO
 - Depends On: P0-1, P0-2, P0-3
 - Scope:
-  - 建立 `docs/PLAN.md`
-  - 明确 phase 顺序与任务模板
+  - Create `docs/PLAN.md`
+  - Define phase order and task template
 - Test Plan:
-  - 文档审阅（无代码测试）
+  - Document review (no code test)
 
-## P1 工程基础设施（Swift 侧）
+## P1 Swift-side Infrastructure
 
-### P1-1: SwiftPM/Xcode 工程骨架与模块边界
+### P1-1: SwiftPM/Xcode project skeleton and module boundaries
 - Status: TODO
 - Depends On: P0-1, P0-2, P0-3, P0-4
 - Scope:
-  - 创建 Swift 包/模块结构（与 `pi-mono` package 映射）
-  - 定义基础 target、test target
+  - Create Swift package/module structure (mapped to `pi-mono` packages)
+  - Define base targets and test targets
 - Test Plan:
   - `swift build`
-  - 空测试目标可运行
+  - Empty test targets can run
 
-### P1-2: 共享测试工具与 fixture/golden 基础设施
+### P1-2: Shared test utilities and fixture/golden infrastructure
 - Status: TODO
 - Depends On: P1-1
 - Scope:
-  - 统一测试 helper、fixture loader、golden assertion
-  - 建立对照测试目录规范
+  - Standardize test helpers, fixture loaders, golden assertions
+  - Define comparison test directory conventions
 - Test Plan:
-  - helper 单测
-  - fixture 读写与 golden diff 测试
+  - Unit tests for helpers
+  - Fixture I/O and golden diff tests
 
-### P1-3: 跨模块基础类型（消息/事件/工具 schema 基础）
+### P1-3: Cross-module foundational types (messages/events/tool schema base)
 - Status: TODO
 - Depends On: P1-1, P1-2
 - Scope:
-  - 先落最小共享数据模型，用于后续 `pi-ai` / `agent`
+  - Implement the minimum shared data model for later `pi-ai` / `agent` work
 - Test Plan:
-  - 编解码与等值单测
+  - Encoding/decoding and equality unit tests
 
-## P2 `pi-ai` 迁移（核心依赖）
+## P2 `pi-ai` Migration (Core Dependency)
 
-### P2-1: `pi-ai` 基础类型与模型注册表（最小闭环）
+### P2-1: `pi-ai` foundational types and model registry (minimum closed loop)
 - Status: TODO
 - Depends On: P1-3
 - Scope:
-  - provider/model 基础类型
-  - 模型查找/解析最小能力
+  - Base provider/model types
+  - Minimum model lookup/parsing capability
 - Test Plan:
-  - 模型查找、错误路径、模糊匹配规则测试
+  - Model lookup, error-path, and fuzzy-match rule tests
 
-### P2-2: 统一消息上下文与 stream 事件模型
+### P2-2: Unified message context and stream event model
 - Status: TODO
 - Depends On: P2-1
 - Scope:
-  - context/messages/tool call/result/thinking 事件结构
+  - Context/messages/tool call/result/thinking event structures
 - Test Plan:
-  - 事件序列序列化/反序列化测试
-  - 边界字段测试
+  - Event sequence serialization/deserialization tests
+  - Boundary-field tests
 
-### P2-3: JSON / event-stream / validation 工具函数
+### P2-3: JSON / event-stream / validation utility functions
 - Status: TODO
 - Depends On: P2-2
 - Scope:
-  - 流解析、partial JSON、校验辅助、overflow 处理
+  - Stream parsing, partial JSON, validation helpers, overflow handling
 - Test Plan:
-  - 对照 `pi-mono` 同类边界 case
+  - Match equivalent `pi-mono` edge cases
 
-### P2-4: OpenAI Responses 适配（首个 provider）
+### P2-4: OpenAI Responses adapter (first provider)
 - Status: TODO
 - Depends On: P2-2, P2-3
 - Scope:
-  - 首个 provider 适配，跑通 tool calling 与流式文本
+  - First provider adapter with working tool calling and streaming text
 - Test Plan:
-  - mock provider 测试
-  - 事件流顺序测试
+  - Mock provider tests
+  - Event-stream ordering tests
 
-### P2-5: Anthropic 适配
+### P2-5: Anthropic adapter
 - Status: TODO
 - Depends On: P2-4
 - Scope:
-  - 消息/工具/thinking 映射
+  - Message/tool/thinking mapping
 - Test Plan:
-  - tool 名称与参数规范化回归测试
+  - Regression tests for tool-name and argument normalization
 
-### P2-6: Google/Vertex 系列适配
+### P2-6: Google/Vertex family adapters
 - Status: TODO
 - Depends On: P2-4
 - Scope:
-  - Google/Gemini/Vertex 消息与事件处理
+  - Google/Gemini/Vertex message and event handling
 - Test Plan:
-  - 缺参 tool call、空流、thinking signature 等回归测试
+  - Regression tests for missing-arg tool calls, empty streams, thinking signature, etc.
 
-### P2-7: OAuth 与 provider credential 辅助
+### P2-7: OAuth and provider credential helpers
 - Status: TODO
 - Depends On: P2-4
 - Scope:
-  - OAuth helper 抽象与 token 注入机制
+  - OAuth helper abstractions and token injection mechanism
 - Test Plan:
-  - token 生命周期与错误路径测试
+  - Token lifecycle and error-path tests
 
-### P2-8: `pi-ai` 回归测试补齐与覆盖率冲刺
+### P2-8: `pi-ai` regression test completion and coverage push
 - Status: TODO
 - Depends On: P2-5, P2-6, P2-7
 - Scope:
-  - 对齐 `../pi-mono/packages/ai/test` 关键行为
-  - 覆盖率尽量接近 100%
+  - Align critical behaviors with `../pi-mono/packages/ai/test`
+  - Push coverage as close to 100% as practical
 - Test Plan:
-  - 模块完整测试
-  - 覆盖率报告
+  - Full module test run
+  - Coverage report
 
-## P3 `pi-agent-core` 迁移
+## P3 `pi-agent-core` Migration
 
-### P3-1: AgentState / AgentMessage / AgentEvent 类型
+### P3-1: AgentState / AgentMessage / AgentEvent types
 - Status: TODO
 - Depends On: P2-2
 - Scope:
-  - 迁移状态模型与事件类型
+  - Migrate state model and event types
 - Test Plan:
-  - 类型行为与状态初始化测试
+  - Type behavior and state initialization tests
 
-### P3-2: agent loop（单轮）
+### P3-2: Agent loop (single turn)
 - Status: TODO
 - Depends On: P3-1, P2-4
 - Scope:
-  - 单次 prompt -> stream assistant message
+  - Single prompt -> streaming assistant message
 - Test Plan:
-  - 事件顺序测试
+  - Event ordering tests
 
-### P3-3: tool execution loop（多轮）
+### P3-3: Tool execution loop (multi-turn)
 - Status: TODO
 - Depends On: P3-2
 - Scope:
-  - 工具调用执行、tool result 注入、后续轮次继续
+  - Execute tool calls, inject tool results, continue next turns
 - Test Plan:
-  - 多轮事件序列与 pending tool calls 测试
+  - Multi-turn event sequence and pending-tool-call tests
 
 ### P3-4: continue/retry/abort/sessionId/thinkingBudgets
 - Status: TODO
 - Depends On: P3-3
 - Scope:
-  - 补齐 runtime 控制能力
+  - Complete runtime control capabilities
 - Test Plan:
-  - abort、continue、重试上限测试
+  - Abort, continue, and retry-limit tests
 
-### P3-5: `pi-agent-core` 回归测试补齐
+### P3-5: `pi-agent-core` regression test completion
 - Status: TODO
 - Depends On: P3-4
 - Scope:
-  - 对齐 `../pi-mono/packages/agent/test`
+  - Align with `../pi-mono/packages/agent/test`
 - Test Plan:
-  - 模块完整测试 + 覆盖率
+  - Full module test run + coverage
 
-## P4 `pi-tui` 迁移
+## P4 `pi-tui` Migration
 
-### P4-1: 终端抽象 + 渲染缓冲 + 差分渲染
+### P4-1: Terminal abstraction + render buffer + differential rendering
 - Status: TODO
 - Depends On: P1-2
 - Scope:
-  - TUI 核心渲染循环
+  - Core TUI render loop
 - Test Plan:
-  - 渲染差分与覆盖写回归测试
+  - Differential-render and overwrite regression tests
 
-### P4-2: 输入/编辑器/按键系统
+### P4-2: Input/editor/key system
 - Status: TODO
 - Depends On: P4-1
 - Scope:
   - Input/Editor/keys/undo/kill-ring
 - Test Plan:
-  - 键盘输入编辑行为测试
+  - Keyboard editing behavior tests
 
-### P4-3: 列表/Overlay/布局组件
+### P4-3: List/Overlay/layout components
 - Status: TODO
 - Depends On: P4-1
 - Scope:
-  - SelectList / SettingsList / Overlay options
+  - `SelectList` / `SettingsList` / overlay options
 - Test Plan:
-  - overlay 定位与可见性测试
+  - Overlay positioning and visibility tests
 
-### P4-4: Markdown/图片/自动补全
+### P4-4: Markdown/images/autocomplete
 - Status: TODO
 - Depends On: P4-1
 - Scope:
-  - markdown 渲染、终端图片、autocomplete
+  - Markdown rendering, terminal images, autocomplete
 - Test Plan:
-  - markdown wrapping、图片协议、路径补全测试
+  - Markdown wrapping, image protocol, path autocomplete tests
 
-### P4-5: `pi-tui` 回归测试补齐
+### P4-5: `pi-tui` regression test completion
 - Status: TODO
 - Depends On: P4-2, P4-3, P4-4
 - Scope:
-  - 对齐 `../pi-mono/packages/tui/test`
+  - Align with `../pi-mono/packages/tui/test`
 - Test Plan:
-  - 模块完整测试 + 覆盖率
+  - Full module test run + coverage
 
-## P5 `pi-coding-agent` 迁移（核心产品）
+## P5 `pi-coding-agent` Migration (Core Product)
 
-### P5-1: CLI args/help 与最小启动流程
+### P5-1: CLI args/help and minimum startup flow
 - Status: TODO
 - Depends On: P3-5, P4-5
 - Scope:
-  - args parser、help、入口 main、模式选择最小闭环
+  - Args parser, help, entry `main`, minimum mode-selection loop
 - Test Plan:
-  - args/help 单测与 smoke test
+  - Args/help unit tests and smoke test
 
-### P5-2: 内置工具协议与基础工具（read/write/edit/bash）
+### P5-2: Built-in tool protocol and core tools (`read`/`write`/`edit`/`bash`)
 - Status: TODO
 - Depends On: P5-1, P3-5
 - Scope:
-  - 工具注册/调度，先打通四个核心工具
+  - Tool registration/dispatch; first make the four core tools work end-to-end
 - Test Plan:
-  - 工具行为对照测试
-  - 错误路径测试
+  - Tool behavior comparison tests
+  - Error-path tests
 
-### P5-3: Session 管理（save/resume/continue）
+### P5-3: Session management (`save`/`resume`/`continue`)
 - Status: TODO
 - Depends On: P5-1
 - Scope:
-  - session 存储、读取、resume 选择基础能力
+  - Session storage/load and basic resume selection capability
 - Test Plan:
-  - 文件操作、时间戳、迁移测试
+  - File operations, timestamps, migration tests
 
 ### P5-4: Session tree / branching / traversal
 - Status: TODO
 - Depends On: P5-3
 - Scope:
-  - 分支会话树与导航
+  - Branching session tree and navigation
 - Test Plan:
-  - branching/tree traversal 回归测试
+  - Branching/tree traversal regression tests
 
-### P5-5: Compaction（含自动 compaction 队列）
+### P5-5: Compaction (including auto-compaction queue)
 - Status: TODO
 - Depends On: P5-3, P3-5
 - Scope:
-  - compaction 流程、策略、自动触发队列
+  - Compaction flow, strategy, and auto-trigger queue
 - Test Plan:
-  - compaction fixtures 与回归测试
+  - Compaction fixtures and regression tests
 
-### P5-6: Skills / Prompt Templates / Themes / Extensions 发现与加载
+### P5-6: Skills / Prompt Templates / Themes / Extensions discovery and loading
 - Status: TODO
 - Depends On: P5-1
 - Scope:
-  - 资源发现、frontmatter、冲突与校验规则
+  - Resource discovery, frontmatter parsing, conflict handling, validation rules
 - Test Plan:
-  - fixture 驱动回归测试（技能冲突、非法 frontmatter 等）
+  - Fixture-driven regression tests (skill collisions, invalid frontmatter, etc.)
 
 ### P5-7: Settings / Auth Storage / Model Registry & Resolver
 - Status: TODO
 - Depends On: P5-1, P2-8
 - Scope:
-  - 设置、凭证、模型解析与选择逻辑
+  - Settings, credentials, model parsing and resolution logic
 - Test Plan:
-  - settings/auth/model resolver 回归测试
+  - Settings/auth/model resolver regression tests
 
-### P5-8: Interactive TUI 模式与关键交互（状态栏、选择器、快捷键）
+### P5-8: Interactive TUI mode and key interactions (status bar, selectors, shortcuts)
 - Status: TODO
 - Depends On: P5-3, P5-6, P4-5
 - Scope:
-  - 交互 UI 核心流程
+  - Core interactive UI flows
 - Test Plan:
-  - 交互状态与渲染行为测试
+  - Interactive state and rendering behavior tests
 
-### P5-9: RPC / JSON / Print / SDK 模式
+### P5-9: RPC / JSON / Print / SDK modes
 - Status: TODO
 - Depends On: P5-1, P5-2, P5-3
 - Scope:
-  - 非交互模式与程序化集成能力
+  - Non-interactive modes and programmatic integration capability
 - Test Plan:
-  - 模式输出与协议测试
+  - Mode output and protocol tests
 
-### P5-10: 附件/图像处理/导出能力
+### P5-10: Attachment/image processing/export capabilities
 - Status: TODO
 - Depends On: P5-2, P5-8
 - Scope:
-  - 文件参数、图像处理、导出（HTML 等）
+  - File arguments, image processing, exports (HTML, etc.)
 - Test Plan:
-  - 附件与图像处理回归测试
+  - Attachment and image-processing regression tests
 
-### P5-11: `pi-coding-agent` 回归测试补齐与覆盖率冲刺
+### P5-11: `pi-coding-agent` regression test completion and coverage push
 - Status: TODO
 - Depends On: P5-4, P5-5, P5-6, P5-7, P5-8, P5-9, P5-10
 - Scope:
-  - 对齐 `../pi-mono/packages/coding-agent/test` 关键行为
+  - Align critical behaviors with `../pi-mono/packages/coding-agent/test`
 - Test Plan:
-  - 模块完整测试 + 覆盖率
+  - Full module test run + coverage
 
-## P6 外围能力迁移（按依赖与平台逐步推进）
+## P6 Peripheral Capabilities (Incremental by dependency/platform)
 
-### P6-1: `pi-web-ui` 功能映射与 Swift 平台等价方案设计
+### P6-1: `pi-web-ui` feature mapping and Swift platform-equivalent design
 - Status: TODO
 - Depends On: P2-8, P3-5
 - Scope:
-  - 明确 Web Components 功能如何在 Swift（SwiftUI/WebView/客户端）落地
+  - Define how Web Components functionality maps to Swift surfaces (SwiftUI/WebView/client apps)
 - Test Plan:
-  - 设计评审与样例验证
+  - Design review and sample validation
 
-### P6-2: `pi-mom`（Slack bot）迁移
+### P6-2: `pi-mom` (Slack bot) migration
 - Status: TODO
 - Depends On: P3-5, P5-11
 - Scope:
-  - Slack 接入、工具委托、sandbox 抽象
+  - Slack integration, tool delegation, sandbox abstraction
 - Test Plan:
-  - mock Slack 事件与命令执行测试
+  - Mock Slack event and command-execution tests
 
-### P6-3: `pods`（GPU pod CLI）迁移
+### P6-3: `pods` (GPU pod CLI) migration
 - Status: TODO
 - Depends On: P3-5
 - Scope:
-  - CLI、SSH、模型生命周期、配置管理
+  - CLI, SSH, model lifecycle, configuration management
 - Test Plan:
-  - 配置与命令生成测试、集成 smoke test
+  - Config and command-generation tests, integration smoke test
 
-## 6. 文档同步任务（持续执行）
+## 6. Documentation Sync Tasks (Continuous)
 
-每完成任一任务，追加/更新对应模块文档（建议）：
+After any task is completed, append/update the corresponding module doc (recommended):
 
 - `docs/modules/pi-ai.md`
 - `docs/modules/pi-agent-core.md`
@@ -405,14 +407,13 @@
 - `docs/modules/pi-mom.md`
 - `docs/modules/pi-pods.md`
 
-这些文档应至少包含：
+These docs should include at least:
 
-- 已实现功能
-- 与 `pi-mono` 对齐情况
-- 已知差异（如果有）
-- 测试覆盖与回归点
+- Implemented functionality
+- Parity status vs `pi-mono`
+- Known differences (if any)
+- Test coverage and regression points
 
-## 7. 当前执行入口（下一步）
+## 7. Current Entry Point (Next Step)
 
-开始编码前，先完成 P0 文档基线并确认无歧义。之后从 `P1-1` 开始，严格按“先测试后实现”的节奏推进。
-
+Before coding starts, complete the P0 documentation baseline and confirm there are no ambiguities. Then start from `P1-1` and follow the strict test-first implementation cadence.
