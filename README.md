@@ -50,4 +50,4 @@ The migration is planned in dependency order:
 
 ## Status
 
-Project bootstrapping and planning docs are in place. Implementation starts with Swift project/module scaffolding (`P1-1` in `docs/PLAN.md`).
+Project bootstrapping/planning docs are in place, and the initial SwiftPM module skeleton (`P1-1`) is implemented and verified. Next step: shared test utilities and fixture/golden infrastructure (`P1-2` in `docs/PLAN.md`).

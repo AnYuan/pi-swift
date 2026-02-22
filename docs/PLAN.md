@@ -58,45 +58,53 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
 ## P0 Documentation and Baseline Freeze (Complete docs before coding)
 
 ### P0-1: Establish project execution rules (AGENTS)
-- Status: TODO
+- Status: DONE
 - Depends On: none
 - Scope:
   - Create project-level `AGENTS.md`
   - Lock task-status gate rules and execution loop
 - Test Plan:
   - Document review (no code test)
+- Verification:
+  - Docs reviewed and committed in `docs: initialize PRD, plan, and architecture` and follow-up English/rules docs commit on 2026-02-22
 
 ### P0-2: Create PRD (feature inventory)
-- Status: TODO
+- Status: DONE
 - Depends On: none
 - Scope:
   - Build package-level feature inventory from `../pi-mono`
   - Mark core vs peripheral capabilities and regression requirements
 - Test Plan:
   - Document review (no code test)
+- Verification:
+  - `docs/PRD.md` created from local `../pi-mono` package/source/test scan and reviewed on 2026-02-22
 
 ### P0-3: Create architecture doc (with diagram)
-- Status: TODO
+- Status: DONE
 - Depends On: none
 - Scope:
   - Define target Swift module mapping
   - Produce high-level architecture diagram and dependency boundaries
 - Test Plan:
   - Document review (no code test)
+- Verification:
+  - `docs/ARCHITECTURE.md` created with Mermaid diagram and module dependency order; reviewed on 2026-02-22
 
 ### P0-4: Create migration plan and task status rules
-- Status: TODO
+- Status: DONE
 - Depends On: P0-1, P0-2, P0-3
 - Scope:
   - Create `docs/PLAN.md`
   - Define phase order and task template
 - Test Plan:
   - Document review (no code test)
+- Verification:
+  - `docs/PLAN.md` created and later updated with English/atomic-commit policy on 2026-02-22
 
 ## P1 Swift-side Infrastructure
 
 ### P1-1: SwiftPM/Xcode project skeleton and module boundaries
-- Status: TODO
+- Status: DONE
 - Depends On: P0-1, P0-2, P0-3, P0-4
 - Scope:
   - Create Swift package/module structure (mapped to `pi-mono` packages)
@@ -104,6 +112,11 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
 - Test Plan:
   - `swift build`
   - Empty test targets can run
+- Verification:
+  - Tests: `swift test` passed (8 smoke tests) on 2026-02-22
+  - Build: `swift build` passed on 2026-02-22
+  - Regression: N/A (initial scaffold only; validated target graph and imports via smoke tests)
+  - Docs updated: `README.md`, `docs/modules/project-infrastructure.md`, `docs/PLAN.md`
 
 ### P1-2: Shared test utilities and fixture/golden infrastructure
 - Status: TODO
@@ -416,4 +429,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Before coding starts, complete the P0 documentation baseline and confirm there are no ambiguities. Then start from `P1-1` and follow the strict test-first implementation cadence.
+Next recommended task: `P1-2` (shared test utilities and fixture/golden infrastructure). Continue following the strict test-first implementation cadence and atomic-commit rule.
