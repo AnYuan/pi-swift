@@ -217,12 +217,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-6: Google/Vertex family adapters
-- Status: TODO
+- Status: DONE
 - Depends On: P2-4
 - Scope:
   - Google/Gemini/Vertex message and event handling
 - Test Plan:
   - Regression tests for missing-arg tool calls, empty streams, thinking signature, etc.
+- Verification:
+  - Tests: `swift test` passed (37 tests total, including `PiAIGoogleFamilyProviderTests`) on 2026-02-22
+  - Build: `swift build` passed on 2026-02-22
+  - Regression: Google-family mock adapter covers thinking-signature semantics, missing-arg tool calls defaulting to `{}`, and empty-stream retry without duplicate `start`
+  - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-7: OAuth and provider credential helpers
 - Status: TODO
@@ -464,4 +469,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P2-6` (Google/Vertex family adapters). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P2-7` (OAuth and provider credential helpers). Continue following the strict test-first implementation cadence and atomic-commit rule.

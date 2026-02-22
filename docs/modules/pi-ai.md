@@ -225,11 +225,51 @@ Tests added for P2-5:
 - OAuth tool-name normalization round-trip regression coverage (`find` remains `find`, not `Glob`)
 - terminal error event/result when mock source throws
 
+### P2-6: Google/Vertex family adapter core (mock-driven shared semantics)
+
+Files:
+
+- `Sources/PiAI/Providers/GoogleFamilyAdapter.swift`
+- `Tests/PiAITests/PiAIGoogleFamilyProviderTests.swift`
+
+Implemented behavior:
+
+- `PiAIGoogleStreamingSemantics`
+  - `isThinkingPart(thought:thoughtSignature:)` matches Google semantics (`thought == true` only)
+  - `retainThoughtSignature(existing:incoming:)` preserves prior non-empty signature across deltas
+- `PiAIGoogleFamilyProvider` (mock-driven adapter entry)
+  - `streamMock(...)` for single-attempt mock streams
+  - `streamMockRetryingEmptyAttempts(...)` for empty-stream retry behavior (single `start`, retry on empty attempts)
+- `PiAIGoogleFamilyEventProcessor` (internal)
+  - coalesces streamed text/thinking parts into content blocks with lifecycle events
+  - preserves thinking/text signatures per block
+  - maps function calls to tool-call lifecycle events
+  - defaults missing function-call args to `{}` (no-arg tool compatibility)
+  - generates deterministic tool-call IDs when providers omit IDs
+  - applies Google-style usage metadata and finish-reason mapping
+  - overrides terminal stop reason to `.toolUse` when tool calls are emitted
+
+Mock raw chunk coverage (current subset):
+
+- text parts (regular + thinking via `thought: true`)
+- function-call parts (with/without `id`, with/without `args`)
+- finish reason mapping
+- usage metadata mapping (`prompt`, `candidates`, `thoughts`, `cached`, `total`)
+- empty-attempt retry sequence
+
+Tests added for P2-6:
+
+- Google thinking signature semantics (`thoughtSignature` alone does not imply thinking)
+- signature retention across omitted/empty deltas
+- missing-args tool call defaults to empty object
+- empty stream retry without duplicate `start`
+- event ordering and content assembly for mixed thinking + text + tool call stream
+
 ## Parity Status vs `pi-mono`
 
 - Partial
-- Implemented foundational `PiAI` model registry, context/message/event types, utility foundations, and two provider adapter cores (OpenAI Responses + Anthropic Messages, both mock-driven)
-- Real provider transport integrations and additional providers are still pending (`P2-6+`)
+- Implemented foundational `PiAI` model registry, context/message/event types, utility foundations, and three provider adapter cores (OpenAI Responses, Anthropic Messages, Google-family shared semantics; all mock-driven)
+- Real provider transport integrations and remaining provider/credential work are still pending (`P2-7+`)
 
 ## Verification Evidence
 
@@ -237,8 +277,9 @@ Tests added for P2-5:
 - `swift test` passed (includes `PiAIUtilitiesTests`)
 - `swift test` passed (includes `PiAIOpenAIResponsesProviderTests`)
 - `swift test` passed (includes `PiAIAnthropicProviderTests`)
+- `swift test` passed (includes `PiAIGoogleFamilyProviderTests`)
 - `swift build` passed
 
 ## Next Step
 
-- `P2-6`: Google/Vertex family adapters
+- `P2-7`: OAuth and provider credential helpers
