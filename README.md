@@ -56,4 +56,8 @@ Project bootstrapping/planning docs are in place, and `P1` groundwork is underwa
 - `P1-2` shared test infrastructure (fixtures/goldens): implemented and verified
 - `P1-3` cross-module foundational core types: implemented and verified
 
-Next step: `P2-1` (`pi-ai` foundational types and model registry) in `docs/PLAN.md`.
+`P2` has started:
+
+- `P2-1` `pi-ai` foundational model registry: implemented and verified
+
+Next step: `P2-2` (unified message context and stream event model in `PiAI`) in `docs/PLAN.md`.

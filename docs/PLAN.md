@@ -149,13 +149,18 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
 ## P2 `pi-ai` Migration (Core Dependency)
 
 ### P2-1: `pi-ai` foundational types and model registry (minimum closed loop)
-- Status: TODO
+- Status: DONE
 - Depends On: P1-3
 - Scope:
   - Base provider/model types
   - Minimum model lookup/parsing capability
 - Test Plan:
   - Model lookup, error-path, and fuzzy-match rule tests
+- Verification:
+  - Tests: `swift test` passed (22 tests total, including `PiAIModelRegistryTests`) on 2026-02-22
+  - Build: `swift build` passed on 2026-02-22
+  - Regression: N/A (new `PiAI` registry baseline; edge/error paths covered in unit tests)
+  - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-2: Unified message context and stream event model
 - Status: TODO
@@ -439,4 +444,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P2-1` (`pi-ai` foundational types and model registry). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P2-2` (unified message context and stream event model in `PiAI`). Continue following the strict test-first implementation cadence and atomic-commit rule.
