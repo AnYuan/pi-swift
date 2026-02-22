@@ -1,0 +1,1 @@
+[{"kind":"start","modelID":"openai\/gpt-4o-mini"},{"kind":"textStart"},{"delta":"Hello","kind":"textDelta"},{"kind":"toolCall","toolCall":{"arguments":{"timezone":"UTC"},"id":"call_1","name":"get_time"}},{"kind":"toolResult","toolResult":{"content":{"time":"12:00"},"isError":false,"toolCallID":"call_1"}},{"kind":"textEnd"},{"kind":"finish","stopReason":"stop"}]

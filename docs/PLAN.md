@@ -134,12 +134,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/testing-infrastructure.md`, `docs/PLAN.md`
 
 ### P1-3: Cross-module foundational types (messages/events/tool schema base)
-- Status: TODO
+- Status: DONE
 - Depends On: P1-1, P1-2
 - Scope:
   - Implement the minimum shared data model for later `pi-ai` / `agent` work
 - Test Plan:
   - Encoding/decoding and equality unit tests
+- Verification:
+  - Tests: `swift test` passed (16 tests total, including new `PiCoreTypesCodableTests`) on 2026-02-22
+  - Build: `swift build` passed on 2026-02-22
+  - Regression: N/A (foundational type additions; stable event JSON encoding checked via golden fixture)
+  - Docs updated: `README.md`, `docs/modules/pi-core-types.md`, `docs/PLAN.md`
 
 ## P2 `pi-ai` Migration (Core Dependency)
 
@@ -434,4 +439,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P1-3` (cross-module foundational message/event/tool schema types). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P2-1` (`pi-ai` foundational types and model registry). Continue following the strict test-first implementation cadence and atomic-commit rule.

@@ -50,4 +50,10 @@ The migration is planned in dependency order:
 
 ## Status
 
-Project bootstrapping/planning docs are in place, and the initial SwiftPM module skeleton (`P1-1`) plus shared test utilities/fixture-golden infrastructure (`P1-2`) are implemented and verified. Next step: cross-module foundational types (`P1-3` in `docs/PLAN.md`).
+Project bootstrapping/planning docs are in place, and `P1` groundwork is underway:
+
+- `P1-1` SwiftPM/module skeleton: implemented and verified
+- `P1-2` shared test infrastructure (fixtures/goldens): implemented and verified
+- `P1-3` cross-module foundational core types: implemented and verified
+
+Next step: `P2-1` (`pi-ai` foundational types and model registry) in `docs/PLAN.md`.
