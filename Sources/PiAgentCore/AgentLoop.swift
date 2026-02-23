@@ -102,23 +102,62 @@ public final class PiAgentEventStream: AsyncSequence, @unchecked Sendable {
     }
 }
 
+public struct PiAgentThinkingBudgets: Codable, Equatable, Sendable {
+    public var minimal: Int?
+    public var low: Int?
+    public var medium: Int?
+    public var high: Int?
+
+    public init(minimal: Int? = nil, low: Int? = nil, medium: Int? = nil, high: Int? = nil) {
+        self.minimal = minimal
+        self.low = low
+        self.medium = medium
+        self.high = high
+    }
+}
+
+public struct PiAgentLLMRequestOptions: Codable, Equatable, Sendable {
+    public var reasoning: PiAgentThinkingLevel?
+    public var sessionId: String?
+    public var thinkingBudgets: PiAgentThinkingBudgets?
+
+    public init(
+        reasoning: PiAgentThinkingLevel? = nil,
+        sessionId: String? = nil,
+        thinkingBudgets: PiAgentThinkingBudgets? = nil
+    ) {
+        self.reasoning = reasoning
+        self.sessionId = sessionId
+        self.thinkingBudgets = thinkingBudgets
+    }
+}
+
 public struct PiAgentLoopConfig: Sendable {
     public typealias ConvertToLLM = @Sendable ([PiAgentMessage]) async throws -> [PiAIMessage]
     public typealias GetMessages = @Sendable () async -> [PiAgentMessage]
 
     public var model: PiAIModel
     public var convertToLLM: ConvertToLLM
+    public var thinkingLevel: PiAgentThinkingLevel
+    public var sessionId: String?
+    public var thinkingBudgets: PiAgentThinkingBudgets?
     public var getSteeringMessages: GetMessages?
     public var getFollowUpMessages: GetMessages?
 
     public init(
         model: PiAIModel,
         convertToLLM: ConvertToLLM? = nil,
+        thinkingLevel: PiAgentThinkingLevel = .off,
+        sessionId: String? = nil,
+        thinkingBudgets: PiAgentThinkingBudgets? = nil,
         getSteeringMessages: GetMessages? = nil,
         getFollowUpMessages: GetMessages? = nil
     ) {
         self.model = model
         self.convertToLLM = convertToLLM ?? Self.standardMessageConverter
+        self.thinkingLevel = thinkingLevel
+        self.sessionId = sessionId
+        self.thinkingBudgets = thinkingBudgets
         self.getSteeringMessages = getSteeringMessages
         self.getFollowUpMessages = getFollowUpMessages
     }
@@ -155,6 +194,7 @@ public struct PiAgentRuntimeTool: Sendable {
 
 public enum PiAgentLoop {
     public typealias AssistantStreamFactory = @Sendable (PiAIModel, PiAIContext) async throws -> PiAIAssistantMessageEventStream
+    public typealias AssistantStreamFactoryWithOptions = @Sendable (PiAIModel, PiAIContext, PiAgentLLMRequestOptions) async throws -> PiAIAssistantMessageEventStream
 
     public static func run(
         prompts: [PiAgentMessage],
@@ -163,6 +203,25 @@ public enum PiAgentLoop {
         runtimeTools: [PiAgentRuntimeTool],
         abortController: PiAgentAbortController? = nil,
         assistantStreamFactory: @escaping AssistantStreamFactory
+    ) -> PiAgentEventStream {
+        run(
+            prompts: prompts,
+            context: context,
+            config: config,
+            runtimeTools: runtimeTools,
+            abortController: abortController
+        ) { model, aiContext, _ in
+            try await assistantStreamFactory(model, aiContext)
+        }
+    }
+
+    public static func run(
+        prompts: [PiAgentMessage],
+        context: PiAgentContext,
+        config: PiAgentLoopConfig,
+        runtimeTools: [PiAgentRuntimeTool],
+        abortController: PiAgentAbortController? = nil,
+        assistantStreamFactory: @escaping AssistantStreamFactoryWithOptions
     ) -> PiAgentEventStream {
         let stream = PiAgentEventStream()
 
@@ -271,6 +330,23 @@ public enum PiAgentLoop {
         abortController: PiAgentAbortController? = nil,
         assistantStreamFactory: @escaping AssistantStreamFactory
     ) throws -> PiAgentEventStream {
+        try runContinue(
+            context: context,
+            config: config,
+            runtimeTools: runtimeTools,
+            abortController: abortController
+        ) { model, aiContext, _ in
+            try await assistantStreamFactory(model, aiContext)
+        }
+    }
+
+    public static func runContinue(
+        context: PiAgentContext,
+        config: PiAgentLoopConfig,
+        runtimeTools: [PiAgentRuntimeTool] = [],
+        abortController: PiAgentAbortController? = nil,
+        assistantStreamFactory: @escaping AssistantStreamFactoryWithOptions
+    ) throws -> PiAgentEventStream {
         guard !context.messages.isEmpty else {
             throw PiAgentLoopError.cannotContinueWithoutMessages
         }
@@ -294,6 +370,23 @@ public enum PiAgentLoop {
         config: PiAgentLoopConfig,
         abortController: PiAgentAbortController? = nil,
         assistantStreamFactory: @escaping AssistantStreamFactory
+    ) -> PiAgentEventStream {
+        runSingleTurn(
+            prompts: prompts,
+            context: context,
+            config: config,
+            abortController: abortController
+        ) { model, aiContext, _ in
+            try await assistantStreamFactory(model, aiContext)
+        }
+    }
+
+    public static func runSingleTurn(
+        prompts: [PiAgentMessage],
+        context: PiAgentContext,
+        config: PiAgentLoopConfig,
+        abortController: PiAgentAbortController? = nil,
+        assistantStreamFactory: @escaping AssistantStreamFactoryWithOptions
     ) -> PiAgentEventStream {
         let stream = PiAgentEventStream()
 
@@ -348,7 +441,7 @@ public enum PiAgentLoop {
         config: PiAgentLoopConfig,
         stream: PiAgentEventStream,
         abortController: PiAgentAbortController?,
-        assistantStreamFactory: AssistantStreamFactory
+        assistantStreamFactory: AssistantStreamFactoryWithOptions
     ) async throws -> PiAIAssistantMessage {
         try throwIfAborted(abortController)
         let llmMessages = try await config.convertToLLM(messages)
@@ -359,7 +452,7 @@ public enum PiAgentLoop {
         )
 
         try throwIfAborted(abortController)
-        let assistantStream = try await assistantStreamFactory(config.model, aiContext)
+        let assistantStream = try await assistantStreamFactory(config.model, aiContext, makeLLMRequestOptions(config: config))
         var addedPartial = false
 
         for await event in assistantStream {
@@ -544,6 +637,15 @@ public enum PiAgentLoop {
         if abortController?.isAborted == true {
             throw PiAgentLoopError.aborted
         }
+    }
+
+    private static func makeLLMRequestOptions(config: PiAgentLoopConfig) -> PiAgentLLMRequestOptions {
+        let reasoning: PiAgentThinkingLevel? = config.thinkingLevel == .off ? nil : config.thinkingLevel
+        return PiAgentLLMRequestOptions(
+            reasoning: reasoning,
+            sessionId: config.sessionId,
+            thinkingBudgets: config.thinkingBudgets
+        )
     }
 
     private static func currentTimestampMillis() -> Int64 {

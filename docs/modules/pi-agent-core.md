@@ -183,6 +183,37 @@ Notes:
 
 - `P3-4` is still not complete. Session-id/thinking-budget plumbing and broader retry/abort parity behaviors remain.
 
+### P3-4 (in progress): request-options plumbing (`sessionId` / `reasoning` / `thinkingBudgets`)
+
+Files:
+
+- `Sources/PiAgentCore/AgentLoop.swift`
+- `Tests/PiAgentCoreTests/PiAgentLoopRequestOptionsTests.swift`
+
+Implemented in this slice:
+
+- `PiAgentThinkingBudgets`
+  - Swift parity shape for token budgets by thinking level (`minimal`, `low`, `medium`, `high`)
+- `PiAgentLLMRequestOptions`
+  - loop-to-provider request options payload (`reasoning`, `sessionId`, `thinkingBudgets`)
+- `PiAgentLoopConfig`
+  - added `thinkingLevel`, `sessionId`, and `thinkingBudgets`
+- `PiAgentLoop` assistant factory overloads
+  - existing 2-argument factory API remains supported for backwards compatibility
+  - new overloads pass `PiAgentLLMRequestOptions` to the assistant stream factory
+- reasoning mapping behavior
+  - `thinkingLevel == .off` maps to `reasoning = nil`
+  - other levels map through directly
+
+Tests added:
+
+- `runSingleTurn(...)` passes `sessionId`, `thinkingBudgets`, and non-`off` reasoning to factory options
+- `runSingleTurn(...)` omits `reasoning` when `thinkingLevel == .off`
+
+Notes:
+
+- `P3-4` remains in progress. These options are now plumbed through the loop/factory boundary; provider adapter consumption parity is a later integration step.
+
 ## Parity Status vs `pi-mono`
 
 - Partial (foundational types + single-turn loop + baseline multi-turn tool execution loop)
