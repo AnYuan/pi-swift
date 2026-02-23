@@ -132,6 +132,33 @@ Notes:
 
 - `P3-4` is not complete yet. This commit only covers the continue/retry entrypoint baseline. Abort/session-id/thinking-budget parity work remains.
 
+### P3-4 (in progress): steering/follow-up runtime-control loops
+
+Files:
+
+- `Sources/PiAgentCore/AgentLoop.swift`
+- `Tests/PiAgentCoreTests/PiAgentLoopSteeringTests.swift`
+
+Implemented in this slice:
+
+- `PiAgentLoopConfig`
+  - optional `getSteeringMessages` callback
+  - optional `getFollowUpMessages` callback
+- Runtime loop control behavior
+  - queued steering messages are injected before the next assistant turn
+  - remaining tool calls in the same assistant message are skipped when steering messages arrive
+  - skipped tool calls emit error `tool_execution_end` + injected error `toolResult` messages (matching `pi-mono` behavior)
+  - follow-up messages can restart the loop after the agent would otherwise stop
+
+Tests added:
+
+- queued steering message skips remaining tool calls and is injected before the next LLM call
+- follow-up message continues the loop after a normal stop and starts a new assistant turn
+
+Notes:
+
+- `P3-4` is still not complete. Abort/session-id/thinking-budget parity work remains.
+
 ## Parity Status vs `pi-mono`
 
 - Partial (foundational types + single-turn loop + baseline multi-turn tool execution loop)

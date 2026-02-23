@@ -84,16 +84,23 @@ public final class PiAgentEventStream: AsyncSequence, @unchecked Sendable {
 
 public struct PiAgentLoopConfig: Sendable {
     public typealias ConvertToLLM = @Sendable ([PiAgentMessage]) async throws -> [PiAIMessage]
+    public typealias GetMessages = @Sendable () async -> [PiAgentMessage]
 
     public var model: PiAIModel
     public var convertToLLM: ConvertToLLM
+    public var getSteeringMessages: GetMessages?
+    public var getFollowUpMessages: GetMessages?
 
     public init(
         model: PiAIModel,
-        convertToLLM: ConvertToLLM? = nil
+        convertToLLM: ConvertToLLM? = nil,
+        getSteeringMessages: GetMessages? = nil,
+        getFollowUpMessages: GetMessages? = nil
     ) {
         self.model = model
         self.convertToLLM = convertToLLM ?? Self.standardMessageConverter
+        self.getSteeringMessages = getSteeringMessages
+        self.getFollowUpMessages = getFollowUpMessages
     }
 
     public static func standardMessageConverter(_ messages: [PiAgentMessage]) async throws -> [PiAIMessage] {
@@ -140,6 +147,7 @@ public enum PiAgentLoop {
         Task {
             var emittedMessages: [PiAgentMessage] = []
             var currentMessages = context.messages
+            var pendingMessages: [PiAgentMessage] = []
 
             stream.push(.agentStart)
             stream.push(.turnStart)
@@ -160,6 +168,16 @@ public enum PiAgentLoop {
                     }
                     isFirstTurn = false
 
+                    if !pendingMessages.isEmpty {
+                        for message in pendingMessages {
+                            currentMessages.append(message)
+                            emittedMessages.append(message)
+                            stream.push(.messageStart(message: message))
+                            stream.push(.messageEnd(message: message))
+                        }
+                        pendingMessages.removeAll(keepingCapacity: true)
+                    }
+
                     let assistant = try await streamAssistantResponse(
                         systemPrompt: context.systemPrompt,
                         tools: context.tools,
@@ -172,11 +190,13 @@ public enum PiAgentLoop {
                     let assistantAgentMessage = PiAgentMessage.assistant(assistant)
                     emittedMessages.append(assistantAgentMessage)
 
-                    let toolResults = try await executeToolCalls(
+                    let toolExecution = try await executeToolCalls(
                         from: assistant,
                         runtimeTools: runtimeTools,
-                        stream: stream
+                        stream: stream,
+                        getSteeringMessages: config.getSteeringMessages
                     )
+                    let toolResults = toolExecution.toolResults
 
                     for toolResult in toolResults {
                         let toolResultAgentMessage = PiAgentMessage.toolResult(toolResult)
@@ -190,7 +210,16 @@ public enum PiAgentLoop {
                         break
                     }
 
+                    if let steeringMessages = toolExecution.steeringMessages, !steeringMessages.isEmpty {
+                        pendingMessages = steeringMessages
+                        continue
+                    }
+
                     if toolResults.isEmpty {
+                        if let followUpMessages = await config.getFollowUpMessages?(), !followUpMessages.isEmpty {
+                            pendingMessages = followUpMessages
+                            continue
+                        }
                         break
                     }
                 }
@@ -383,20 +412,22 @@ public enum PiAgentLoop {
     private static func executeToolCalls(
         from assistantMessage: PiAIAssistantMessage,
         runtimeTools: [PiAgentRuntimeTool],
-        stream: PiAgentEventStream
-    ) async throws -> [PiAIToolResultMessage] {
+        stream: PiAgentEventStream,
+        getSteeringMessages: PiAgentLoopConfig.GetMessages?
+    ) async throws -> (toolResults: [PiAIToolResultMessage], steeringMessages: [PiAgentMessage]?) {
         let toolCalls = assistantMessage.content.compactMap { part -> PiAIToolCallContent? in
             guard case .toolCall(let toolCall) = part else { return nil }
             return toolCall
         }
 
         guard !toolCalls.isEmpty else {
-            return []
+            return ([], nil)
         }
 
         var results: [PiAIToolResultMessage] = []
+        var steeringMessages: [PiAgentMessage]?
 
-        for toolCall in toolCalls {
+        for (index, toolCall) in toolCalls.enumerated() {
             stream.push(.toolExecutionStart(
                 toolCallID: toolCall.id,
                 toolName: toolCall.name,
@@ -448,12 +479,61 @@ public enum PiAgentLoop {
             let agentMessage = PiAgentMessage.toolResult(toolResultMessage)
             stream.push(.messageStart(message: agentMessage))
             stream.push(.messageEnd(message: agentMessage))
+
+            if let getSteeringMessages {
+                let steering = await getSteeringMessages()
+                if !steering.isEmpty {
+                    steeringMessages = steering
+                    if index < toolCalls.count - 1 {
+                        for skippedCall in toolCalls[(index + 1)...] {
+                            let skipped = skipToolCall(skippedCall, stream: stream)
+                            results.append(skipped)
+                        }
+                    }
+                    break
+                }
+            }
         }
 
-        return results
+        return (results, steeringMessages)
     }
 
     private static func currentTimestampMillis() -> Int64 {
         Int64(Date().timeIntervalSince1970 * 1000)
+    }
+
+    private static func skipToolCall(
+        _ toolCall: PiAIToolCallContent,
+        stream: PiAgentEventStream
+    ) -> PiAIToolResultMessage {
+        let result = PiAgentToolExecutionResult(
+            content: [.text(.init(text: "Skipped due to queued user message."))],
+            details: .object([:])
+        )
+
+        stream.push(.toolExecutionStart(
+            toolCallID: toolCall.id,
+            toolName: toolCall.name,
+            args: .object(toolCall.arguments)
+        ))
+        stream.push(.toolExecutionEnd(
+            toolCallID: toolCall.id,
+            toolName: toolCall.name,
+            result: result,
+            isError: true
+        ))
+
+        let toolResultMessage = PiAIToolResultMessage(
+            toolCallId: toolCall.id,
+            toolName: toolCall.name,
+            content: result.content,
+            details: .object([:]),
+            isError: true,
+            timestamp: currentTimestampMillis()
+        )
+        let agentMessage = PiAgentMessage.toolResult(toolResultMessage)
+        stream.push(.messageStart(message: agentMessage))
+        stream.push(.messageEnd(message: agentMessage))
+        return toolResultMessage
     }
 }
