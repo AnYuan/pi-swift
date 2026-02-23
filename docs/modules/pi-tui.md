@@ -1,0 +1,63 @@
+# `pi-tui` Module Notes
+
+## Status
+
+- `P4-1` is in progress.
+- This document tracks verified incremental slices before `P4-1` is marked `DONE` in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`.
+
+## Implemented (P4-1 foundation slice)
+
+### Terminal Abstraction (test-oriented)
+
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUITerminal.swift`
+- Introduced `PiTUITerminal` protocol for:
+  - lifecycle (`start` / `stop`)
+  - viewport dimensions (`columns` / `rows`)
+  - cursor visibility (`hideCursor` / `showCursor`)
+  - screen mutations (`clearScreen`, `writeLine`, `clearLine`)
+- Added `PiTUIVirtualTerminal` for deterministic tests and operation logging.
+
+### Render Buffer + Differential Plan
+
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIRenderBuffer.swift`
+- Introduced a render-state buffer that tracks:
+  - `previousLines`
+  - `previousWidth`
+  - `maxLinesRendered`
+- Supports:
+  - first-render full redraw
+  - width-change full redraw
+  - `clearOnShrink` full redraw
+  - differential row edits + extra-row clearing
+
+### Minimal Core TUI Render Loop
+
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/TUI.swift`
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIComponent.swift`
+- Current `PiTUI` foundation supports:
+  - child component composition (`render(width:)`)
+  - `start()` / `stop()`
+  - sync `requestRender(force:)`
+  - `clearOnShrink` toggle
+  - `fullRedraws` counter (regression observability)
+
+## Verified Regression Coverage (current slice)
+
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIDifferentialRenderingTests.swift`
+- Covered scenarios (derived from `../pi-mono/packages/tui/test/tui-render.test.ts`):
+  - width change triggers full redraw
+  - content shrink clears stale rows when `clearOnShrink` is enabled
+  - differential rendering updates only a changed middle line
+  - content -> empty -> content transition
+  - shrink then later line change still targets correct row
+
+## Not Yet Implemented in `P4-1`
+
+- ANSI/VT sequence renderer and real process terminal integration
+- cursor-position tracking / hardware cursor placement
+- synchronized output batching
+- style reset handling between lines
+- overlay composition and viewport-aware diff behavior
+- overflow/visible-width handling parity with ANSI-aware width functions
+
+These remain in scope for subsequent `P4-1` slices before the task is marked complete.
