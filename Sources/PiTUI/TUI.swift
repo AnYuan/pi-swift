@@ -1,13 +1,19 @@
 public final class PiTUI: PiTUIContainer {
     public let terminal: PiTUITerminal
+    public let scheduler: PiTUIRenderScheduler
 
     private var renderBuffer = PiTUIRenderBuffer()
     private var started = false
     private var clearOnShrink = false
     private var fullRedrawCount = 0
+    private var renderRequested = false
 
-    public init(terminal: PiTUITerminal) {
+    public init(
+        terminal: PiTUITerminal,
+        scheduler: PiTUIRenderScheduler = PiTUIImmediateRenderScheduler()
+    ) {
         self.terminal = terminal
+        self.scheduler = scheduler
         super.init()
     }
 
@@ -45,7 +51,13 @@ public final class PiTUI: PiTUIContainer {
         if force {
             renderBuffer.reset()
         }
-        doRender()
+        if renderRequested { return }
+        renderRequested = true
+        scheduler.schedule { [weak self] in
+            guard let self else { return }
+            self.renderRequested = false
+            self.doRender()
+        }
     }
 
     private func doRender() {

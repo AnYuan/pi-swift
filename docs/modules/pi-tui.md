@@ -36,11 +36,13 @@
 ### Minimal Core TUI Render Loop
 
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/TUI.swift`
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIRenderScheduler.swift`
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIComponent.swift`
 - Current `PiTUI` foundation supports:
   - child component composition (`render(width:)`)
   - `start()` / `stop()`
-  - sync `requestRender(force:)`
+  - `requestRender(force:)` with scheduler-driven coalescing (default immediate scheduler)
+  - test-only/manual scheduler for deterministic render queue flushing
   - `clearOnShrink` toggle
   - `fullRedraws` counter (regression observability)
 
@@ -48,6 +50,7 @@
 
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIDifferentialRenderingTests.swift`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIANSITerminalTests.swift`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIRenderSchedulingTests.swift`
 - Covered scenarios (derived from `../pi-mono/packages/tui/test/tui-render.test.ts`):
   - width change triggers full redraw
   - content shrink clears stale rows when `clearOnShrink` is enabled
@@ -63,6 +66,9 @@
   - row-targeted line write + clear + truncation
   - resize/input callback plumbing
   - out-of-bounds row no-op safety
+- Render scheduling coverage:
+  - multiple `requestRender()` calls coalesce before scheduler flush
+  - resize-triggered render coalesces with explicit render request
 
 ## Not Yet Implemented in `P4-1`
 
