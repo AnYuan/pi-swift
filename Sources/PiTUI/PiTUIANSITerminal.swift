@@ -36,6 +36,11 @@ public final class PiTUIANSITerminal: PiTUITerminal {
         writeOutput("\u{001B}[?25h")
     }
 
+    public func setCursorPosition(row: Int, column: Int) {
+        guard isValidRow(row) else { return }
+        writeOutput("\u{001B}[\(row + 1);\(max(0, column) + 1)H")
+    }
+
     public func clearScreen() {
         writeOutput("\u{001B}[2J\u{001B}[H")
     }

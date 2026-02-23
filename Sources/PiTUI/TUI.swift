@@ -7,6 +7,7 @@ public final class PiTUI: PiTUIContainer {
     private var clearOnShrink = false
     private var fullRedrawCount = 0
     private var renderRequested = false
+    private var showHardwareCursor = false
 
     public init(
         terminal: PiTUITerminal,
@@ -27,6 +28,17 @@ public final class PiTUI: PiTUIContainer {
 
     public func setClearOnShrink(_ enabled: Bool) {
         clearOnShrink = enabled
+    }
+
+    public func getShowHardwareCursor() -> Bool {
+        showHardwareCursor
+    }
+
+    public func setShowHardwareCursor(_ enabled: Bool) {
+        showHardwareCursor = enabled
+        if !enabled, started {
+            terminal.hideCursor()
+        }
     }
 
     public func start() {
@@ -61,9 +73,12 @@ public final class PiTUI: PiTUIContainer {
     }
 
     private func doRender() {
+        var renderedLines = render(width: terminal.columns)
+        let cursorPosition = extractCursorPosition(from: &renderedLines)
+
         let step = renderBuffer.makeStep(
             width: terminal.columns,
-            newLines: render(width: terminal.columns),
+            newLines: renderedLines,
             clearOnShrink: clearOnShrink
         )
 
@@ -73,7 +88,7 @@ public final class PiTUI: PiTUIContainer {
 
         switch step.plan {
         case .none:
-            return
+            break
         case .fullRedraw(let clearScreen, let lines):
             if clearScreen {
                 terminal.clearScreen()
@@ -87,6 +102,8 @@ public final class PiTUI: PiTUIContainer {
                 terminal.clearLine(row: row)
             }
         }
+
+        applyHardwareCursor(cursorPosition)
     }
 
     private func applyFull(lines: [String]) {
@@ -98,4 +115,34 @@ public final class PiTUI: PiTUIContainer {
             }
         }
     }
+
+    private func extractCursorPosition(from lines: inout [String]) -> PiTUITerminalCursorPosition? {
+        for row in stride(from: lines.count - 1, through: 0, by: -1) where row >= 0 {
+            let line = lines[row]
+            guard let range = line.range(of: PiTUICursor.marker) else { continue }
+            let beforeMarker = String(line[..<range.lowerBound])
+            let afterMarker = String(line[range.upperBound...])
+            let column = PiTUIANSIText.visibleWidth(beforeMarker)
+            lines[row] = beforeMarker + afterMarker
+            return .init(row: row, column: column)
+        }
+        return nil
+    }
+
+    private func applyHardwareCursor(_ cursorPosition: PiTUITerminalCursorPosition?) {
+        guard showHardwareCursor else {
+            return
+        }
+        guard let cursorPosition else {
+            terminal.hideCursor()
+            return
+        }
+        terminal.setCursorPosition(row: cursorPosition.row, column: cursorPosition.column)
+        terminal.showCursor()
+    }
+}
+
+private struct PiTUITerminalCursorPosition {
+    var row: Int
+    var column: Int
 }

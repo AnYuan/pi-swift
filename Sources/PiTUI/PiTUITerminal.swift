@@ -7,6 +7,7 @@ public protocol PiTUITerminal: AnyObject {
 
     func hideCursor()
     func showCursor()
+    func setCursorPosition(row: Int, column: Int)
     func clearScreen()
     func writeLine(row: Int, content: String)
     func clearLine(row: Int)
@@ -18,6 +19,7 @@ public final class PiTUIVirtualTerminal: PiTUITerminal {
         case stop
         case hideCursor
         case showCursor
+        case setCursorPosition(row: Int, column: Int)
         case clearScreen
         case writeLine(row: Int, content: String)
         case clearLine(row: Int)
@@ -31,6 +33,17 @@ public final class PiTUIVirtualTerminal: PiTUITerminal {
     private var onInput: ((String) -> Void)?
     private var onResize: (() -> Void)?
     private var visibleLines: [String]
+    public private(set) var cursorPosition: CursorPosition?
+
+    public struct CursorPosition: Equatable {
+        public var row: Int
+        public var column: Int
+
+        public init(row: Int, column: Int) {
+            self.row = row
+            self.column = column
+        }
+    }
 
     public init(columns: Int, rows: Int) {
         self.columns = max(1, columns)
@@ -51,6 +64,7 @@ public final class PiTUIVirtualTerminal: PiTUITerminal {
     }
 
     public func hideCursor() {
+        cursorPosition = nil
         operationLog.append(.hideCursor)
     }
 
@@ -58,8 +72,15 @@ public final class PiTUIVirtualTerminal: PiTUITerminal {
         operationLog.append(.showCursor)
     }
 
+    public func setCursorPosition(row: Int, column: Int) {
+        guard row >= 0, row < rows else { return }
+        cursorPosition = .init(row: row, column: max(0, column))
+        operationLog.append(.setCursorPosition(row: row, column: max(0, column)))
+    }
+
     public func clearScreen() {
         visibleLines = Array(repeating: "", count: rows)
+        cursorPosition = nil
         operationLog.append(.clearScreen)
     }
 

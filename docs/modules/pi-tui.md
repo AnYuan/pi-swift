@@ -42,6 +42,7 @@
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/TUI.swift`
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIRenderScheduler.swift`
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIComponent.swift`
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUICursor.swift`
 - Current `PiTUI` foundation supports:
   - child component composition (`render(width:)`)
   - `start()` / `stop()`
@@ -49,6 +50,7 @@
   - test-only/manual scheduler for deterministic render queue flushing
   - `clearOnShrink` toggle
   - `fullRedraws` counter (regression observability)
+  - cursor-marker extraction + optional hardware cursor positioning
 
 ## Verified Regression Coverage (current slice)
 
@@ -56,6 +58,7 @@
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIANSITerminalTests.swift`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIANSITextTests.swift`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIRenderSchedulingTests.swift`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUICursorTests.swift`
 - Covered scenarios (derived from `../pi-mono/packages/tui/test/tui-render.test.ts`):
   - width change triggers full redraw
   - content shrink clears stale rows when `clearOnShrink` is enabled
@@ -80,6 +83,11 @@
 - Render scheduling coverage:
   - multiple `requestRender()` calls coalesce before scheduler flush
   - resize-triggered render coalesces with explicit render request
+- Cursor handling coverage:
+  - cursor marker removal from rendered output
+  - cursor row/column positioning in virtual terminal
+  - ANSI-aware cursor column calculation (ignores style escape sequences before marker)
+  - no-marker path keeps hardware cursor hidden
 
 ## Not Yet Implemented in `P4-1`
 
