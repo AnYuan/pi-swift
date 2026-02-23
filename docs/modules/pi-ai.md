@@ -265,11 +265,50 @@ Tests added for P2-6:
 - empty stream retry without duplicate `start`
 - event ordering and content assembly for mixed thinking + text + tool call stream
 
+### P2-7: OAuth and provider credential helpers
+
+Files:
+
+- `Sources/PiAI/Utils/OAuthHelpers.swift`
+- `Tests/PiAITests/PiAIOAuthHelpersTests.swift`
+
+Implemented behavior:
+
+- `PiAIOAuthCredentials`
+  - OAuth credential record (`refresh`, `access`, `expires`)
+  - `extra: [String: JSONValue]` for provider-specific fields (e.g. `projectId`)
+- `PiAIOAuthProvider`
+  - provider descriptor with `refreshToken(...)` and `apiKey(...)` closures
+- `PiAIOAuthProviderRegistry`
+  - register provider
+  - lookup by ID
+  - list providers in registration order
+- `PiAIOAuthCredentialService`
+  - `getOAuthAPIKey(...)`
+  - returns `nil` when no credentials exist for the provider
+  - auto-refreshes expired credentials before API key generation
+  - returns updated credentials + provider-specific API key string
+  - wraps refresh failures with provider-context error (`refreshFailed(providerID:)`)
+- `PiAIAPIKeyInjector`
+  - inject API key into HTTP headers via:
+    - `Authorization: Bearer ...`
+    - custom header name
+
+Tests added for P2-7:
+
+- provider registry register/lookup/list
+- nil result when provider credentials are absent
+- no refresh when token is not expired
+- refresh path for expired credentials (including provider-specific API key encoding)
+- unknown-provider error
+- refresh-failure error wrapping
+- bearer/custom-header API key injection
+
 ## Parity Status vs `pi-mono`
 
 - Partial
-- Implemented foundational `PiAI` model registry, context/message/event types, utility foundations, and three provider adapter cores (OpenAI Responses, Anthropic Messages, Google-family shared semantics; all mock-driven)
-- Real provider transport integrations and remaining provider/credential work are still pending (`P2-7+`)
+- Implemented foundational `PiAI` model registry, context/message/event types, utility foundations, three provider adapter cores (OpenAI Responses, Anthropic Messages, Google-family shared semantics; all mock-driven), plus OAuth credential abstractions/helpers
+- Real provider transport integrations and `pi-ai` regression/coverage push are still pending (`P2-8+`)
 
 ## Verification Evidence
 
@@ -278,8 +317,9 @@ Tests added for P2-6:
 - `swift test` passed (includes `PiAIOpenAIResponsesProviderTests`)
 - `swift test` passed (includes `PiAIAnthropicProviderTests`)
 - `swift test` passed (includes `PiAIGoogleFamilyProviderTests`)
+- `swift test` passed (includes `PiAIOAuthHelpersTests`)
 - `swift build` passed
 
 ## Next Step
 
-- `P2-7`: OAuth and provider credential helpers
+- `P2-8`: `pi-ai` regression test completion and coverage push

@@ -230,12 +230,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-7: OAuth and provider credential helpers
-- Status: TODO
+- Status: DONE
 - Depends On: P2-4
 - Scope:
   - OAuth helper abstractions and token injection mechanism
 - Test Plan:
   - Token lifecycle and error-path tests
+- Verification:
+  - Tests: `swift test` passed (44 tests total, including `PiAIOAuthHelpersTests`) on 2026-02-23
+  - Build: `swift build` passed on 2026-02-23
+  - Regression: OAuth helper registry/lookup, expiry-triggered refresh, refresh error wrapping, no-credentials path, and API key header injection are covered
+  - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-8: `pi-ai` regression test completion and coverage push
 - Status: TODO
@@ -469,4 +474,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P2-7` (OAuth and provider credential helpers). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P2-8` (`pi-ai` regression test completion and coverage push). Continue following the strict test-first implementation cadence and atomic-commit rule.
