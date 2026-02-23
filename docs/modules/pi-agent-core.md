@@ -247,9 +247,23 @@ Regression tests added (ported behavior from `pi-mono` agent-loop tests):
 - custom context messages can be filtered out by `convertToLLM` during `run(...)`
 - `transformContext` runs before `convertToLLM`, and conversion sees the transformed/pruned message list
 
-Notes:
+Notes (historical slice context):
 
-- `P3-5` remains in progress. Additional `pi-mono/packages/agent/test` parity cases and coverage/reporting still need to be completed.
+- This slice added key regression coverage and `transformContext` parity. P3-5 completion is recorded in the summary below.
+
+### P3-5 completion summary
+
+Completed regression-alignment and verification work for the current `PiAgentCore` scope:
+
+- ported/covered key `agent-loop` behaviors from `pi-mono`
+- added regression tests for custom message filtering and `transformContext` ordering
+- generated module coverage report: `docs/reports/pi-agent-core-coverage.md`
+
+Coverage snapshot (`Sources/PiAgentCore/*`):
+
+- Regions: `90.68%`
+- Functions: `96.72%`
+- Lines: `92.55%`
 
 ## Parity Status vs `pi-mono`
 
@@ -258,9 +272,10 @@ Notes:
 
 ## Verification Evidence
 
-- `swift test` passed (includes `PiAgentLoopContinueTests`, `PiAgentLoopSteeringTests`, `PiAgentLoopAbortTests`, and `PiAgentLoopRequestOptionsTests`)
+- `swift test` passed (includes `PiAgentLoopContinueTests`, `PiAgentLoopSteeringTests`, `PiAgentLoopAbortTests`, `PiAgentLoopRequestOptionsTests`, and `PiAgentLoopRegressionTests`)
+- `swift test --enable-code-coverage` passed; coverage report generated at `docs/reports/pi-agent-core-coverage.md`
 - `swift build` passed
 
 ## Next Step
 
-- Continue `P3-5`: `pi-agent-core` regression test completion
+- `P4-1`: `pi-tui` terminal abstraction + render buffer + differential rendering

@@ -314,12 +314,19 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-agent-core.md`, `docs/PLAN.md`
 
 ### P3-5: `pi-agent-core` regression test completion
-- Status: TODO
+- Status: DONE
 - Depends On: P3-4
 - Scope:
   - Align with `../pi-mono/packages/agent/test`
 - Test Plan:
   - Full module test run + coverage
+- Verification:
+  - Tests: `swift test` passed (67 tests total, including `PiAgentLoopRegressionTests`) on 2026-02-23
+  - Coverage: `swift test --enable-code-coverage` passed and report generated at `docs/reports/pi-agent-core-coverage.md`
+  - Coverage snapshot (`Sources/PiAgentCore/*`): Regions `90.68%`, Functions `96.72%`, Lines `92.55%`
+  - Build: `swift build` passed on 2026-02-23
+  - Regression: Added regression coverage for custom-message filtering in `convertToLLM` and `transformContext` ordering before conversion, complementing existing loop/tool/continue/abort/runtime-control tests
+  - Docs updated: `README.md`, `docs/modules/pi-agent-core.md`, `docs/PLAN.md`, `docs/reports/pi-agent-core-coverage.md`
 
 ## P4 `pi-tui` Migration
 
@@ -501,4 +508,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P3-5` (`pi-agent-core` regression test completion). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P4-1` (`pi-tui` terminal abstraction + render buffer + differential rendering). Continue following the strict test-first implementation cadence and atomic-commit rule.
