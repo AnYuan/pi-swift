@@ -91,17 +91,21 @@ public final class PiTUI: PiTUIContainer {
         case .none:
             break
         case .fullRedraw(let clearScreen, let lines):
+            terminal.beginSynchronizedOutput()
             if clearScreen {
                 terminal.clearScreen()
             }
             applyFull(lines: lines)
+            terminal.endSynchronizedOutput()
         case .differential(let edits, let clearedRows):
+            terminal.beginSynchronizedOutput()
             for edit in edits {
                 terminal.writeLine(row: edit.row, content: edit.content)
             }
             for row in clearedRows {
                 terminal.clearLine(row: row)
             }
+            terminal.endSynchronizedOutput()
         }
 
         applyHardwareCursor(cursorPosition)

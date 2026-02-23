@@ -5,6 +5,8 @@ public protocol PiTUITerminal: AnyObject {
     func start(onInput: @escaping (String) -> Void, onResize: @escaping () -> Void)
     func stop()
 
+    func beginSynchronizedOutput()
+    func endSynchronizedOutput()
     func hideCursor()
     func showCursor()
     func setCursorPosition(row: Int, column: Int)
@@ -62,6 +64,10 @@ public final class PiTUIVirtualTerminal: PiTUITerminal {
         onResize = nil
         operationLog.append(.stop)
     }
+
+    public func beginSynchronizedOutput() {}
+
+    public func endSynchronizedOutput() {}
 
     public func hideCursor() {
         cursorPosition = nil

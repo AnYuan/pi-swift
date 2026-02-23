@@ -16,9 +16,11 @@
   - cursor visibility (`hideCursor` / `showCursor`)
   - screen mutations (`clearScreen`, `writeLine`, `clearLine`)
 - Added `PiTUIVirtualTerminal` for deterministic tests and operation logging.
+  - Virtual terminal now uses the same ANSI-safe line sanitization semantics as the TUI/ANSI terminal path.
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIANSITerminal.swift`
   - writer-based ANSI/VT terminal adapter that translates row writes/clears into escape sequences
   - test hooks for input simulation and resize callbacks (supports unit testing without a real process terminal)
+  - synchronized output begin/end markers (`CSI ?2026 h/l`)
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIANSIText.swift`
   - ANSI-aware visible-width calculation (CSI + OSC hyperlink sequence skipping)
   - ANSI-safe visible-width truncation (preserves escape sequences)
@@ -52,6 +54,7 @@
   - `fullRedraws` counter (regression observability)
   - cursor-marker extraction + optional hardware cursor positioning
   - ANSI-safe line sanitization in render loop (visible-width truncation + line-end reset) before diffing
+  - synchronized output batching around full and differential render passes
 
 ## Verified Regression Coverage (current slice)
 
@@ -60,6 +63,7 @@
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIANSITextTests.swift`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIRenderSchedulingTests.swift`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUICursorTests.swift`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUISynchronizedOutputTests.swift`
 - Covered scenarios (derived from `../pi-mono/packages/tui/test/tui-render.test.ts`):
   - width change triggers full redraw
   - content shrink clears stale rows when `clearOnShrink` is enabled
@@ -78,6 +82,7 @@
   - resize/input callback plumbing
   - out-of-bounds row no-op safety
   - ANSI-visible-width truncation + automatic reset append for styled lines
+  - synchronized output begin/end VT markers
 - ANSI text utility coverage:
   - visible width ignores CSI color sequences
   - visible width ignores OSC-8 hyperlink wrappers
@@ -91,6 +96,10 @@
   - cursor row/column positioning in virtual terminal
   - ANSI-aware cursor column calculation (ignores style escape sequences before marker)
   - no-marker path keeps hardware cursor hidden
+- Synchronized output coverage:
+  - first render wrapped in begin/end sync markers
+  - differential render wrapped in begin/end sync markers
+  - no-op render does not emit sync markers
 
 ## Not Yet Implemented in `P4-1`
 

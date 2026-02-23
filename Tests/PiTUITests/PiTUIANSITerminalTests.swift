@@ -41,6 +41,24 @@ final class PiTUIANSITerminalTests: XCTestCase {
         )
     }
 
+    func testSynchronizedOutputMarkersEmitExpectedSequences() {
+        let collector = WriteCollector()
+        let terminal = PiTUIANSITerminal(columns: 80, rows: 24) { output in
+            collector.append(output)
+        }
+
+        terminal.beginSynchronizedOutput()
+        terminal.endSynchronizedOutput()
+
+        XCTAssertEqual(
+            collector.snapshot(),
+            [
+                "\u{001B}[?2026h",
+                "\u{001B}[?2026l"
+            ]
+        )
+    }
+
     func testWriteLineMovesToRowClearsLineAndTruncatesToColumns() {
         let collector = WriteCollector()
         let terminal = PiTUIANSITerminal(columns: 5, rows: 10) { output in

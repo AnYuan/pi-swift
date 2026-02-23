@@ -28,6 +28,14 @@ public final class PiTUIANSITerminal: PiTUITerminal {
         onResize = nil
     }
 
+    public func beginSynchronizedOutput() {
+        writeOutput("\u{001B}[?2026h")
+    }
+
+    public func endSynchronizedOutput() {
+        writeOutput("\u{001B}[?2026l")
+    }
+
     public func hideCursor() {
         writeOutput("\u{001B}[?25l")
     }
