@@ -243,7 +243,7 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P2-8: `pi-ai` regression test completion and coverage push
-- Status: TODO
+- Status: DONE
 - Depends On: P2-5, P2-6, P2-7
 - Scope:
   - Align critical behaviors with `../pi-mono/packages/ai/test`
@@ -251,6 +251,13 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
 - Test Plan:
   - Full module test run
   - Coverage report
+- Verification:
+  - Tests: `swift test` passed (49 tests total, including `PiAIRegressionCoverageTests`) on 2026-02-23
+  - Coverage: `swift test --enable-code-coverage` passed and report generated at `docs/reports/pi-ai-coverage.md`
+  - Coverage snapshot (`Sources/PiAI/*`): Regions `86.03%`, Functions `96.09%`, Lines `94.22%`
+  - Build: `swift build` passed on 2026-02-23
+  - Regression: Added edge-case tests for validation scalar branches, overflow no-body status detection, JSON repair/escaping, and `AssistantMessageEventStream` terminal behavior
+  - Docs updated: `README.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`, `docs/reports/pi-ai-coverage.md`
 
 ## P3 `pi-agent-core` Migration
 
@@ -474,4 +481,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P2-8` (`pi-ai` regression test completion and coverage push). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P3-1` (`pi-agent-core` AgentState / AgentMessage / AgentEvent types). Continue following the strict test-first implementation cadence and atomic-commit rule.

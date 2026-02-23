@@ -65,5 +65,6 @@ Project bootstrapping/planning docs are in place, and `P1` groundwork is underwa
 - `P2-5` Anthropic adapter (mock-driven thinking/text/tool mapping + OAuth tool-name normalization regression tests): implemented and verified
 - `P2-6` Google/Vertex family adapter core (mock-driven Google stream mapping + thinking signature / empty-stream / missing-args regression tests): implemented and verified
 - `P2-7` OAuth and provider credential helpers (registry, expiry-aware refresh, API key injection): implemented and verified
+- `P2-8` `pi-ai` regression/coverage push: implemented and verified (`docs/reports/pi-ai-coverage.md`)
 
-Next step: `P2-8` (`pi-ai` regression test completion and coverage push) in `docs/PLAN.md`.
+Next step: `P3-1` (`pi-agent-core` AgentState / AgentMessage / AgentEvent types) in `docs/PLAN.md`.

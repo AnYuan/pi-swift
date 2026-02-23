@@ -304,11 +304,35 @@ Tests added for P2-7:
 - refresh-failure error wrapping
 - bearer/custom-header API key injection
 
+### P2-8: Regression completion and coverage push
+
+Files:
+
+- `Tests/PiAITests/PiAIRegressionCoverageTests.swift`
+- `docs/reports/pi-ai-coverage.md`
+
+Implemented behavior / additions:
+
+- Added targeted regression coverage for low-covered `PiAI` utility branches:
+  - `PiAIValidation`: unknown tool, enum mismatch, integer validation, null validation, unexpected properties
+  - `PiAIOverflow`: HTTP no-body overflow detection (`400/413`) and non-overflow paths
+  - `PiAIJSON`: nested array/object parsing, escaped quotes, repaired partial arrays
+  - `PiAIAssistantMessageEventStream`: `end(with:)` terminal result path and ignored post-finish pushes
+- Generated and committed a `PiAI` coverage report snapshot using `swift test --enable-code-coverage` + `llvm-cov`
+
+Coverage snapshot (`Sources/PiAI/*`, 2026-02-23):
+
+- Regions coverage: `86.03%`
+- Functions executed: `96.09%`
+- Lines coverage: `94.22%`
+- Report file: `docs/reports/pi-ai-coverage.md`
+
 ## Parity Status vs `pi-mono`
 
 - Partial
 - Implemented foundational `PiAI` model registry, context/message/event types, utility foundations, three provider adapter cores (OpenAI Responses, Anthropic Messages, Google-family shared semantics; all mock-driven), plus OAuth credential abstractions/helpers
-- Real provider transport integrations and `pi-ai` regression/coverage push are still pending (`P2-8+`)
+- `P2` planned `PiAI` baseline tasks (`P2-1` ... `P2-8`) are complete
+- Real provider transport integrations / production SDK wiring remain future work beyond current mock-driven adapter cores
 
 ## Verification Evidence
 
@@ -318,8 +342,10 @@ Tests added for P2-7:
 - `swift test` passed (includes `PiAIAnthropicProviderTests`)
 - `swift test` passed (includes `PiAIGoogleFamilyProviderTests`)
 - `swift test` passed (includes `PiAIOAuthHelpersTests`)
+- `swift test` passed (includes `PiAIRegressionCoverageTests`)
+- `swift test --enable-code-coverage` passed (`docs/reports/pi-ai-coverage.md`)
 - `swift build` passed
 
 ## Next Step
 
-- `P2-8`: `pi-ai` regression test completion and coverage push
+- `P3-1`: `pi-agent-core` AgentState / AgentMessage / AgentEvent types
