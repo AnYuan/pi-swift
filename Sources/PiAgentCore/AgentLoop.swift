@@ -135,9 +135,11 @@ public struct PiAgentLLMRequestOptions: Codable, Equatable, Sendable {
 public struct PiAgentLoopConfig: Sendable {
     public typealias ConvertToLLM = @Sendable ([PiAgentMessage]) async throws -> [PiAIMessage]
     public typealias GetMessages = @Sendable () async -> [PiAgentMessage]
+    public typealias TransformContext = @Sendable ([PiAgentMessage], PiAgentAbortController?) async throws -> [PiAgentMessage]
 
     public var model: PiAIModel
     public var convertToLLM: ConvertToLLM
+    public var transformContext: TransformContext?
     public var thinkingLevel: PiAgentThinkingLevel
     public var sessionId: String?
     public var thinkingBudgets: PiAgentThinkingBudgets?
@@ -147,6 +149,7 @@ public struct PiAgentLoopConfig: Sendable {
     public init(
         model: PiAIModel,
         convertToLLM: ConvertToLLM? = nil,
+        transformContext: TransformContext? = nil,
         thinkingLevel: PiAgentThinkingLevel = .off,
         sessionId: String? = nil,
         thinkingBudgets: PiAgentThinkingBudgets? = nil,
@@ -155,6 +158,7 @@ public struct PiAgentLoopConfig: Sendable {
     ) {
         self.model = model
         self.convertToLLM = convertToLLM ?? Self.standardMessageConverter
+        self.transformContext = transformContext
         self.thinkingLevel = thinkingLevel
         self.sessionId = sessionId
         self.thinkingBudgets = thinkingBudgets
@@ -452,7 +456,14 @@ public enum PiAgentLoop {
         assistantStreamFactory: AssistantStreamFactoryWithOptions
     ) async throws -> PiAIAssistantMessage {
         try throwIfAborted(abortController)
-        let llmMessages = try await config.convertToLLM(messages)
+        let transformedMessages: [PiAgentMessage]
+        if let transformContext = config.transformContext {
+            transformedMessages = try await transformContext(messages, abortController)
+        } else {
+            transformedMessages = messages
+        }
+        try throwIfAborted(abortController)
+        let llmMessages = try await config.convertToLLM(transformedMessages)
         let aiContext = PiAIContext(
             systemPrompt: systemPrompt.isEmpty ? nil : systemPrompt,
             messages: llmMessages,

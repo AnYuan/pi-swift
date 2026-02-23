@@ -227,6 +227,30 @@ Completed runtime-control capabilities in `PiAgentCore` now cover:
 - loop-level and tool-triggered abort via `PiAgentAbortController`
 - request-options plumbing (`reasoning`, `sessionId`, `thinkingBudgets`) to the assistant stream factory boundary
 
+### P3-5 slice: regression alignment (`custom converter` + `transformContext` ordering)
+
+Files:
+
+- `Sources/PiAgentCore/AgentLoop.swift`
+- `Tests/PiAgentCoreTests/PiAgentLoopRegressionTests.swift`
+
+Implemented in this slice:
+
+- `PiAgentLoopConfig.transformContext`
+  - optional context transform hook executed before `convertToLLM`
+  - receives the current `PiAgentAbortController?` for parity-oriented future cancellation-aware transforms
+- `streamAssistantResponse(...)`
+  - applies `transformContext` before `convertToLLM` (matching `pi-mono` ordering semantics)
+
+Regression tests added (ported behavior from `pi-mono` agent-loop tests):
+
+- custom context messages can be filtered out by `convertToLLM` during `run(...)`
+- `transformContext` runs before `convertToLLM`, and conversion sees the transformed/pruned message list
+
+Notes:
+
+- `P3-5` remains in progress. Additional `pi-mono/packages/agent/test` parity cases and coverage/reporting still need to be completed.
+
 ## Parity Status vs `pi-mono`
 
 - Partial (foundational types + single-turn loop + multi-turn tool loop + runtime-control baseline)
@@ -239,4 +263,4 @@ Completed runtime-control capabilities in `PiAgentCore` now cover:
 
 ## Next Step
 
-- `P3-5`: `pi-agent-core` regression test completion
+- Continue `P3-5`: `pi-agent-core` regression test completion
