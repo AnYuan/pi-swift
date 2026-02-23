@@ -262,12 +262,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
 ## P3 `pi-agent-core` Migration
 
 ### P3-1: AgentState / AgentMessage / AgentEvent types
-- Status: TODO
+- Status: DONE
 - Depends On: P2-2
 - Scope:
   - Migrate state model and event types
 - Test Plan:
   - Type behavior and state initialization tests
+- Verification:
+  - Tests: `swift test` passed (52 tests total, including `PiAgentCoreTypesTests`) on 2026-02-23
+  - Build: `swift build` passed on 2026-02-23
+  - Regression: Added agent-state default initialization checks and stable `PiAgentEvent` JSON golden fixture coverage
+  - Docs updated: `README.md`, `docs/modules/pi-agent-core.md`, `docs/PLAN.md`
 
 ### P3-2: Agent loop (single turn)
 - Status: TODO
@@ -481,4 +486,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P3-1` (`pi-agent-core` AgentState / AgentMessage / AgentEvent types). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P3-2` (`pi-agent-core` Agent loop (single turn)). Continue following the strict test-first implementation cadence and atomic-commit rule.

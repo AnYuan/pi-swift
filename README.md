@@ -67,4 +67,8 @@ Project bootstrapping/planning docs are in place, and `P1` groundwork is underwa
 - `P2-7` OAuth and provider credential helpers (registry, expiry-aware refresh, API key injection): implemented and verified
 - `P2-8` `pi-ai` regression/coverage push: implemented and verified (`docs/reports/pi-ai-coverage.md`)
 
-Next step: `P3-1` (`pi-agent-core` AgentState / AgentMessage / AgentEvent types) in `docs/PLAN.md`.
+`P3` has started:
+
+- `P3-1` `pi-agent-core` state/message/event foundational types: implemented and verified
+
+Next step: `P3-2` (`pi-agent-core` Agent loop (single turn)) in `docs/PLAN.md`.
