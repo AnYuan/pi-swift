@@ -301,12 +301,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-agent-core.md`, `docs/PLAN.md`
 
 ### P3-4: continue/retry/abort/sessionId/thinkingBudgets
-- Status: TODO
+- Status: DONE
 - Depends On: P3-3
 - Scope:
   - Complete runtime control capabilities
 - Test Plan:
   - Abort, continue, and retry-limit tests
+- Verification:
+  - Tests: `swift test` passed (65 tests total, including `PiAgentLoopContinueTests`, `PiAgentLoopSteeringTests`, `PiAgentLoopAbortTests`, and `PiAgentLoopRequestOptionsTests`) on 2026-02-23
+  - Build: `swift build` passed on 2026-02-23
+  - Regression: Added continue/retry entrypoint precondition coverage, steering/follow-up runtime loop control coverage, loop/tool-triggered abort coverage, and request-options plumbing (`sessionId`/`reasoning`/`thinkingBudgets`) coverage
+  - Docs updated: `README.md`, `docs/modules/pi-agent-core.md`, `docs/PLAN.md`
 
 ### P3-5: `pi-agent-core` regression test completion
 - Status: TODO
@@ -496,4 +501,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P3-4` (`pi-agent-core` continue/retry/abort/sessionId/thinkingBudgets). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P3-5` (`pi-agent-core` regression test completion). Continue following the strict test-first implementation cadence and atomic-commit rule.

@@ -1,5 +1,6 @@
 import XCTest
 import PiAI
+import PiCoreTypes
 @testable import PiAgentCore
 
 final class PiAgentLoopAbortTests: XCTestCase {
@@ -44,5 +45,93 @@ final class PiAgentLoopAbortTests: XCTestCase {
             return XCTFail("Expected assistant result")
         }
         XCTAssertEqual(finalAssistant.stopReason, .aborted)
+    }
+
+    func testAbortTriggeredByToolPreventsNextAssistantCall() async throws {
+        actor State {
+            private(set) var llmCalls = 0
+
+            func nextLLMCall() -> Int {
+                defer { llmCalls += 1 }
+                return llmCalls
+            }
+
+            func snapshot() -> Int { llmCalls }
+        }
+
+        let state = State()
+        let model = PiAIModel(provider: "openai", id: "gpt-4o-mini")
+        let prompt = PiAgentMessage.user(.init(content: .text("start"), timestamp: 1))
+        let toolSchema = PiToolParameterSchema(
+            type: .object,
+            properties: ["value": .init(type: .string)],
+            required: ["value"],
+            additionalProperties: false
+        )
+        let tool = PiAgentTool(name: "echo", label: "Echo", description: "Echo tool", parameters: toolSchema)
+        let abort = PiAgentAbortController()
+
+        let runtimeTool = PiAgentRuntimeTool(tool: tool) { _, args, passedAbortController, _ in
+            XCTAssertTrue(passedAbortController === abort)
+            XCTAssertEqual(args["value"], .string("hello"))
+            passedAbortController?.abort()
+            return .init(
+                content: [.text(.init(text: "ok"))],
+                details: .object([:])
+            )
+        }
+
+        let stream = PiAgentLoop.run(
+            prompts: [prompt],
+            context: .init(systemPrompt: "", messages: [], tools: [tool]),
+            config: .init(model: model),
+            runtimeTools: [runtimeTool],
+            abortController: abort
+        ) { _, _, _ in
+            let callIndex = await state.nextLLMCall()
+            let s = PiAIAssistantMessageEventStream()
+            Task {
+                if callIndex == 0 {
+                    let toolCall = PiAIToolCallContent(id: "tool-1", name: "echo", arguments: ["value": .string("hello")])
+                    s.push(.done(reason: .toolUse, message: .init(
+                        content: [.toolCall(toolCall)],
+                        api: "openai-responses",
+                        provider: "openai",
+                        model: "gpt-4o-mini",
+                        usage: .zero,
+                        stopReason: .toolUse,
+                        timestamp: 2
+                    )))
+                } else {
+                    XCTFail("Abort should prevent second assistant call")
+                    s.push(.done(reason: .stop, message: .init(
+                        content: [],
+                        api: "openai-responses",
+                        provider: "openai",
+                        model: "gpt-4o-mini",
+                        usage: .zero,
+                        stopReason: .stop,
+                        timestamp: 3
+                    )))
+                }
+            }
+            return s
+        }
+
+        var events: [PiAgentEvent] = []
+        for await event in stream {
+            events.append(event)
+        }
+
+        let llmCallCount = await state.snapshot()
+        XCTAssertEqual(llmCallCount, 1)
+        let result = await stream.result()
+        XCTAssertEqual(result.count, 4) // user + assistant(toolcall) + toolResult + aborted assistant
+        guard case .assistant(let finalAssistant) = result.last else {
+            return XCTFail("Expected final assistant")
+        }
+        XCTAssertEqual(finalAssistant.stopReason, PiAIStopReason.aborted)
+
+        XCTAssertEqual(events.filter { if case .turnEnd = $0 { return true }; return false }.count, 2)
     }
 }

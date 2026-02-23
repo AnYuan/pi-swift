@@ -181,7 +181,8 @@ public enum PiAgentLoopError: Error, Equatable, Sendable {
 
 public struct PiAgentRuntimeTool: Sendable {
     public typealias ProgressCallback = @Sendable (PiAgentToolExecutionResult) -> Void
-    public typealias Execute = @Sendable (_ toolCallID: String, _ args: [String: JSONValue], _ onProgress: @escaping ProgressCallback) async throws -> PiAgentToolExecutionResult
+    public typealias Execute = @Sendable (_ toolCallID: String, _ args: [String: JSONValue], _ abortController: PiAgentAbortController?, _ onProgress: @escaping ProgressCallback) async throws -> PiAgentToolExecutionResult
+    public typealias LegacyExecute = @Sendable (_ toolCallID: String, _ args: [String: JSONValue], _ onProgress: @escaping ProgressCallback) async throws -> PiAgentToolExecutionResult
 
     public var tool: PiAgentTool
     public var execute: Execute
@@ -189,6 +190,13 @@ public struct PiAgentRuntimeTool: Sendable {
     public init(tool: PiAgentTool, execute: @escaping Execute) {
         self.tool = tool
         self.execute = execute
+    }
+
+    public init(tool: PiAgentTool, execute: @escaping LegacyExecute) {
+        self.tool = tool
+        self.execute = { toolCallID, args, _, onProgress in
+            try await execute(toolCallID, args, onProgress)
+        }
     }
 }
 
@@ -577,7 +585,7 @@ public enum PiAgentLoop {
                     throw PiAIValidationError("Tool \"\(toolCall.name)\" not found")
                 }
                 let validatedArgs = try PiAIValidation.validateToolArguments(tool: runtimeTool.tool.asAITool, toolCall: toolCall)
-                executionResult = try await runtimeTool.execute(toolCall.id, validatedArgs) { partialResult in
+                executionResult = try await runtimeTool.execute(toolCall.id, validatedArgs, abortController) { partialResult in
                     stream.push(.toolExecutionUpdate(
                         toolCallID: toolCall.id,
                         toolName: toolCall.name,

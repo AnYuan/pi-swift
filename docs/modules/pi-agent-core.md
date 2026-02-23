@@ -113,7 +113,7 @@ Tests added:
 - tool result is injected into second-turn LLM context
 - final agent result includes prompt + assistant(toolCall) + toolResult + assistant(final)
 
-### P3-4 (in progress): `runContinue(...)` retry/continue entrypoint baseline
+### P3-4 slice: `runContinue(...)` retry/continue entrypoint baseline
 
 Files:
 
@@ -128,11 +128,11 @@ Implemented in this slice:
 - continue-path execution reuses the multi-turn loop without re-emitting existing user prompt message events
 - custom trailing messages are allowed when caller provides a custom `convertToLLM` implementation (matching `pi-mono` behavior and caller-responsibility model)
 
-Notes:
+Notes (historical slice context):
 
-- `P3-4` is not complete yet. This commit only covers the continue/retry entrypoint baseline. Abort/session-id/thinking-budget parity work remains.
+- This slice established the continue/retry entrypoint baseline. Later P3-4 slices added abort and request-option parity.
 
-### P3-4 (in progress): steering/follow-up runtime-control loops
+### P3-4 slice: steering/follow-up runtime-control loops
 
 Files:
 
@@ -155,11 +155,11 @@ Tests added:
 - queued steering message skips remaining tool calls and is injected before the next LLM call
 - follow-up message continues the loop after a normal stop and starts a new assistant turn
 
-Notes:
+Notes (historical slice context):
 
-- `P3-4` is still not complete. Abort/session-id/thinking-budget parity work remains.
+- This slice added runtime queue control. Later P3-4 slices completed abort and request-option plumbing.
 
-### P3-4 (in progress): abort controller (loop-level)
+### P3-4 slice: abort controller (loop-level)
 
 Files:
 
@@ -174,16 +174,19 @@ Implemented in this slice:
   - abort is checked before LLM invocation and at key loop boundaries
   - aborted execution emits a synthetic assistant terminal message with `stopReason = .aborted`
   - stream still closes via normal `turn_end` + `agent_end` flow
+- runtime tool execution receives the same `PiAgentAbortController` instance
+  - tools can trigger abort and the loop stops before the next assistant request
 
 Tests added:
 
 - pre-aborted `runContinue(...)` skips LLM factory invocation and returns an assistant message with `stopReason = .aborted`
+- tool-triggered abort prevents the next assistant call and terminates with an `.aborted` assistant message
 
-Notes:
+Notes (historical slice context):
 
-- `P3-4` is still not complete. Session-id/thinking-budget plumbing and broader retry/abort parity behaviors remain.
+- This slice introduced loop-level abort handling. A later slice added request-options plumbing and stronger abort coverage.
 
-### P3-4 (in progress): request-options plumbing (`sessionId` / `reasoning` / `thinkingBudgets`)
+### P3-4 slice: request-options plumbing (`sessionId` / `reasoning` / `thinkingBudgets`)
 
 Files:
 
@@ -212,18 +215,28 @@ Tests added:
 
 Notes:
 
-- `P3-4` remains in progress. These options are now plumbed through the loop/factory boundary; provider adapter consumption parity is a later integration step.
+- These options are plumbed through the loop/factory boundary in `PiAgentCore`; provider-specific adapter consumption remains an integration concern outside this module.
+
+### P3-4 completion summary
+
+Completed runtime-control capabilities in `PiAgentCore` now cover:
+
+- continue/retry entrypoint via `runContinue(...)`
+- steering and follow-up message polling/injection loops
+- queued steering skip behavior for remaining tool calls
+- loop-level and tool-triggered abort via `PiAgentAbortController`
+- request-options plumbing (`reasoning`, `sessionId`, `thinkingBudgets`) to the assistant stream factory boundary
 
 ## Parity Status vs `pi-mono`
 
-- Partial (foundational types + single-turn loop + baseline multi-turn tool execution loop)
-- Covers core state/message/event contracts and the minimum tool-call execution/replay loop needed for higher-level agent runtime features
+- Partial (foundational types + single-turn loop + multi-turn tool loop + runtime-control baseline)
+- Covers core state/message/event contracts, tool-call execution/replay, and the major runtime-control hooks needed by higher-level agent orchestration
 
 ## Verification Evidence
 
-- `swift test` passed (includes `PiAgentCoreTypesTests`, `PiAgentLoopSingleTurnTests`, and `PiAgentLoopToolExecutionTests`)
+- `swift test` passed (includes `PiAgentLoopContinueTests`, `PiAgentLoopSteeringTests`, `PiAgentLoopAbortTests`, and `PiAgentLoopRequestOptionsTests`)
 - `swift build` passed
 
 ## Next Step
 
-- `P3-4`: continue/retry/abort/sessionId/thinkingBudgets
+- `P3-5`: `pi-agent-core` regression test completion
