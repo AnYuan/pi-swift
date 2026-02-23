@@ -16,6 +16,9 @@
   - cursor visibility (`hideCursor` / `showCursor`)
   - screen mutations (`clearScreen`, `writeLine`, `clearLine`)
 - Added `PiTUIVirtualTerminal` for deterministic tests and operation logging.
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIANSITerminal.swift`
+  - writer-based ANSI/VT terminal adapter that translates row writes/clears into escape sequences
+  - test hooks for input simulation and resize callbacks (supports unit testing without a real process terminal)
 
 ### Render Buffer + Differential Plan
 
@@ -44,6 +47,7 @@
 ## Verified Regression Coverage (current slice)
 
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIDifferentialRenderingTests.swift`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIANSITerminalTests.swift`
 - Covered scenarios (derived from `../pi-mono/packages/tui/test/tui-render.test.ts`):
   - width change triggers full redraw
   - content shrink clears stale rows when `clearOnShrink` is enabled
@@ -53,6 +57,12 @@
   - only first line changes
   - only last line changes
   - multiple non-adjacent lines change
+- ANSI terminal adapter coverage:
+  - hide/show cursor VT sequences
+  - clear screen VT sequence
+  - row-targeted line write + clear + truncation
+  - resize/input callback plumbing
+  - out-of-bounds row no-op safety
 
 ## Not Yet Implemented in `P4-1`
 
