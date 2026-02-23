@@ -50,6 +50,9 @@
   - differential rendering updates only a changed middle line
   - content -> empty -> content transition
   - shrink then later line change still targets correct row
+  - only first line changes
+  - only last line changes
+  - multiple non-adjacent lines change
 
 ## Not Yet Implemented in `P4-1`
 

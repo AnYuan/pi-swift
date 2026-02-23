@@ -122,4 +122,81 @@ final class PiTUIDifferentialRenderingTests: XCTestCase {
         XCTAssertFalse(terminal.operationLog.contains(.writeLine(row: 0, content: "Line 0")))
         XCTAssertFalse(terminal.operationLog.contains(.writeLine(row: 2, content: "Line 2")))
     }
+
+    func testRendersCorrectlyWhenOnlyFirstLineChanges() {
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
+        let tui = PiTUI(terminal: terminal)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["Line 0", "Line 1", "Line 2", "Line 3"]
+        tui.start()
+        terminal.clearOperationLog()
+
+        component.lines = ["CHANGED", "Line 1", "Line 2", "Line 3"]
+        tui.requestRender()
+
+        XCTAssertEqual(
+            terminal.operationLog,
+            [.writeLine(row: 0, content: "CHANGED")]
+        )
+        let viewport = terminal.viewport()
+        XCTAssertTrue(viewport[0].contains("CHANGED"))
+        XCTAssertTrue(viewport[1].contains("Line 1"))
+        XCTAssertTrue(viewport[2].contains("Line 2"))
+        XCTAssertTrue(viewport[3].contains("Line 3"))
+    }
+
+    func testRendersCorrectlyWhenOnlyLastLineChanges() {
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
+        let tui = PiTUI(terminal: terminal)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["Line 0", "Line 1", "Line 2", "Line 3"]
+        tui.start()
+        terminal.clearOperationLog()
+
+        component.lines = ["Line 0", "Line 1", "Line 2", "CHANGED"]
+        tui.requestRender()
+
+        XCTAssertEqual(
+            terminal.operationLog,
+            [.writeLine(row: 3, content: "CHANGED")]
+        )
+        let viewport = terminal.viewport()
+        XCTAssertTrue(viewport[0].contains("Line 0"))
+        XCTAssertTrue(viewport[1].contains("Line 1"))
+        XCTAssertTrue(viewport[2].contains("Line 2"))
+        XCTAssertTrue(viewport[3].contains("CHANGED"))
+    }
+
+    func testRendersCorrectlyWhenMultipleNonAdjacentLinesChange() {
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
+        let tui = PiTUI(terminal: terminal)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["Line 0", "Line 1", "Line 2", "Line 3", "Line 4"]
+        tui.start()
+        terminal.clearOperationLog()
+
+        component.lines = ["Line 0", "CHANGED 1", "Line 2", "CHANGED 3", "Line 4"]
+        tui.requestRender()
+
+        XCTAssertEqual(
+            terminal.operationLog,
+            [
+                .writeLine(row: 1, content: "CHANGED 1"),
+                .writeLine(row: 3, content: "CHANGED 3")
+            ]
+        )
+
+        let viewport = terminal.viewport()
+        XCTAssertTrue(viewport[0].contains("Line 0"))
+        XCTAssertTrue(viewport[1].contains("CHANGED 1"))
+        XCTAssertTrue(viewport[2].contains("Line 2"))
+        XCTAssertTrue(viewport[3].contains("CHANGED 3"))
+        XCTAssertTrue(viewport[4].contains("Line 4"))
+    }
 }
