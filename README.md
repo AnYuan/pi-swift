@@ -71,5 +71,6 @@ Project bootstrapping/planning docs are in place, and `P1` groundwork is underwa
 
 - `P3-1` `pi-agent-core` state/message/event foundational types: implemented and verified
 - `P3-2` `pi-agent-core` single-turn agent loop (streamed assistant event -> agent event sequence): implemented and verified
+- `P3-3` `pi-agent-core` multi-turn tool execution loop (tool-call execution, tool-result injection, next-turn replay): implemented and verified
 
-Next step: `P3-3` (`pi-agent-core` Tool execution loop (multi-turn)) in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`.
+Next step: `P3-4` (`pi-agent-core` continue/retry/abort/sessionId/thinkingBudgets) in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`.

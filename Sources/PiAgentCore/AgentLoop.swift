@@ -1,5 +1,6 @@
 import Foundation
 import PiAI
+import PiCoreTypes
 
 public final class PiAgentEventStream: AsyncSequence, @unchecked Sendable {
     public typealias Element = PiAgentEvent
@@ -109,8 +110,103 @@ public enum PiAgentLoopError: Error, Equatable, Sendable {
     case unconvertibleAgentMessageRole(String)
 }
 
+public struct PiAgentRuntimeTool: Sendable {
+    public typealias ProgressCallback = @Sendable (PiAgentToolExecutionResult) -> Void
+    public typealias Execute = @Sendable (_ toolCallID: String, _ args: [String: JSONValue], _ onProgress: @escaping ProgressCallback) async throws -> PiAgentToolExecutionResult
+
+    public var tool: PiAgentTool
+    public var execute: Execute
+
+    public init(tool: PiAgentTool, execute: @escaping Execute) {
+        self.tool = tool
+        self.execute = execute
+    }
+}
+
 public enum PiAgentLoop {
     public typealias AssistantStreamFactory = @Sendable (PiAIModel, PiAIContext) async throws -> PiAIAssistantMessageEventStream
+
+    public static func run(
+        prompts: [PiAgentMessage],
+        context: PiAgentContext,
+        config: PiAgentLoopConfig,
+        runtimeTools: [PiAgentRuntimeTool],
+        assistantStreamFactory: @escaping AssistantStreamFactory
+    ) -> PiAgentEventStream {
+        let stream = PiAgentEventStream()
+
+        Task {
+            var emittedMessages: [PiAgentMessage] = []
+            var currentMessages = context.messages
+
+            stream.push(.agentStart)
+            stream.push(.turnStart)
+
+            for prompt in prompts {
+                currentMessages.append(prompt)
+                emittedMessages.append(prompt)
+                stream.push(.messageStart(message: prompt))
+                stream.push(.messageEnd(message: prompt))
+            }
+
+            do {
+                var isFirstTurn = true
+
+                while true {
+                    if !isFirstTurn {
+                        stream.push(.turnStart)
+                    }
+                    isFirstTurn = false
+
+                    let assistant = try await streamAssistantResponse(
+                        systemPrompt: context.systemPrompt,
+                        tools: context.tools,
+                        messages: &currentMessages,
+                        config: config,
+                        stream: stream,
+                        assistantStreamFactory: assistantStreamFactory
+                    )
+
+                    let assistantAgentMessage = PiAgentMessage.assistant(assistant)
+                    emittedMessages.append(assistantAgentMessage)
+
+                    let toolResults = try await executeToolCalls(
+                        from: assistant,
+                        runtimeTools: runtimeTools,
+                        stream: stream
+                    )
+
+                    for toolResult in toolResults {
+                        let toolResultAgentMessage = PiAgentMessage.toolResult(toolResult)
+                        currentMessages.append(toolResultAgentMessage)
+                        emittedMessages.append(toolResultAgentMessage)
+                    }
+
+                    stream.push(.turnEnd(message: assistantAgentMessage, toolResults: toolResults))
+
+                    if assistant.stopReason == .error || assistant.stopReason == .aborted {
+                        break
+                    }
+
+                    if toolResults.isEmpty {
+                        break
+                    }
+                }
+
+                stream.push(.agentEnd(messages: emittedMessages))
+            } catch {
+                let errorAssistant = makeErrorAssistantMessage(model: config.model, error: error)
+                let errorMessage = PiAgentMessage.assistant(errorAssistant)
+                emittedMessages.append(errorMessage)
+                stream.push(.messageStart(message: errorMessage))
+                stream.push(.messageEnd(message: errorMessage))
+                stream.push(.turnEnd(message: errorMessage, toolResults: []))
+                stream.push(.agentEnd(messages: emittedMessages))
+            }
+        }
+
+        return stream
+    }
 
     public static func runSingleTurn(
         prompts: [PiAgentMessage],
@@ -258,5 +354,82 @@ public enum PiAgentLoop {
             errorMessage: String(describing: error),
             timestamp: Int64(Date().timeIntervalSince1970 * 1000)
         )
+    }
+
+    private static func executeToolCalls(
+        from assistantMessage: PiAIAssistantMessage,
+        runtimeTools: [PiAgentRuntimeTool],
+        stream: PiAgentEventStream
+    ) async throws -> [PiAIToolResultMessage] {
+        let toolCalls = assistantMessage.content.compactMap { part -> PiAIToolCallContent? in
+            guard case .toolCall(let toolCall) = part else { return nil }
+            return toolCall
+        }
+
+        guard !toolCalls.isEmpty else {
+            return []
+        }
+
+        var results: [PiAIToolResultMessage] = []
+
+        for toolCall in toolCalls {
+            stream.push(.toolExecutionStart(
+                toolCallID: toolCall.id,
+                toolName: toolCall.name,
+                args: .object(toolCall.arguments)
+            ))
+
+            let executionResult: PiAgentToolExecutionResult
+            let isError: Bool
+
+            do {
+                guard let runtimeTool = runtimeTools.first(where: { $0.tool.name == toolCall.name }) else {
+                    throw PiAIValidationError("Tool \"\(toolCall.name)\" not found")
+                }
+                let validatedArgs = try PiAIValidation.validateToolArguments(tool: runtimeTool.tool.asAITool, toolCall: toolCall)
+                executionResult = try await runtimeTool.execute(toolCall.id, validatedArgs) { partialResult in
+                    stream.push(.toolExecutionUpdate(
+                        toolCallID: toolCall.id,
+                        toolName: toolCall.name,
+                        args: .object(toolCall.arguments),
+                        partialResult: partialResult
+                    ))
+                }
+                isError = false
+            } catch {
+                executionResult = PiAgentToolExecutionResult(
+                    content: [.text(.init(text: String(describing: error)))],
+                    details: .object([:])
+                )
+                isError = true
+            }
+
+            stream.push(.toolExecutionEnd(
+                toolCallID: toolCall.id,
+                toolName: toolCall.name,
+                result: executionResult,
+                isError: isError
+            ))
+
+            let toolResultMessage = PiAIToolResultMessage(
+                toolCallId: toolCall.id,
+                toolName: toolCall.name,
+                content: executionResult.content,
+                details: executionResult.details,
+                isError: isError,
+                timestamp: currentTimestampMillis()
+            )
+            results.append(toolResultMessage)
+
+            let agentMessage = PiAgentMessage.toolResult(toolResultMessage)
+            stream.push(.messageStart(message: agentMessage))
+            stream.push(.messageEnd(message: agentMessage))
+        }
+
+        return results
+    }
+
+    private static func currentTimestampMillis() -> Int64 {
+        Int64(Date().timeIntervalSince1970 * 1000)
     }
 }

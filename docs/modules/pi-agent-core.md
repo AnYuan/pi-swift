@@ -85,16 +85,44 @@ Tests added:
 - final `result()` contains prompt + final assistant message
 - terminal assistant `.done(...)` without a prior `.start(...)` synthesizes assistant `message_start`
 
+### P3-3: Tool execution loop (multi-turn)
+
+Files:
+
+- `Sources/PiAgentCore/AgentLoop.swift`
+- `Tests/PiAgentCoreTests/PiAgentLoopToolExecutionTests.swift`
+
+Implemented behavior:
+
+- `PiAgentRuntimeTool`
+  - runtime tool wrapper that keeps serializable `PiAgentTool` metadata separate from executable async closure
+  - supports progress callback -> `tool_execution_update`
+- `PiAgentLoop.run(...)`
+  - multi-turn agent loop with tool execution
+  - replays prompt messages, streams assistant response, executes tool calls, injects tool-result messages, and starts next turn until no tool calls remain
+  - preserves `turn_end` payload with `toolResults` for each assistant turn
+  - reuses `PiAIValidation.validateToolArguments(...)` before execution
+- Tool execution event/message lifecycle
+  - emits `tool_execution_start` / `tool_execution_update` / `tool_execution_end`
+  - emits corresponding `message_start` / `message_end` for injected `toolResult` messages
+  - converts execution failures into error tool-result messages instead of crashing the agent stream
+
+Tests added:
+
+- multi-turn loop executes tool call and emits tool execution lifecycle events
+- tool result is injected into second-turn LLM context
+- final agent result includes prompt + assistant(toolCall) + toolResult + assistant(final)
+
 ## Parity Status vs `pi-mono`
 
-- Partial (foundational types + single-turn agent loop)
-- Covers core state/message/event contracts and the minimum single-turn streaming loop required for tool-loop work
+- Partial (foundational types + single-turn loop + baseline multi-turn tool execution loop)
+- Covers core state/message/event contracts and the minimum tool-call execution/replay loop needed for higher-level agent runtime features
 
 ## Verification Evidence
 
-- `swift test` passed (includes `PiAgentCoreTypesTests` and `PiAgentLoopSingleTurnTests`)
+- `swift test` passed (includes `PiAgentCoreTypesTests`, `PiAgentLoopSingleTurnTests`, and `PiAgentLoopToolExecutionTests`)
 - `swift build` passed
 
 ## Next Step
 
-- `P3-3`: Tool execution loop (multi-turn)
+- `P3-4`: continue/retry/abort/sessionId/thinkingBudgets

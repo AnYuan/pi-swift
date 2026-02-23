@@ -288,12 +288,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-agent-core.md`, `docs/PLAN.md`
 
 ### P3-3: Tool execution loop (multi-turn)
-- Status: TODO
+- Status: DONE
 - Depends On: P3-2
 - Scope:
   - Execute tool calls, inject tool results, continue next turns
 - Test Plan:
   - Multi-turn event sequence and pending-tool-call tests
+- Verification:
+  - Tests: `swift test` passed (55 tests total, including `PiAgentLoopToolExecutionTests`) on 2026-02-23
+  - Build: `swift build` passed on 2026-02-23
+  - Regression: Added multi-turn tool execution loop coverage for tool-call -> tool events -> tool-result message injection -> next-turn assistant response context replay
+  - Docs updated: `README.md`, `docs/modules/pi-agent-core.md`, `docs/PLAN.md`
 
 ### P3-4: continue/retry/abort/sessionId/thinkingBudgets
 - Status: TODO
@@ -491,4 +496,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P3-3` (`pi-agent-core` Tool execution loop (multi-turn)). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P3-4` (`pi-agent-core` continue/retry/abort/sessionId/thinkingBudgets). Continue following the strict test-first implementation cadence and atomic-commit rule.
