@@ -275,12 +275,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `README.md`, `docs/modules/pi-agent-core.md`, `docs/PLAN.md`
 
 ### P3-2: Agent loop (single turn)
-- Status: TODO
+- Status: DONE
 - Depends On: P3-1, P2-4
 - Scope:
   - Single prompt -> streaming assistant message
 - Test Plan:
   - Event ordering tests
+- Verification:
+  - Tests: `swift test` passed (54 tests total, including `PiAgentLoopSingleTurnTests`) on 2026-02-23
+  - Build: `swift build` passed on 2026-02-23
+  - Regression: Added single-turn event-order coverage, prompt+assistant final result shape checks, and terminal `.done` fallback without prior `.start`
+  - Docs updated: `README.md`, `docs/modules/pi-agent-core.md`, `docs/PLAN.md`
 
 ### P3-3: Tool execution loop (multi-turn)
 - Status: TODO
@@ -486,4 +491,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P3-2` (`pi-agent-core` Agent loop (single turn)). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P3-3` (`pi-agent-core` Tool execution loop (multi-turn)). Continue following the strict test-first implementation cadence and atomic-commit rule.

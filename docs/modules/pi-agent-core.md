@@ -55,16 +55,46 @@ Implemented types and behavior:
 - Tool execution result `details` is modeled as `JSONValue` (instead of generics) for stable storage/event serialization in early phases.
 - `PiAgentTool` currently models metadata only; executable behavior is deferred to later `P3` tasks.
 
+### P3-2: Agent loop (single turn)
+
+Files:
+
+- `Sources/PiAgentCore/AgentLoop.swift`
+- `Tests/PiAgentCoreTests/PiAgentLoopSingleTurnTests.swift`
+
+Implemented behavior:
+
+- `PiAgentEventStream`
+  - async event stream wrapper for `PiAgentEvent`
+  - supports awaiting final emitted message list through `result()`
+  - finishes automatically on `.agentEnd(...)`
+- `PiAgentLoopConfig`
+  - model selection
+  - pluggable agent-message -> `PiAIMessage` conversion (`standardMessageConverter` by default)
+- `PiAgentLoop.runSingleTurn(...)`
+  - emits `agent_start` / `turn_start`
+  - appends prompt messages to working context and emits prompt `message_start` + `message_end`
+  - builds `PiAIContext` and consumes provider assistant streaming events
+  - converts streaming assistant partials into `message_start` + `message_update` + `message_end`
+  - emits `turn_end` and `agent_end` with final emitted messages
+  - error fallback path emits synthetic assistant error message and still closes the turn/agent sequence
+
+Tests added:
+
+- single-turn event ordering for prompt + streamed assistant message
+- final `result()` contains prompt + final assistant message
+- terminal assistant `.done(...)` without a prior `.start(...)` synthesizes assistant `message_start`
+
 ## Parity Status vs `pi-mono`
 
-- Partial (foundational types only)
-- Covers the core state/message/event contracts needed for later agent-loop migration
+- Partial (foundational types + single-turn agent loop)
+- Covers core state/message/event contracts and the minimum single-turn streaming loop required for tool-loop work
 
 ## Verification Evidence
 
-- `swift test` passed (includes `PiAgentCoreTypesTests`)
+- `swift test` passed (includes `PiAgentCoreTypesTests` and `PiAgentLoopSingleTurnTests`)
 - `swift build` passed
 
 ## Next Step
 
-- `P3-2`: Agent loop (single turn)
+- `P3-3`: Tool execution loop (multi-turn)
