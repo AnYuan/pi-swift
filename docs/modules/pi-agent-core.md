@@ -159,6 +159,30 @@ Notes:
 
 - `P3-4` is still not complete. Abort/session-id/thinking-budget parity work remains.
 
+### P3-4 (in progress): abort controller (loop-level)
+
+Files:
+
+- `Sources/PiAgentCore/AgentLoop.swift`
+- `Tests/PiAgentCoreTests/PiAgentLoopAbortTests.swift`
+
+Implemented in this slice:
+
+- `PiAgentAbortController`
+  - thread-safe `abort()` / `isAborted`
+- loop-level abort checks in `run(...)`, `runContinue(...)`, and `runSingleTurn(...)`
+  - abort is checked before LLM invocation and at key loop boundaries
+  - aborted execution emits a synthetic assistant terminal message with `stopReason = .aborted`
+  - stream still closes via normal `turn_end` + `agent_end` flow
+
+Tests added:
+
+- pre-aborted `runContinue(...)` skips LLM factory invocation and returns an assistant message with `stopReason = .aborted`
+
+Notes:
+
+- `P3-4` is still not complete. Session-id/thinking-budget plumbing and broader retry/abort parity behaviors remain.
+
 ## Parity Status vs `pi-mono`
 
 - Partial (foundational types + single-turn loop + baseline multi-turn tool execution loop)

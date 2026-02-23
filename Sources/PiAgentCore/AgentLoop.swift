@@ -2,6 +2,26 @@ import Foundation
 import PiAI
 import PiCoreTypes
 
+public final class PiAgentAbortController: @unchecked Sendable {
+    private let lock = NSLock()
+    private var aborted = false
+
+    public init() {}
+
+    public func abort() {
+        lock.lock()
+        aborted = true
+        lock.unlock()
+    }
+
+    public var isAborted: Bool {
+        lock.lock()
+        let value = aborted
+        lock.unlock()
+        return value
+    }
+}
+
 public final class PiAgentEventStream: AsyncSequence, @unchecked Sendable {
     public typealias Element = PiAgentEvent
 
@@ -117,6 +137,7 @@ public enum PiAgentLoopError: Error, Equatable, Sendable {
     case unconvertibleAgentMessageRole(String)
     case cannotContinueWithoutMessages
     case cannotContinueFromAssistantMessage
+    case aborted
 }
 
 public struct PiAgentRuntimeTool: Sendable {
@@ -140,6 +161,7 @@ public enum PiAgentLoop {
         context: PiAgentContext,
         config: PiAgentLoopConfig,
         runtimeTools: [PiAgentRuntimeTool],
+        abortController: PiAgentAbortController? = nil,
         assistantStreamFactory: @escaping AssistantStreamFactory
     ) -> PiAgentEventStream {
         let stream = PiAgentEventStream()
@@ -163,6 +185,7 @@ public enum PiAgentLoop {
                 var isFirstTurn = true
 
                 while true {
+                    try throwIfAborted(abortController)
                     if !isFirstTurn {
                         stream.push(.turnStart)
                     }
@@ -184,6 +207,7 @@ public enum PiAgentLoop {
                         messages: &currentMessages,
                         config: config,
                         stream: stream,
+                        abortController: abortController,
                         assistantStreamFactory: assistantStreamFactory
                     )
 
@@ -194,6 +218,7 @@ public enum PiAgentLoop {
                         from: assistant,
                         runtimeTools: runtimeTools,
                         stream: stream,
+                        abortController: abortController,
                         getSteeringMessages: config.getSteeringMessages
                     )
                     let toolResults = toolExecution.toolResults
@@ -226,7 +251,7 @@ public enum PiAgentLoop {
 
                 stream.push(.agentEnd(messages: emittedMessages))
             } catch {
-                let errorAssistant = makeErrorAssistantMessage(model: config.model, error: error)
+                let errorAssistant = makeFailureAssistantMessage(model: config.model, error: error)
                 let errorMessage = PiAgentMessage.assistant(errorAssistant)
                 emittedMessages.append(errorMessage)
                 stream.push(.messageStart(message: errorMessage))
@@ -243,6 +268,7 @@ public enum PiAgentLoop {
         context: PiAgentContext,
         config: PiAgentLoopConfig,
         runtimeTools: [PiAgentRuntimeTool] = [],
+        abortController: PiAgentAbortController? = nil,
         assistantStreamFactory: @escaping AssistantStreamFactory
     ) throws -> PiAgentEventStream {
         guard !context.messages.isEmpty else {
@@ -257,6 +283,7 @@ public enum PiAgentLoop {
             context: context,
             config: config,
             runtimeTools: runtimeTools,
+            abortController: abortController,
             assistantStreamFactory: assistantStreamFactory
         )
     }
@@ -265,6 +292,7 @@ public enum PiAgentLoop {
         prompts: [PiAgentMessage],
         context: PiAgentContext,
         config: PiAgentLoopConfig,
+        abortController: PiAgentAbortController? = nil,
         assistantStreamFactory: @escaping AssistantStreamFactory
     ) -> PiAgentEventStream {
         let stream = PiAgentEventStream()
@@ -284,12 +312,14 @@ public enum PiAgentLoop {
             }
 
             do {
+                try throwIfAborted(abortController)
                 let assistant = try await streamAssistantResponse(
                     systemPrompt: context.systemPrompt,
                     tools: context.tools,
                     messages: &currentMessages,
                     config: config,
                     stream: stream,
+                    abortController: abortController,
                     assistantStreamFactory: assistantStreamFactory
                 )
 
@@ -298,7 +328,7 @@ public enum PiAgentLoop {
                 stream.push(.turnEnd(message: assistantMessage, toolResults: []))
                 stream.push(.agentEnd(messages: emittedMessages))
             } catch {
-                let errorAssistant = makeErrorAssistantMessage(model: config.model, error: error)
+                let errorAssistant = makeFailureAssistantMessage(model: config.model, error: error)
                 let errorMessage = PiAgentMessage.assistant(errorAssistant)
                 emittedMessages.append(errorMessage)
                 stream.push(.messageStart(message: errorMessage))
@@ -317,8 +347,10 @@ public enum PiAgentLoop {
         messages: inout [PiAgentMessage],
         config: PiAgentLoopConfig,
         stream: PiAgentEventStream,
+        abortController: PiAgentAbortController?,
         assistantStreamFactory: AssistantStreamFactory
     ) async throws -> PiAIAssistantMessage {
+        try throwIfAborted(abortController)
         let llmMessages = try await config.convertToLLM(messages)
         let aiContext = PiAIContext(
             systemPrompt: systemPrompt.isEmpty ? nil : systemPrompt,
@@ -326,10 +358,12 @@ public enum PiAgentLoop {
             tools: tools?.map(\.asAITool)
         )
 
+        try throwIfAborted(abortController)
         let assistantStream = try await assistantStreamFactory(config.model, aiContext)
         var addedPartial = false
 
         for await event in assistantStream {
+            try throwIfAborted(abortController)
             switch event {
             case .start(let partial):
                 let partialMessage = PiAgentMessage.assistant(partial)
@@ -396,14 +430,20 @@ public enum PiAgentLoop {
         }
     }
 
-    private static func makeErrorAssistantMessage(model: PiAIModel, error: Error) -> PiAIAssistantMessage {
-        PiAIAssistantMessage(
+    private static func makeFailureAssistantMessage(model: PiAIModel, error: Error) -> PiAIAssistantMessage {
+        let stopReason: PiAIStopReason
+        if let loopError = error as? PiAgentLoopError, loopError == .aborted {
+            stopReason = .aborted
+        } else {
+            stopReason = .error
+        }
+        return PiAIAssistantMessage(
             content: [],
             api: "agent-loop",
             provider: model.provider,
             model: model.id,
             usage: .zero,
-            stopReason: .error,
+            stopReason: stopReason,
             errorMessage: String(describing: error),
             timestamp: Int64(Date().timeIntervalSince1970 * 1000)
         )
@@ -413,6 +453,7 @@ public enum PiAgentLoop {
         from assistantMessage: PiAIAssistantMessage,
         runtimeTools: [PiAgentRuntimeTool],
         stream: PiAgentEventStream,
+        abortController: PiAgentAbortController?,
         getSteeringMessages: PiAgentLoopConfig.GetMessages?
     ) async throws -> (toolResults: [PiAIToolResultMessage], steeringMessages: [PiAgentMessage]?) {
         let toolCalls = assistantMessage.content.compactMap { part -> PiAIToolCallContent? in
@@ -428,6 +469,7 @@ public enum PiAgentLoop {
         var steeringMessages: [PiAgentMessage]?
 
         for (index, toolCall) in toolCalls.enumerated() {
+            try throwIfAborted(abortController)
             stream.push(.toolExecutionStart(
                 toolCallID: toolCall.id,
                 toolName: toolCall.name,
@@ -496,6 +538,12 @@ public enum PiAgentLoop {
         }
 
         return (results, steeringMessages)
+    }
+
+    private static func throwIfAborted(_ abortController: PiAgentAbortController?) throws {
+        if abortController?.isAborted == true {
+            throw PiAgentLoopError.aborted
+        }
     }
 
     private static func currentTimestampMillis() -> Int64 {
