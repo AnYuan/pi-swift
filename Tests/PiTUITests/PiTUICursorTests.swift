@@ -42,7 +42,7 @@ final class PiTUICursorTests: XCTestCase {
         tui.start()
 
         XCTAssertEqual(terminal.cursorPosition, .init(row: 0, column: 2))
-        XCTAssertEqual(terminal.viewport()[0], "\u{001B}[31mAB\u{001B}[0mZ")
+        XCTAssertEqual(terminal.viewport()[0], "\u{001B}[31mAB\u{001B}[0mZ\u{001B}[0m")
     }
 
     func testNoCursorMarkerKeepsCursorHidden() {

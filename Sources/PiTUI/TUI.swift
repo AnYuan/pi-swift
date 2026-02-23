@@ -75,6 +75,7 @@ public final class PiTUI: PiTUIContainer {
     private func doRender() {
         var renderedLines = render(width: terminal.columns)
         let cursorPosition = extractCursorPosition(from: &renderedLines)
+        renderedLines = sanitizeRenderedLines(renderedLines, width: terminal.columns)
 
         let step = renderBuffer.makeStep(
             width: terminal.columns,
@@ -114,6 +115,10 @@ public final class PiTUI: PiTUIContainer {
                 terminal.clearLine(row: row)
             }
         }
+    }
+
+    private func sanitizeRenderedLines(_ lines: [String], width: Int) -> [String] {
+        lines.map { PiTUIANSIText.sanitizeLine($0, columns: width) }
     }
 
     private func extractCursorPosition(from lines: inout [String]) -> PiTUITerminalCursorPosition? {

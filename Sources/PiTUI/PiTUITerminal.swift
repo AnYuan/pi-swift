@@ -86,8 +86,9 @@ public final class PiTUIVirtualTerminal: PiTUITerminal {
 
     public func writeLine(row: Int, content: String) {
         guard row >= 0, row < rows else { return }
-        visibleLines[row] = String(content.prefix(columns))
-        operationLog.append(.writeLine(row: row, content: String(content.prefix(columns))))
+        let sanitized = PiTUIANSIText.sanitizeLine(content, columns: columns)
+        visibleLines[row] = sanitized
+        operationLog.append(.writeLine(row: row, content: sanitized))
     }
 
     public func clearLine(row: Int) {

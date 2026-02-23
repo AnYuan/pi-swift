@@ -199,4 +199,36 @@ final class PiTUIDifferentialRenderingTests: XCTestCase {
         XCTAssertTrue(viewport[3].contains("CHANGED 3"))
         XCTAssertTrue(viewport[4].contains("Line 4"))
     }
+
+    func testAppliesLineResetForANSIStyledRenderedLines() {
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
+        let tui = PiTUI(terminal: terminal)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["\u{001B}[3mItalic line", "Plain"]
+        tui.start()
+
+        let viewport = terminal.viewport()
+        XCTAssertEqual(viewport[0], "\u{001B}[3mItalic line\u{001B}[0m")
+        XCTAssertEqual(viewport[1], "Plain")
+    }
+
+    func testTruncatesRenderedANSILineByVisibleWidthBeforeDiffing() {
+        final class RawANSIComponent: PiTUIComponent {
+            let line: String
+            init(line: String) { self.line = line }
+            func render(width: Int) -> [String] { [line] }
+            func invalidate() {}
+        }
+
+        let terminal = PiTUIVirtualTerminal(columns: 3, rows: 10)
+        let tui = PiTUI(terminal: terminal)
+        let component = RawANSIComponent(line: "\u{001B}[31mabcdef\u{001B}[0m")
+        tui.addChild(component)
+
+        tui.start()
+
+        XCTAssertEqual(terminal.viewport()[0], "\u{001B}[31mabc\u{001B}[0m")
+    }
 }

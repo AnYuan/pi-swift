@@ -43,7 +43,7 @@ public struct PiTUIRenderBuffer: Sendable {
         clearOnShrink: Bool
     ) -> PiTUIRenderStep {
         let clampedWidth = max(1, width)
-        let newLines = rawLines.map { String($0.prefix(clampedWidth)) }
+        let newLines = rawLines
         let widthChanged = previousWidth != 0 && previousWidth != clampedWidth
 
         if previousLines.isEmpty && !widthChanged {

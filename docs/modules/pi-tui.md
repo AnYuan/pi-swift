@@ -51,6 +51,7 @@
   - `clearOnShrink` toggle
   - `fullRedraws` counter (regression observability)
   - cursor-marker extraction + optional hardware cursor positioning
+  - ANSI-safe line sanitization in render loop (visible-width truncation + line-end reset) before diffing
 
 ## Verified Regression Coverage (current slice)
 
@@ -68,6 +69,8 @@
   - only first line changes
   - only last line changes
   - multiple non-adjacent lines change
+  - styled line gets reset at line end (style-leak prevention baseline)
+  - ANSI-styled line truncates by visible width before diffing/rendering
 - ANSI terminal adapter coverage:
   - hide/show cursor VT sequences
   - clear screen VT sequence
