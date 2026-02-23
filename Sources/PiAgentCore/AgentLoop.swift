@@ -108,6 +108,8 @@ public struct PiAgentLoopConfig: Sendable {
 
 public enum PiAgentLoopError: Error, Equatable, Sendable {
     case unconvertibleAgentMessageRole(String)
+    case cannotContinueWithoutMessages
+    case cannotContinueFromAssistantMessage
 }
 
 public struct PiAgentRuntimeTool: Sendable {
@@ -206,6 +208,28 @@ public enum PiAgentLoop {
         }
 
         return stream
+    }
+
+    public static func runContinue(
+        context: PiAgentContext,
+        config: PiAgentLoopConfig,
+        runtimeTools: [PiAgentRuntimeTool] = [],
+        assistantStreamFactory: @escaping AssistantStreamFactory
+    ) throws -> PiAgentEventStream {
+        guard !context.messages.isEmpty else {
+            throw PiAgentLoopError.cannotContinueWithoutMessages
+        }
+        if case .assistant = context.messages.last {
+            throw PiAgentLoopError.cannotContinueFromAssistantMessage
+        }
+
+        return run(
+            prompts: [],
+            context: context,
+            config: config,
+            runtimeTools: runtimeTools,
+            assistantStreamFactory: assistantStreamFactory
+        )
     }
 
     public static func runSingleTurn(

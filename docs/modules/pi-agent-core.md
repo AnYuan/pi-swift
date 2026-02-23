@@ -113,6 +113,25 @@ Tests added:
 - tool result is injected into second-turn LLM context
 - final agent result includes prompt + assistant(toolCall) + toolResult + assistant(final)
 
+### P3-4 (in progress): `runContinue(...)` retry/continue entrypoint baseline
+
+Files:
+
+- `Sources/PiAgentCore/AgentLoop.swift`
+- `Tests/PiAgentCoreTests/PiAgentLoopContinueTests.swift`
+
+Implemented in this slice:
+
+- `PiAgentLoop.runContinue(...)` synchronous precondition checks
+  - rejects empty context (`cannotContinueWithoutMessages`)
+  - rejects continuing from a trailing assistant message (`cannotContinueFromAssistantMessage`)
+- continue-path execution reuses the multi-turn loop without re-emitting existing user prompt message events
+- custom trailing messages are allowed when caller provides a custom `convertToLLM` implementation (matching `pi-mono` behavior and caller-responsibility model)
+
+Notes:
+
+- `P3-4` is not complete yet. This commit only covers the continue/retry entrypoint baseline. Abort/session-id/thinking-budget parity work remains.
+
 ## Parity Status vs `pi-mono`
 
 - Partial (foundational types + single-turn loop + baseline multi-turn tool execution loop)
