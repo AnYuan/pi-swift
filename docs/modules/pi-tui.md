@@ -25,6 +25,11 @@
   - ANSI-aware visible-width calculation (CSI + OSC hyperlink sequence skipping)
   - ANSI-safe visible-width truncation (preserves escape sequences)
   - line-end reset helper to prevent style leakage across terminal rows
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIProcessTerminal.swift`
+  - host-based process terminal scaffold (`PiTUITerminalHost` + `PiTUIProcessTerminal`)
+  - delegates ANSI rendering to `PiTUIANSITerminal`
+  - bridges host input/resize callbacks into `PiTUI` terminal interface
+  - includes minimal `PiTUIStandardIOHost` stdout-backed implementation (stdin/raw-mode/signal wiring deferred)
 
 ### Render Buffer + Differential Plan
 
@@ -64,6 +69,7 @@
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIRenderSchedulingTests.swift`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUICursorTests.swift`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUISynchronizedOutputTests.swift`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIProcessTerminalTests.swift`
 - Covered scenarios (derived from `../pi-mono/packages/tui/test/tui-render.test.ts`):
   - width change triggers full redraw
   - content shrink clears stale rows when `clearOnShrink` is enabled
@@ -100,13 +106,15 @@
   - first render wrapped in begin/end sync markers
   - differential render wrapped in begin/end sync markers
   - no-op render does not emit sync markers
+- Process terminal scaffold coverage:
+  - host writer receives delegated ANSI output
+  - host input/resize callbacks bridge to `PiTUIProcessTerminal` callbacks and dimension updates
+  - stop delegation
+  - `PiTUIStandardIOHost` writer injection + dimension clamping
 
 ## Not Yet Implemented in `P4-1`
 
-- ANSI/VT sequence renderer and real process terminal integration
-- cursor-position tracking / hardware cursor placement
-- synchronized output batching
-- style reset handling between lines
+- Full stdin/raw-mode/signal-driven process terminal integration (current `PiTUIStandardIOHost` is a minimal stdout-backed scaffold)
 - overlay composition and viewport-aware diff behavior
 - overflow/visible-width handling parity with ANSI-aware width functions
 

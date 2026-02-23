@@ -4,14 +4,14 @@ public final class PiTUIANSITerminal: PiTUITerminal {
     public private(set) var columns: Int
     public private(set) var rows: Int
 
-    private let writeOutput: @Sendable (String) -> Void
+    private let writeOutput: (String) -> Void
     private var onInput: ((String) -> Void)?
     private var onResize: (() -> Void)?
 
     public init(
         columns: Int,
         rows: Int,
-        writer: @escaping @Sendable (String) -> Void
+        writer: @escaping (String) -> Void
     ) {
         self.columns = max(1, columns)
         self.rows = max(1, rows)
