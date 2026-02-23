@@ -23,6 +23,7 @@
   - synchronized output begin/end markers (`CSI ?2026 h/l`)
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIANSIText.swift`
   - ANSI-aware visible-width calculation (CSI + OSC hyperlink sequence skipping)
+  - display-width handling for wide characters (CJK/emoji ranges) and zero-width scalars (combining marks / ZWJ / variation selectors)
   - ANSI-safe visible-width truncation (preserves escape sequences)
   - line-end reset helper to prevent style leakage across terminal rows
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIProcessTerminal.swift`
@@ -92,7 +93,9 @@
 - ANSI text utility coverage:
   - visible width ignores CSI color sequences
   - visible width ignores OSC-8 hyperlink wrappers
+  - visible width handles wide and combining scalars
   - visible-width truncation preserves ANSI sequences
+  - visible-width truncation does not split wide characters
   - reset helper behavior for ANSI vs plain text lines
 - Render scheduling coverage:
   - multiple `requestRender()` calls coalesce before scheduler flush
@@ -101,6 +104,7 @@
   - cursor marker removal from rendered output
   - cursor row/column positioning in virtual terminal
   - ANSI-aware cursor column calculation (ignores style escape sequences before marker)
+  - wide-character cursor column accounting (`你` counts as width 2)
   - no-marker path keeps hardware cursor hidden
 - Synchronized output coverage:
   - first render wrapped in begin/end sync markers

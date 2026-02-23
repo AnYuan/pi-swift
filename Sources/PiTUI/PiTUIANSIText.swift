@@ -18,7 +18,7 @@ public enum PiTUIANSIText {
             if scalar.value < 0x20 || scalar.value == 0x7F {
                 continue
             }
-            width += 1
+            width += displayWidth(of: scalar)
         }
 
         return width
@@ -41,12 +41,13 @@ public enum PiTUIANSIText {
                 continue
             }
 
-            if width >= maxWidth {
+            let scalarWidth = displayWidth(of: scalar)
+            if width + scalarWidth > maxWidth {
                 break
             }
 
             output.append(iterator.next()!)
-            width += 1
+            width += scalarWidth
         }
 
         return String(output)
@@ -65,6 +66,54 @@ public enum PiTUIANSIText {
     public static func sanitizeLine(_ value: String, columns: Int) -> String {
         let truncated = truncateToVisibleWidth(value, maxWidth: max(0, columns))
         return ensureLineReset(truncated)
+    }
+
+    private static func displayWidth(of scalar: UnicodeScalar) -> Int {
+        if isZeroWidthScalar(scalar) {
+            return 0
+        }
+        if isWideScalar(scalar) {
+            return 2
+        }
+        return 1
+    }
+
+    private static func isZeroWidthScalar(_ scalar: UnicodeScalar) -> Bool {
+        switch scalar.properties.generalCategory {
+        case .nonspacingMark, .enclosingMark, .format:
+            return true
+        default:
+            break
+        }
+
+        switch scalar.value {
+        case 0x200D, // ZWJ
+            0xFE00...0xFE0F, // variation selectors
+            0xE0100...0xE01EF: // variation selectors supplement
+            return true
+        default:
+            return false
+        }
+    }
+
+    private static func isWideScalar(_ scalar: UnicodeScalar) -> Bool {
+        switch scalar.value {
+        case 0x1100...0x115F,
+            0x2329...0x232A,
+            0x2E80...0xA4CF,
+            0xAC00...0xD7A3,
+            0xF900...0xFAFF,
+            0xFE10...0xFE19,
+            0xFE30...0xFE6F,
+            0xFF00...0xFF60,
+            0xFFE0...0xFFE6,
+            0x1F300...0x1FAFF,
+            0x20000...0x2FFFD,
+            0x30000...0x3FFFD:
+            return true
+        default:
+            return false
+        }
     }
 }
 

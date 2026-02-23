@@ -57,4 +57,17 @@ final class PiTUICursorTests: XCTestCase {
 
         XCTAssertNil(terminal.cursorPosition)
     }
+
+    func testCursorColumnCountsWideCharactersUsingDisplayWidth() {
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
+        let tui = PiTUI(terminal: terminal)
+        let component = CursorComponent()
+        tui.addChild(component)
+        tui.setShowHardwareCursor(true)
+
+        component.lines = ["你\(PiTUICursor.marker)A"]
+        tui.start()
+
+        XCTAssertEqual(terminal.cursorPosition, .init(row: 0, column: 2))
+    }
 }
