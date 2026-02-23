@@ -52,6 +52,20 @@ final class PiTUIANSITerminalTests: XCTestCase {
         XCTAssertEqual(collector.snapshot(), ["\u{001B}[3;1H\u{001B}[2Kabcde"])
     }
 
+    func testWriteLineUsesANSIVisibleWidthTruncationAndAppendsReset() {
+        let collector = WriteCollector()
+        let terminal = PiTUIANSITerminal(columns: 3, rows: 10) { output in
+            collector.append(output)
+        }
+
+        terminal.writeLine(row: 0, content: "\u{001B}[31mabcdef\u{001B}[0m")
+
+        XCTAssertEqual(
+            collector.snapshot(),
+            ["\u{001B}[1;1H\u{001B}[2K\u{001B}[31mabc\u{001B}[0m"]
+        )
+    }
+
     func testClearLineMovesAndClearsOnlyTargetRow() {
         let collector = WriteCollector()
         let terminal = PiTUIANSITerminal(columns: 20, rows: 10) { output in

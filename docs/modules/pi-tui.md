@@ -19,6 +19,10 @@
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIANSITerminal.swift`
   - writer-based ANSI/VT terminal adapter that translates row writes/clears into escape sequences
   - test hooks for input simulation and resize callbacks (supports unit testing without a real process terminal)
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIANSIText.swift`
+  - ANSI-aware visible-width calculation (CSI + OSC hyperlink sequence skipping)
+  - ANSI-safe visible-width truncation (preserves escape sequences)
+  - line-end reset helper to prevent style leakage across terminal rows
 
 ### Render Buffer + Differential Plan
 
@@ -50,6 +54,7 @@
 
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIDifferentialRenderingTests.swift`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIANSITerminalTests.swift`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIANSITextTests.swift`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIRenderSchedulingTests.swift`
 - Covered scenarios (derived from `../pi-mono/packages/tui/test/tui-render.test.ts`):
   - width change triggers full redraw
@@ -66,6 +71,12 @@
   - row-targeted line write + clear + truncation
   - resize/input callback plumbing
   - out-of-bounds row no-op safety
+  - ANSI-visible-width truncation + automatic reset append for styled lines
+- ANSI text utility coverage:
+  - visible width ignores CSI color sequences
+  - visible width ignores OSC-8 hyperlink wrappers
+  - visible-width truncation preserves ANSI sequences
+  - reset helper behavior for ANSI vs plain text lines
 - Render scheduling coverage:
   - multiple `requestRender()` calls coalesce before scheduler flush
   - resize-triggered render coalesces with explicit render request

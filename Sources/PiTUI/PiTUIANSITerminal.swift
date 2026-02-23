@@ -42,8 +42,8 @@ public final class PiTUIANSITerminal: PiTUITerminal {
 
     public func writeLine(row: Int, content: String) {
         guard isValidRow(row) else { return }
-        let truncated = String(content.prefix(columns))
-        writeOutput(cursorMove(row: row) + "\u{001B}[2K" + truncated)
+        let sanitized = PiTUIANSIText.sanitizeLine(content, columns: columns)
+        writeOutput(cursorMove(row: row) + "\u{001B}[2K" + sanitized)
     }
 
     public func clearLine(row: Int) {
