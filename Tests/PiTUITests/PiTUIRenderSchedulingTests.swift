@@ -61,4 +61,53 @@ final class PiTUIRenderSchedulingTests: XCTestCase {
         scheduler.flush()
         XCTAssertGreaterThanOrEqual(tui.fullRedraws, 2) // initial render + width-change full redraw
     }
+
+    func testPendingScheduledRenderDoesNotRunAfterStop() {
+        let scheduler = PiTUIManualRenderScheduler()
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
+        let tui = PiTUI(terminal: terminal, scheduler: scheduler)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["Initial"]
+        tui.start()
+        XCTAssertEqual(scheduler.pendingCount, 1)
+
+        tui.stop()
+        terminal.clearOperationLog()
+
+        scheduler.flush()
+
+        XCTAssertTrue(terminal.operationLog.isEmpty)
+        XCTAssertEqual(terminal.viewport(), Array(repeating: "", count: 10))
+    }
+
+    func testOldScheduledRenderIsIgnoredAfterStopAndRestart() {
+        let scheduler = PiTUIManualRenderScheduler()
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
+        let tui = PiTUI(terminal: terminal, scheduler: scheduler)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["First session"]
+        tui.start()
+        XCTAssertEqual(scheduler.pendingCount, 1)
+
+        tui.stop()
+        component.lines = ["Second session"]
+        tui.start()
+        XCTAssertEqual(scheduler.pendingCount, 2) // old pending + new start request
+        terminal.clearOperationLog()
+
+        scheduler.flush()
+
+        XCTAssertEqual(terminal.viewport()[0], "Second session")
+        XCTAssertEqual(
+            terminal.operationLog.filter {
+                if case .writeLine = $0 { return true }
+                return false
+            },
+            [.writeLine(row: 0, content: "Second session")]
+        )
+    }
 }

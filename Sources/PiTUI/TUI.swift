@@ -8,6 +8,7 @@ public final class PiTUI: PiTUIContainer {
     private var fullRedrawCount = 0
     private var renderRequested = false
     private var showHardwareCursor = false
+    private var renderGeneration: UInt64 = 0
 
     public init(
         terminal: PiTUITerminal,
@@ -44,6 +45,7 @@ public final class PiTUI: PiTUIContainer {
     public func start() {
         guard !started else { return }
         started = true
+        renderGeneration &+= 1
         terminal.start(onInput: { _ in }, onResize: { [weak self] in
             self?.requestRender()
         })
@@ -56,6 +58,8 @@ public final class PiTUI: PiTUIContainer {
         terminal.showCursor()
         terminal.stop()
         started = false
+        renderRequested = false
+        renderGeneration &+= 1
     }
 
     public func requestRender(force: Bool = false) {
@@ -65,14 +69,18 @@ public final class PiTUI: PiTUIContainer {
         }
         if renderRequested { return }
         renderRequested = true
+        let generation = renderGeneration
         scheduler.schedule { [weak self] in
             guard let self else { return }
+            guard self.renderGeneration == generation else { return }
             self.renderRequested = false
+            guard self.started else { return }
             self.doRender()
         }
     }
 
     private func doRender() {
+        guard started else { return }
         var renderedLines = render(width: terminal.columns)
         let cursorPosition = extractCursorPosition(from: &renderedLines)
         renderedLines = sanitizeRenderedLines(renderedLines, width: terminal.columns)
