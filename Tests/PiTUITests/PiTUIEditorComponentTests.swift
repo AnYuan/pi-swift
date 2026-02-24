@@ -85,4 +85,47 @@ final class PiTUIEditorComponentTests: XCTestCase {
         XCTAssertEqual(terminal.viewport()[1], "cd")
         XCTAssertEqual(terminal.cursorPosition, .init(row: 1, column: 1))
     }
+
+    func testHistoryNavigationUpDownRestoresEditorDraft() {
+        let editor = PiTUIEditorComponent()
+        editor.addToHistory("older")
+        editor.addToHistory("newer")
+        editor.setText("")
+
+        editor.handleInput("\u{001B}[A") // up
+        XCTAssertEqual(editor.getText(), "newer")
+        editor.handleInput("\u{001B}[A") // up
+        XCTAssertEqual(editor.getText(), "older")
+        editor.handleInput("\u{001B}[B") // down
+        XCTAssertEqual(editor.getText(), "newer")
+        editor.handleInput("\u{001B}[B") // down -> draft
+        XCTAssertEqual(editor.getText(), "")
+    }
+
+    func testTypingExitsEditorHistoryBrowsingMode() {
+        let editor = PiTUIEditorComponent()
+        editor.addToHistory("hello")
+        editor.setText("")
+
+        editor.handleInput("\u{001B}[A")
+        XCTAssertEqual(editor.getText(), "hello")
+
+        editor.handleInput("!")
+        XCTAssertEqual(editor.getText(), "hello!")
+
+        editor.handleInput("\u{001B}[B") // not browsing anymore, down should move cursor instead
+        XCTAssertEqual(editor.getText(), "hello!")
+    }
+
+    func testUpArrowUsesCursorMovementWhenNotOnFirstLine() {
+        let editor = PiTUIEditorComponent()
+        editor.addToHistory("history")
+        editor.setText("line1\nline2")
+        editor.model.setCursor(line: 1, colUTF16: 2)
+
+        editor.handleInput("\u{001B}[A")
+
+        XCTAssertEqual(editor.getText(), "line1\nline2")
+        XCTAssertEqual(editor.model.cursorPosition, .init(line: 0, colUTF16: 2))
+    }
 }

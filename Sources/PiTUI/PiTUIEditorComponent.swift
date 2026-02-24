@@ -6,6 +6,9 @@ public final class PiTUIEditorComponent: PiTUIComponent {
     public var onChange: ((String) -> Void)?
     public var onEscape: (() -> Void)?
 
+    private let history = PiTUIEditorHistory()
+    private var suppressHistoryDraftUpdate = false
+
     public init(
         model: PiTUIEditorModel = PiTUIEditorModel(),
         prompt: String = "> "
@@ -25,8 +28,7 @@ public final class PiTUIEditorComponent: PiTUIComponent {
     }
 
     public func addToHistory(_ text: String) {
-        // History model exists separately and will be integrated in a later editor slice.
-        _ = text
+        history.addToHistory(text)
     }
 
     public func handleInput(_ data: String) {
@@ -48,10 +50,26 @@ public final class PiTUIEditorComponent: PiTUIComponent {
         }
 
         if kb.matches(data, action: .cursorUp) {
+            if (history.isBrowsing || model.cursorPosition.line == 0),
+               let next = history.navigateUp(currentText: model.getText()) {
+                suppressHistoryDraftUpdate = true
+                model.setText(next)
+                emitChangeIfNeeded(previous: before)
+                suppressHistoryDraftUpdate = false
+                return
+            }
             model.moveCursorUp()
             return
         }
         if kb.matches(data, action: .cursorDown) {
+            if history.isBrowsing,
+               let next = history.navigateDown(currentText: model.getText()) {
+                suppressHistoryDraftUpdate = true
+                model.setText(next)
+                emitChangeIfNeeded(previous: before)
+                suppressHistoryDraftUpdate = false
+                return
+            }
             model.moveCursorDown()
             return
         }
@@ -114,6 +132,9 @@ public final class PiTUIEditorComponent: PiTUIComponent {
     private func emitChangeIfNeeded(previous: String) {
         let current = model.getText()
         if current != previous {
+            if !suppressHistoryDraftUpdate {
+                history.updateCurrentDraft(current)
+            }
             onChange?(current)
         }
     }

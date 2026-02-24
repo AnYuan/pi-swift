@@ -231,9 +231,11 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - submit/escape callbacks
   - basic navigation/edit handling via editor keybindings manager (`up/down/left/right`, line start/end, delete/backspace, undo)
   - `shift+enter` inserts newline (via `PiTUIKeys` kitty-aware parsing)
+  - prompt history navigation integration (`up/down`) with draft restore, using `PiTUIEditorHistory`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIEditorComponentTests.swift`
   - multiline render output with cursor marker
   - typing/newline/submit flow
   - multi-line arrow navigation
   - onChange behavior
   - `PiTUI` hardware cursor integration on non-first line
+  - editor history browse/draft restore and non-history cursor-move precedence when not on first line
