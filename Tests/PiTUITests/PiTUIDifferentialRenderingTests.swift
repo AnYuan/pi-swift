@@ -50,6 +50,31 @@ final class PiTUIDifferentialRenderingTests: XCTestCase {
         XCTAssertEqual(viewport[3].trimmingCharacters(in: .whitespaces), "")
     }
 
+    func testShrinkWithoutClearOnShrinkUsesDifferentialTailClearsWithoutFullRedraw() {
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
+        let tui = PiTUI(terminal: terminal)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["Line 0", "Line 1", "Line 2"]
+        tui.start()
+        let initialFullRedraws = tui.fullRedraws
+        terminal.clearOperationLog()
+
+        component.lines = ["Line 0"]
+        tui.requestRender()
+
+        let viewport = terminal.viewport()
+        XCTAssertTrue(viewport[0].contains("Line 0"))
+        XCTAssertEqual(viewport[1].trimmingCharacters(in: .whitespaces), "")
+        XCTAssertEqual(viewport[2].trimmingCharacters(in: .whitespaces), "")
+        XCTAssertEqual(tui.fullRedraws, initialFullRedraws)
+        XCTAssertEqual(
+            terminal.operationLog,
+            [.clearLine(row: 1), .clearLine(row: 2)]
+        )
+    }
+
     func testDifferentialRenderingUpdatesOnlyChangedMiddleLine() {
         let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
         let tui = PiTUI(terminal: terminal)
