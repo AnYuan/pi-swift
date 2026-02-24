@@ -240,3 +240,20 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - onChange behavior
   - `PiTUI` hardware cursor integration on non-first line
   - editor history browse/draft restore and non-history cursor-move precedence when not on first line
+
+## `P4-3` Progress (List/Overlay/Layout Foundation)
+
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUISelectList.swift`
+  - `SelectList`-style component (`PiTUISelectList`) with:
+    - items + filtered view
+    - wrapped up/down selection navigation
+    - confirm/cancel callbacks
+    - description single-line normalization
+    - scroll info footer when list exceeds `maxVisible`
+  - `PiTUISelectItem` and theme hooks (`PiTUISelectListTheme`)
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUISelectListTests.swift`
+  - multiline-description normalization
+  - filter/reset/no-match behavior
+  - wrapped navigation + selection-change callback
+  - confirm/cancel callbacks
+  - scroll-info rendering when list is clipped

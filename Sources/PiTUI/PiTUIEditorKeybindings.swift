@@ -18,6 +18,9 @@ public enum PiTUIEditorAction: String, CaseIterable, Sendable {
     case deleteToLineStart
     case deleteToLineEnd
     case submit
+    case selectUp
+    case selectDown
+    case selectConfirm
     case selectCancel
     case yank
     case yankPop
@@ -43,6 +46,9 @@ public final class PiTUIEditorKeybindingsManager {
         .deleteToLineStart: ["ctrl+u"],
         .deleteToLineEnd: ["ctrl+k"],
         .submit: ["enter"],
+        .selectUp: ["up"],
+        .selectDown: ["down"],
+        .selectConfirm: ["enter"],
         // newline is handled as shift+enter in components/models that support multi-line editing
         .selectCancel: ["escape", "ctrl+c"],
         .yank: ["ctrl+y"],
