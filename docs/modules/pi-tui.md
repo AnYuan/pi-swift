@@ -2,8 +2,8 @@
 
 ## Status
 
-- `P4-1` is in progress.
-- This document tracks verified incremental slices before `P4-1` is marked `DONE` in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`.
+- `P4-1` is complete.
+- This document tracks the verified `P4-1` core render-loop baseline and remaining `pi-tui` work for later phases (`P4-2` / `P4-3` / `P4-4` / `P4-5`).
 
 ## Implemented (P4-1 foundation slice)
 
@@ -78,6 +78,7 @@
 - Covered scenarios (derived from `../pi-mono/packages/tui/test/tui-render.test.ts`):
   - width change triggers full redraw
   - content shrink clears stale rows when `clearOnShrink` is enabled
+  - content shrink without `clearOnShrink` uses differential tail clears (no forced full redraw)
   - differential rendering updates only a changed middle line
   - content -> empty -> content transition
   - long content renders bottom viewport window
@@ -128,11 +129,11 @@
   - late host callbacks after `stop()` are ignored (no stale input/resize delivery)
   - `PiTUIStandardIOHost` writer injection + dimension clamping
 
-## Not Yet Implemented in `P4-1`
+## Deferred Beyond `P4-1` (Later Phases)
 
-- Full stdin/raw-mode/signal-driven process terminal integration (current `PiTUIStandardIOHost` is a minimal stdout-backed scaffold)
-- overlay composition and viewport-aware diff behavior
-- advanced viewport/scrollback overwrite semantics matching `pi-mono` (current implementation projects to visible bottom viewport but does not yet model scrollback/cursor movement intricacies)
-- overflow/visible-width handling parity with ANSI-aware width functions
+- Full stdin/raw-mode/signal-driven process terminal integration (current `PiTUIStandardIOHost` is a minimal stdout-backed scaffold); this can continue as incremental hardening without blocking `P4-2`
+- Overlay composition and overlay viewport/layout behavior (`P4-3`)
+- Advanced viewport/scrollback overwrite semantics matching `pi-mono` cursor-movement internals (can be covered via later regression parity work in `P4-5`)
+- Additional overflow/visible-width parity edge cases and broader `pi-mono` test alignment (`P4-5`)
 
-These remain in scope for subsequent `P4-1` slices before the task is marked complete.
+These are tracked as follow-on work and do not block `P4-1` completion.

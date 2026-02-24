@@ -331,12 +331,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
 ## P4 `pi-tui` Migration
 
 ### P4-1: Terminal abstraction + render buffer + differential rendering
-- Status: TODO
+- Status: DONE
 - Depends On: P1-2
 - Scope:
   - Core TUI render loop
 - Test Plan:
   - Differential-render and overwrite regression tests
+- Verification:
+  - Tests: `swift test --filter PiTUITests` passed (46 `PiTUI` tests) on 2026-02-24
+  - Build: `swift build` passed on 2026-02-24
+  - Regression: Differential render coverage now includes width-change redraws, shrink tail-clears (with and without `clearOnShrink`), viewport projection, cursor projection, ANSI-safe truncation/reset, scheduling lifecycle, synchronized output, and process-terminal lifecycle callback hardening
+  - Docs updated: `docs/modules/pi-tui.md`, `README.md`, `docs/PLAN.md`
 
 ### P4-2: Input/editor/key system
 - Status: TODO
@@ -508,4 +513,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P4-1` (`pi-tui` terminal abstraction + render buffer + differential rendering). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P4-2` (`pi-tui` input/editor/key system). Continue following the strict test-first implementation cadence and atomic-commit rule.
