@@ -193,3 +193,12 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - input delegation to model
   - submit/escape callbacks
   - integration with `PiTUI` hardware cursor positioning
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIEditorHistory.swift`
+  - prompt history storage/navigation model for editor-like components
+  - trimmed history entries, consecutive-duplicate suppression, max-100 retention
+  - up/down browsing with current-draft capture/restore and explicit browsing reset
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIEditorHistoryTests.swift`
+  - empty-history behavior
+  - dedupe/trim/limit semantics
+  - history browse up/down and draft restore
+  - exiting history mode when current draft updates
