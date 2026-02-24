@@ -75,4 +75,4 @@ Project bootstrapping/planning docs are in place, and `P1` groundwork is underwa
 - `P3-4` `pi-agent-core` runtime controls (continue/retry entrypoint, steering/follow-up loops, abort controller, request-options plumbing): implemented and verified
 - `P3-5` `pi-agent-core` regression test completion + coverage report: implemented and verified (`/Users/anyuan/Development/pi-swift/docs/reports/pi-agent-core-coverage.md`)
 
-Next step: `P4-2` (`pi-tui` input/editor/key system) in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`.
+Next step: `P4-3` (`pi-tui` list/overlay/layout components) in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`.

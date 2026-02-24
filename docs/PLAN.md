@@ -344,12 +344,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-tui.md`, `README.md`, `docs/PLAN.md`
 
 ### P4-2: Input/editor/key system
-- Status: TODO
+- Status: DONE
 - Depends On: P4-1
 - Scope:
   - Input/Editor/keys/undo/kill-ring
 - Test Plan:
   - Keyboard editing behavior tests
+- Verification:
+  - Tests: `swift test --filter PiTUITests` passed (110 `PiTUI` tests) on 2026-02-24
+  - Build: `swift build` passed on 2026-02-24
+  - Regression: Added keyboard/input/editor behavior coverage for undo stack, kill ring, stdin buffering + bracketed paste parsing, legacy key parsing/matching, single-line input model + component, editor history navigation model, editor keybindings manager, multiline editor model, and multiline editor component interactions
+  - Docs updated: `docs/modules/pi-tui.md`, `README.md`, `docs/PLAN.md`
 
 ### P4-3: List/Overlay/layout components
 - Status: TODO
@@ -513,4 +518,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P4-2` (`pi-tui` input/editor/key system). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P4-3` (`pi-tui` list/overlay/layout components). Continue following the strict test-first implementation cadence and atomic-commit rule.

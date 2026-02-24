@@ -3,7 +3,8 @@
 ## Status
 
 - `P4-1` is complete.
-- This document tracks the verified `P4-1` core render-loop baseline and remaining `pi-tui` work for later phases (`P4-2` / `P4-3` / `P4-4` / `P4-5`).
+- `P4-2` is complete (baseline input/editor/key system).
+- This document tracks the verified `P4-1` + `P4-2` baseline and remaining `pi-tui` work for later phases (`P4-3` / `P4-4` / `P4-5`).
 
 ## Implemented (P4-1 foundation slice)
 
