@@ -43,10 +43,47 @@ Verification (slice):
 
 - `swift test --filter PiMomSandboxTests` passed on 2026-02-24
 
+## `P6-2` Progress (Slack Event Dispatch Foundation Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiMom/SlackDispatch.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiMomTests/PiMomSlackDispatchTests.swift`
+
+Implemented in this slice:
+
+- Slack event model parity foundation
+  - `PiMomSlackEventType` (`mention`, `dm`)
+  - `PiMomSlackEvent`
+  - `PiMomSlackFileRef`
+- mockable handler/notifier protocols
+  - `PiMomSlackCommandHandling`
+  - `PiMomSlackNotifying`
+- per-channel dispatch queue foundation (`PiMomSlackEventDispatcher`)
+  - queued user events for idle channels
+  - scheduled event queue with max size (default `5`)
+  - FIFO draining by channel
+- stop/busy command routing semantics (aligned to `pi-mono` behavior)
+  - `"stop"` executes immediately when running (not queued)
+  - idle `"stop"` posts `_Nothing running_`
+  - busy mention vs DM messaging uses distinct hint text
+
+Tests added:
+
+- immediate stop command routing when running
+- idle stop command fallback message
+- busy mention/DM message text parity
+- queued idle user event draining to handler
+- scheduled event queue max-size and FIFO behavior
+
+Verification (slice):
+
+- `swift test --filter PiMomSlackDispatchTests` passed on 2026-02-24
+
 ## Notes / Parity Gaps (Pending)
 
 - Slack Socket Mode integration
-- channel queue + running/stop orchestration
+- Slack Socket Mode integration and event parsing adapters
 - event file watcher / scheduler
 - workspace log/context store parity
 - tool delegation and attach/upload flows
