@@ -15,4 +15,8 @@ public enum PiCodingAgentModule {
     public static func bootMessage() -> String {
         "\(moduleName) skeleton initialized"
     }
+
+    public static func runCLI(argv: [String], env: PiCodingAgentCLIEnvironment = .init()) -> PiCodingAgentCLIResult {
+        PiCodingAgentCLIApp.run(argv: argv, env: env)
+    }
 }
