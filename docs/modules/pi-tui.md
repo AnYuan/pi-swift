@@ -319,3 +319,24 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - `PiTUISelectList`
   - `PiTUISettingsList`
   - overlay options/layout planner + overlay visibility/stack composition in `PiTUI`
+
+## `P4-4` Progress (Markdown / Images / Autocomplete Foundation)
+
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIAutocomplete.swift`
+  - local path autocomplete foundation (`PiTUICombinedAutocompleteProvider`) with:
+    - forced file suggestion prefix extraction
+    - slash-command guard for `/command` line starts
+    - quoted path continuation (`"..."`, `@"..."`)
+    - direct path and `@` attachment path suggestions from local filesystem
+    - directory-first sorting
+    - apply-completion logic with quote-deduplication and attachment file trailing-space behavior
+  - supporting types:
+    - `PiTUIAutocompleteItem`
+    - `PiTUIAutocompleteSuggestions`
+    - `PiTUIAutocompleteApplyResult`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIAutocompleteTests.swift`
+  - forced `/` extraction after trailing space
+  - slash-command no-trigger guard
+  - quoted path suggestion generation and continuation
+  - quoted completion application without duplicate closing quote
+  - `@` attachment file/directory completion application semantics
