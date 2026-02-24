@@ -70,4 +70,25 @@ final class PiTUICursorTests: XCTestCase {
 
         XCTAssertEqual(terminal.cursorPosition, .init(row: 0, column: 2))
     }
+
+    func testCursorMarkerPositionProjectsIntoVisibleViewportForLongContent() {
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 3)
+        let tui = PiTUI(terminal: terminal)
+        let component = CursorComponent()
+        tui.addChild(component)
+        tui.setShowHardwareCursor(true)
+
+        component.lines = [
+            "L0",
+            "L1",
+            "L2",
+            "ab\(PiTUICursor.marker)cd"
+        ]
+        tui.start()
+
+        XCTAssertEqual(terminal.viewport()[0], "L1")
+        XCTAssertEqual(terminal.viewport()[1], "L2")
+        XCTAssertEqual(terminal.viewport()[2], "abcd")
+        XCTAssertEqual(terminal.cursorPosition, .init(row: 2, column: 2))
+    }
 }

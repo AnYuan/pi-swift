@@ -231,4 +231,37 @@ final class PiTUIDifferentialRenderingTests: XCTestCase {
 
         XCTAssertEqual(terminal.viewport()[0], "\u{001B}[31mabc\u{001B}[0m")
     }
+
+    func testRendersBottomViewportWhenContentExceedsTerminalHeight() {
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 3)
+        let tui = PiTUI(terminal: terminal)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["L0", "L1", "L2", "L3", "L4"]
+        tui.start()
+
+        XCTAssertEqual(terminal.viewport()[0], "L2")
+        XCTAssertEqual(terminal.viewport()[1], "L3")
+        XCTAssertEqual(terminal.viewport()[2], "L4")
+    }
+
+    func testAppendingLineShiftsViewportToLatestRows() {
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 3)
+        let tui = PiTUI(terminal: terminal)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["L0", "L1", "L2"]
+        tui.start()
+        terminal.clearOperationLog()
+
+        component.lines = ["L0", "L1", "L2", "L3"]
+        tui.requestRender()
+
+        XCTAssertEqual(terminal.viewport()[0], "L1")
+        XCTAssertEqual(terminal.viewport()[1], "L2")
+        XCTAssertEqual(terminal.viewport()[2], "L3")
+        XCTAssertTrue(terminal.operationLog.contains(.writeLine(row: 2, content: "L3")))
+    }
 }

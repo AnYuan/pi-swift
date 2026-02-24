@@ -61,6 +61,8 @@
   - cursor-marker extraction + optional hardware cursor positioning
   - ANSI-safe line sanitization in render loop (visible-width truncation + line-end reset) before diffing
   - synchronized output batching around full and differential render passes
+  - viewport projection to terminal height (renders the bottom visible window of long content)
+  - cursor-position projection into visible viewport coordinates for long content
 
 ## Verified Regression Coverage (current slice)
 
@@ -76,6 +78,8 @@
   - content shrink clears stale rows when `clearOnShrink` is enabled
   - differential rendering updates only a changed middle line
   - content -> empty -> content transition
+  - long content renders bottom viewport window
+  - appending content shifts viewport to latest rows
   - shrink then later line change still targets correct row
   - only first line changes
   - only last line changes
@@ -105,6 +109,7 @@
   - cursor row/column positioning in virtual terminal
   - ANSI-aware cursor column calculation (ignores style escape sequences before marker)
   - wide-character cursor column accounting (`你` counts as width 2)
+  - cursor marker row projection from long content into visible viewport
   - no-marker path keeps hardware cursor hidden
 - Synchronized output coverage:
   - first render wrapped in begin/end sync markers
@@ -120,6 +125,7 @@
 
 - Full stdin/raw-mode/signal-driven process terminal integration (current `PiTUIStandardIOHost` is a minimal stdout-backed scaffold)
 - overlay composition and viewport-aware diff behavior
+- advanced viewport/scrollback overwrite semantics matching `pi-mono` (current implementation projects to visible bottom viewport but does not yet model scrollback/cursor movement intricacies)
 - overflow/visible-width handling parity with ANSI-aware width functions
 
 These remain in scope for subsequent `P4-1` slices before the task is marked complete.

@@ -76,10 +76,11 @@ public final class PiTUI: PiTUIContainer {
         var renderedLines = render(width: terminal.columns)
         let cursorPosition = extractCursorPosition(from: &renderedLines)
         renderedLines = sanitizeRenderedLines(renderedLines, width: terminal.columns)
+        let viewport = projectToViewport(lines: renderedLines, cursorPosition: cursorPosition, rows: terminal.rows)
 
         let step = renderBuffer.makeStep(
             width: terminal.columns,
-            newLines: renderedLines,
+            newLines: viewport.lines,
             clearOnShrink: clearOnShrink
         )
 
@@ -108,7 +109,7 @@ public final class PiTUI: PiTUIContainer {
             terminal.endSynchronizedOutput()
         }
 
-        applyHardwareCursor(cursorPosition)
+        applyHardwareCursor(viewport.cursorPosition)
     }
 
     private func applyFull(lines: [String]) {
@@ -123,6 +124,29 @@ public final class PiTUI: PiTUIContainer {
 
     private func sanitizeRenderedLines(_ lines: [String], width: Int) -> [String] {
         lines.map { PiTUIANSIText.sanitizeLine($0, columns: width) }
+    }
+
+    private func projectToViewport(
+        lines: [String],
+        cursorPosition: PiTUITerminalCursorPosition?,
+        rows: Int
+    ) -> PiTUIViewportProjection {
+        let visibleRows = max(1, rows)
+        let viewportStart = max(0, lines.count - visibleRows)
+        let viewportLines = Array(lines.suffix(visibleRows))
+
+        let projectedCursor: PiTUITerminalCursorPosition?
+        if let cursorPosition {
+            if cursorPosition.row < viewportStart || cursorPosition.row >= viewportStart + visibleRows {
+                projectedCursor = nil
+            } else {
+                projectedCursor = .init(row: cursorPosition.row - viewportStart, column: cursorPosition.column)
+            }
+        } else {
+            projectedCursor = nil
+        }
+
+        return .init(lines: viewportLines, cursorPosition: projectedCursor)
     }
 
     private func extractCursorPosition(from lines: inout [String]) -> PiTUITerminalCursorPosition? {
@@ -154,4 +178,9 @@ public final class PiTUI: PiTUIContainer {
 private struct PiTUITerminalCursorPosition {
     var row: Int
     var column: Int
+}
+
+private struct PiTUIViewportProjection {
+    var lines: [String]
+    var cursorPosition: PiTUITerminalCursorPosition?
 }
