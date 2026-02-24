@@ -183,6 +183,86 @@ public struct PiFileWriteTool: PiCodingAgentTool, @unchecked Sendable {
     }
 }
 
+public struct PiFileEditTool: PiCodingAgentTool, @unchecked Sendable {
+    public let baseDirectory: String
+    private let fileManager: FileManager
+
+    public init(baseDirectory: String, fileManager: FileManager = .default) {
+        self.baseDirectory = baseDirectory
+        self.fileManager = fileManager
+    }
+
+    public var definition: PiToolDefinition {
+        .init(
+            name: "edit",
+            description: "Replace a unique text snippet in a file",
+            parameters: .init(
+                type: .object,
+                properties: [
+                    "path": .init(type: .string),
+                    "oldText": .init(type: .string),
+                    "newText": .init(type: .string),
+                ],
+                required: ["path", "oldText", "newText"],
+                additionalProperties: false
+            )
+        )
+    }
+
+    public func execute(toolCallID: String, arguments: JSONValue) throws -> PiCodingAgentToolResult {
+        let object = try requireObject(arguments)
+        let path = try requireString(object, key: "path")
+        let oldText = try requireString(object, key: "oldText")
+        let newText = try requireString(object, key: "newText")
+        guard oldText != newText else {
+            throw PiCodingAgentToolError.invalidArguments("oldText and newText are identical")
+        }
+
+        let resolved = path.hasPrefix("/") ? path : (baseDirectory as NSString).appendingPathComponent(path)
+        guard fileManager.fileExists(atPath: resolved) else {
+            throw PiCodingAgentToolError.io("File not found: \(path)")
+        }
+
+        let original: String
+        do {
+            original = try String(contentsOfFile: resolved, encoding: .utf8)
+        } catch {
+            throw PiCodingAgentToolError.io("Failed to read file: \(path)")
+        }
+
+        let matches = original.ranges(of: oldText)
+        guard !matches.isEmpty else {
+            throw PiCodingAgentToolError.io("oldText not found in \(path)")
+        }
+        guard matches.count == 1, let range = matches.first else {
+            throw PiCodingAgentToolError.io("oldText matched multiple locations in \(path)")
+        }
+
+        let updated = original.replacingCharacters(in: range, with: newText)
+        do {
+            try updated.write(toFile: resolved, atomically: true, encoding: .utf8)
+        } catch {
+            throw PiCodingAgentToolError.io("Failed to write file: \(path)")
+        }
+
+        let lineEnding = original.contains("\r\n") ? "\r\n" : "\n"
+        let summary = [
+            "--- old",
+            "+++ new",
+            "- \(oldText.replacingOccurrences(of: lineEnding, with: "\\n"))",
+            "+ \(newText.replacingOccurrences(of: lineEnding, with: "\\n"))"
+        ].joined(separator: "\n")
+
+        return .init(
+            content: [.text(.init(text: "Edited \(path)"))],
+            details: .object([
+                "diff": .string(summary),
+                "replacements": .number(1),
+            ])
+        )
+    }
+}
+
 private func requireObject(_ value: JSONValue) throws -> [String: JSONValue] {
     guard case .object(let obj) = value else {
         throw PiCodingAgentToolError.invalidArguments("expected object arguments")
@@ -209,5 +289,19 @@ private func intValue(_ value: JSONValue?) -> Int? {
         return Int(s)
     default:
         return nil
+    }
+}
+
+private extension String {
+    func ranges(of needle: String) -> [Range<String.Index>] {
+        guard !needle.isEmpty else { return [] }
+        var results: [Range<String.Index>] = []
+        var searchStart = startIndex
+        while searchStart < endIndex,
+              let range = self.range(of: needle, range: searchStart..<endIndex) {
+            results.append(range)
+            searchStart = range.upperBound
+        }
+        return results
     }
 }

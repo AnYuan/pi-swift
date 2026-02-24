@@ -66,6 +66,10 @@ Implemented in this slice:
 - built-in `write` tool (`PiFileWriteTool`)
   - parent directory creation
   - UTF-8 write + success confirmation text
+- built-in `edit` tool (`PiFileEditTool`)
+  - unique text replacement in UTF-8 files
+  - explicit errors for no match / multiple matches
+  - simple diff summary in `details.diff`
 
 Tests added:
 
@@ -74,3 +78,4 @@ Tests added:
 - `read` offset-beyond-EOF error
 - `write` parent-directory creation and file output
 - unknown tool error
+- `edit` success diff details + no-match + multi-match errors

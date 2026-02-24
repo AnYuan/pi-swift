@@ -92,6 +92,68 @@ final class PiCodingAgentToolsTests: XCTestCase {
         }
     }
 
+    func testEditToolReplacesUniqueMatchAndReturnsDiffDetails() throws {
+        let url = tempDir.appendingPathComponent("edit.txt")
+        try "hello\nworld\n".write(to: url, atomically: true, encoding: .utf8)
+        let tool = PiFileEditTool(baseDirectory: tempDir.path)
+
+        let result = try tool.execute(
+            toolCallID: "1",
+            arguments: .object([
+                "path": .string("edit.txt"),
+                "oldText": .string("world"),
+                "newText": .string("swift")
+            ])
+        )
+
+        let updated = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertEqual(updated, "hello\nswift\n")
+        XCTAssertEqual(extractText(result), "Edited edit.txt")
+        if case .object(let details)? = result.details {
+            XCTAssertEqual(details["replacements"], .number(1))
+            if case .string(let diff)? = details["diff"] {
+                XCTAssertTrue(diff.contains("- world"))
+                XCTAssertTrue(diff.contains("+ swift"))
+            } else {
+                XCTFail("Missing diff")
+            }
+        } else {
+            XCTFail("Missing details")
+        }
+    }
+
+    func testEditToolErrorsWhenOldTextMissing() throws {
+        try "abc".write(to: tempDir.appendingPathComponent("f.txt"), atomically: true, encoding: .utf8)
+        let tool = PiFileEditTool(baseDirectory: tempDir.path)
+
+        XCTAssertThrowsError(try tool.execute(
+            toolCallID: "1",
+            arguments: .object([
+                "path": .string("f.txt"),
+                "oldText": .string("zzz"),
+                "newText": .string("x"),
+            ])
+        )) { error in
+            XCTAssertEqual(error as? PiCodingAgentToolError, .io("oldText not found in f.txt"))
+        }
+    }
+
+    func testEditToolErrorsWhenOldTextMatchesMultipleLocations() throws {
+        try "x x x".write(to: tempDir.appendingPathComponent("f.txt"), atomically: true, encoding: .utf8)
+        let tool = PiFileEditTool(baseDirectory: tempDir.path)
+
+        XCTAssertThrowsError(try tool.execute(
+            toolCallID: "1",
+            arguments: .object([
+                "path": .string("f.txt"),
+                "oldText": .string("x"),
+                "newText": .string("y"),
+            ])
+        )) { error in
+            XCTAssertEqual(error as? PiCodingAgentToolError, .io("oldText matched multiple locations in f.txt"))
+        }
+    }
+
     private func extractText(_ result: PiCodingAgentToolResult) -> String? {
         guard result.content.count == 1 else { return nil }
         guard case .text(let content) = result.content[0] else { return nil }
