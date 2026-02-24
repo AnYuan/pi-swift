@@ -344,3 +344,38 @@ Tests added:
 
 - `swift test --filter PiCodingAgentTests` passed (60 `PiCodingAgent` tests) on 2026-02-24
 - `swift build` passed on 2026-02-24
+
+## `P5-8` Progress (Interactive Mode Slice 1, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/InteractiveMode.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentInteractiveModeTests.swift`
+
+Implemented in this slice:
+
+- interactive mode foundation (`PiCodingAgentInteractiveMode`)
+  - editor-backed prompt entry (`PiTUIEditorComponent`)
+  - transcript capture for submitted prompts (foundation)
+  - status bar rendering with model + shortcut hints
+  - overlay state machine (`none` / `settings` / `modelSelector`)
+- shortcut handling (foundation)
+  - `F2` toggle settings overlay
+  - `F3` open/close model selector
+  - `Enter` submit prompt
+  - `Esc` close active overlay
+- model selector foundation
+  - auth-filtered model list preferred (`getAvailable()`), fallback to all models
+  - sorted model list navigation (`up/down`)
+  - selection updates settings `defaultProvider/defaultModel` and current model
+
+Tests added:
+
+- status bar includes current model and shortcut hints
+- settings overlay toggle and escape close
+- model selector navigation and selection persistence to settings
+- prompt submit updates transcript and clears editor
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentInteractiveModeTests` passed on 2026-02-24
