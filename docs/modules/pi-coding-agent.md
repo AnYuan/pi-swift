@@ -562,6 +562,33 @@ Verification (slice):
 
 - `swift test --filter 'PiCodingAgentCLITests|PiCodingAgentCLIExecutionTests'` passed on 2026-02-24
 
+## `P5-10` Progress (Image Settings Semantics Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Settings.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentSettingsTests.swift`
+
+Implemented in this slice:
+
+- image settings getters/setters in `PiCodingAgentSettingsManager`
+  - `getImageAutoResize()` (default `true`)
+  - `setImageAutoResize(...)`
+  - `getBlockImages()` (default `false`)
+  - `setBlockImages(...)`
+- nested `images.*` persistence using object merge semantics
+  - preserves compatibility with existing global/project deep-merge behavior
+  - supports project override of only one nested image setting key
+
+Tests added:
+
+- defaults + persistence for `images.autoResize` and `images.blockImages`
+- global/project deep-merge behavior for nested `images` object
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentSettingsTests` passed on 2026-02-24
+
 ## `P5-10` Progress (File Argument / Image Attachment Processing Slice, In Progress)
 
 Files:

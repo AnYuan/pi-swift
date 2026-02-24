@@ -124,6 +124,47 @@ final class PiCodingAgentSettingsTests: XCTestCase {
         XCTAssertEqual(globalSaved["shellCommandPrefix"] as? String, "shopt -s expand_aliases")
     }
 
+    func testImageSettingsBlockImagesDefaultsAndPersists() throws {
+        let storage = PiCodingAgentInMemorySettingsStorage()
+        let manager = PiCodingAgentSettingsManager(storage: storage)
+
+        XCTAssertEqual(manager.getImageAutoResize(), true)
+        XCTAssertEqual(manager.getBlockImages(), false)
+
+        manager.setBlockImages(true)
+        manager.setImageAutoResize(false)
+        try manager.flush()
+
+        XCTAssertEqual(manager.getBlockImages(), true)
+        XCTAssertEqual(manager.getImageAutoResize(), false)
+
+        let reloaded = PiCodingAgentSettingsManager(storage: storage)
+        XCTAssertEqual(reloaded.getBlockImages(), true)
+        XCTAssertEqual(reloaded.getImageAutoResize(), false)
+    }
+
+    func testImageSettingsDeepMergeAcrossScopes() throws {
+        try writeJSON([
+            "images": [
+                "autoResize": true,
+                "blockImages": false
+            ]
+        ], to: globalPath)
+        try writeJSON([
+            "images": [
+                "blockImages": true
+            ]
+        ], to: projectPath)
+
+        let manager = PiCodingAgentSettingsManager(storage: PiCodingAgentFileSettingsStorage(
+            globalPath: globalPath,
+            projectPath: projectPath
+        ))
+
+        XCTAssertEqual(manager.getImageAutoResize(), true)
+        XCTAssertEqual(manager.getBlockImages(), true)
+    }
+
     private func writeJSON(_ object: [String: Any], to path: String) throws {
         let data = try JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted, .sortedKeys])
         try FileManager.default.createDirectory(atPath: (path as NSString).deletingLastPathComponent, withIntermediateDirectories: true)

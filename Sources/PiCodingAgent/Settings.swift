@@ -153,6 +153,22 @@ public final class PiCodingAgentSettingsManager: @unchecked Sendable {
         stringValue(forKey: "shellCommandPrefix")
     }
 
+    public func getImageAutoResize() -> Bool {
+        objectValue(forKey: "images")?["autoResize"]?.boolValue ?? true
+    }
+
+    public func setImageAutoResize(_ enabled: Bool, scope: PiCodingAgentSettingsScope = .global) {
+        setNested(.bool(enabled), parentKey: "images", key: "autoResize", scope: scope)
+    }
+
+    public func getBlockImages() -> Bool {
+        objectValue(forKey: "images")?["blockImages"]?.boolValue ?? false
+    }
+
+    public func setBlockImages(_ enabled: Bool, scope: PiCodingAgentSettingsScope = .global) {
+        setNested(.bool(enabled), parentKey: "images", key: "blockImages", scope: scope)
+    }
+
     public func getExtensionPaths() -> [String] {
         guard case .array(let array)? = effectiveSettings()["extensions"] else { return [] }
         return array.compactMap(\.stringValue)
@@ -222,6 +238,28 @@ public final class PiCodingAgentSettingsManager: @unchecked Sendable {
                 projectSettings.removeValue(forKey: key)
             }
             modifiedProjectKeys.insert(key)
+        }
+    }
+
+    private func setNested(_ value: JSONValue, parentKey: String, key: String, scope: PiCodingAgentSettingsScope) {
+        var object: [String: JSONValue]
+        switch scope {
+        case .global:
+            if case .object(let existing)? = globalSettings[parentKey] {
+                object = existing
+            } else {
+                object = [:]
+            }
+            object[key] = value
+            set(.object(object), forKey: parentKey, scope: .global)
+        case .project:
+            if case .object(let existing)? = projectSettings[parentKey] {
+                object = existing
+            } else {
+                object = [:]
+            }
+            object[key] = value
+            set(.object(object), forKey: parentKey, scope: .project)
         }
     }
 
