@@ -137,3 +137,16 @@
 - Additional overflow/visible-width parity edge cases and broader `pi-mono` test alignment (`P4-5`)
 
 These are tracked as follow-on work and do not block `P4-1` completion.
+
+## `P4-2` Progress (Input/Editor/Keys Foundation)
+
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiUndoStack.swift`
+  - Generic undo snapshot stack with injectable clone-on-push behavior
+  - `push`, `pop`, `clear`, `length`
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiKillRing.swift`
+  - Emacs-style kill ring foundation
+  - supports `push` (with accumulate + prepend/append semantics), `peek`, `rotate`, `length`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIEditingPrimitivesTests.swift`
+  - undo stack push/pop/clear
+  - clone-on-push detachment via custom clone closure
+  - kill-ring accumulation and yank-pop rotation semantics
