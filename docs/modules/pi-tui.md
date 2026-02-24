@@ -292,6 +292,7 @@ These are tracked as follow-on work and do not block `P4-1` completion.
     - aligned label/value rendering
     - up/down selection wrap navigation
     - Enter/Space value cycling (`values`)
+    - submenu plumbing (`submenu` factory, input delegation, done callback restore)
     - description rendering + hint lines
     - optional inline search query + filtered view + no-match handling
     - `updateValue(id:newValue:)` support
@@ -299,6 +300,7 @@ These are tracked as follow-on work and do not block `P4-1` completion.
     - `PiTUISettingItem`
     - `PiTUISettingsListTheme`
     - `PiTUISettingsListOptions`
+    - `PiTUIInteractiveComponent`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUISettingsListTests.swift`
   - aligned render + hint presence
   - wrapped up/down navigation
@@ -307,3 +309,4 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - search filter/backspace and no-match rendering
   - selected description wrapping
   - scroll indicator rendering
+  - submenu render/delegate/done update and cancel flows

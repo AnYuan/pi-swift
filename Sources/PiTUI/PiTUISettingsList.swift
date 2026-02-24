@@ -1,24 +1,44 @@
 import Foundation
 
+public protocol PiTUIInteractiveComponent: PiTUIComponent {
+    func handleInput(_ data: String)
+}
+
+public typealias PiTUISettingsSubmenuFactory = (
+    _ currentValue: String,
+    _ done: @escaping (String?) -> Void
+) -> PiTUIInteractiveComponent
+
 public struct PiTUISettingItem: Equatable {
     public var id: String
     public var label: String
     public var description: String?
     public var currentValue: String
     public var values: [String]?
+    public var submenu: PiTUISettingsSubmenuFactory?
 
     public init(
         id: String,
         label: String,
         description: String? = nil,
         currentValue: String,
-        values: [String]? = nil
+        values: [String]? = nil,
+        submenu: PiTUISettingsSubmenuFactory? = nil
     ) {
         self.id = id
         self.label = label
         self.description = description
         self.currentValue = currentValue
         self.values = values
+        self.submenu = submenu
+    }
+
+    public static func == (lhs: PiTUISettingItem, rhs: PiTUISettingItem) -> Bool {
+        lhs.id == rhs.id &&
+            lhs.label == rhs.label &&
+            lhs.description == rhs.description &&
+            lhs.currentValue == rhs.currentValue &&
+            lhs.values == rhs.values
     }
 }
 
@@ -68,6 +88,8 @@ public final class PiTUISettingsList: PiTUIComponent {
     private let theme: PiTUISettingsListTheme
     private let options: PiTUISettingsListOptions
     private var searchQuery: String = ""
+    private var submenuComponent: PiTUIInteractiveComponent?
+    private var submenuItemFilteredIndex: Int?
 
     public var onChange: ((String, String) -> Void)?
     public var onCancel: (() -> Void)?
@@ -109,6 +131,10 @@ public final class PiTUISettingsList: PiTUIComponent {
     }
 
     public func render(width: Int) -> [String] {
+        if let submenuComponent {
+            return submenuComponent.render(width: width)
+        }
+
         let width = max(1, width)
         var lines: [String] = []
 
@@ -163,6 +189,11 @@ public final class PiTUISettingsList: PiTUIComponent {
     }
 
     public func handleInput(_ data: String) {
+        if let submenuComponent {
+            submenuComponent.handleInput(data)
+            return
+        }
+
         let kb = PiTUIEditorKeybindings.get()
 
         if kb.matches(data, action: .selectUp) {
@@ -190,6 +221,24 @@ public final class PiTUISettingsList: PiTUIComponent {
 
     private func activateSelectedItem() {
         guard let itemIndex = filteredIndices[safe: selectedIndex] else { return }
+        if let submenuFactory = items[itemIndex].submenu {
+            submenuItemFilteredIndex = selectedIndex
+            let currentValue = items[itemIndex].currentValue
+            submenuComponent = submenuFactory(currentValue) { [weak self] selectedValue in
+                guard let self else { return }
+                if let selectedValue {
+                    self.items[itemIndex].currentValue = selectedValue
+                    self.onChange?(self.items[itemIndex].id, selectedValue)
+                }
+                self.submenuComponent = nil
+                if let submenuItemFilteredIndex = self.submenuItemFilteredIndex {
+                    self.selectedIndex = max(0, min(submenuItemFilteredIndex, max(0, self.filteredIndices.count - 1)))
+                }
+                self.submenuItemFilteredIndex = nil
+            }
+            return
+        }
+
         guard let values = items[itemIndex].values, !values.isEmpty else { return }
 
         let currentValue = items[itemIndex].currentValue
@@ -299,3 +348,6 @@ private extension Array {
         return self[index]
     }
 }
+
+extension PiTUIInputComponent: PiTUIInteractiveComponent {}
+extension PiTUIEditorComponent: PiTUIInteractiveComponent {}

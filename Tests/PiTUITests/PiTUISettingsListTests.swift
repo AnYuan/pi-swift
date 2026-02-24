@@ -4,6 +4,30 @@ import XCTest
 final class PiTUISettingsListTests: XCTestCase {
     private let theme = PiTUISettingsListTheme.plain
 
+    final class FakeSubmenu: PiTUIInteractiveComponent {
+        let onDone: (String?) -> Void
+        private(set) var inputs: [String] = []
+
+        init(onDone: @escaping (String?) -> Void) {
+            self.onDone = onDone
+        }
+
+        func render(width: Int) -> [String] {
+            ["SUBMENU"]
+        }
+
+        func invalidate() {}
+
+        func handleInput(_ data: String) {
+            inputs.append(data)
+            if data == "\r" {
+                onDone("Updated")
+            } else if data == "\u{001B}" {
+                onDone(nil)
+            }
+        }
+    }
+
     func testRenderAlignsLabelAndValueAndShowsHint() {
         let list = PiTUISettingsList(
             items: [
@@ -126,5 +150,60 @@ final class PiTUISettingsListTests: XCTestCase {
         list.handleInput("\u{001B}[B")
 
         XCTAssertTrue(list.render(width: 60).contains { $0.contains("(5/10)") })
+    }
+
+    func testSubmenuRenderAndDoneUpdatesValueAndRestoresList() {
+        var submenuCreated = 0
+        let list = PiTUISettingsList(
+            items: [
+                .init(
+                    id: "mode",
+                    label: "Mode",
+                    currentValue: "Old",
+                    submenu: { currentValue, done in
+                        XCTAssertEqual(currentValue, "Old")
+                        submenuCreated += 1
+                        return FakeSubmenu(onDone: done)
+                    }
+                )
+            ],
+            theme: theme
+        )
+        var changes: [(String, String)] = []
+        list.onChange = { changes.append(($0, $1)) }
+
+        list.handleInput("\r")
+        XCTAssertEqual(submenuCreated, 1)
+        XCTAssertEqual(list.render(width: 40), ["SUBMENU"])
+
+        list.handleInput("\r")
+        XCTAssertEqual(list.getSelectedItem()?.currentValue, "Updated")
+        XCTAssertTrue(list.render(width: 40).joined(separator: "\n").contains("Mode"))
+        XCTAssertEqual(changes.map(\.0), ["mode"])
+        XCTAssertEqual(changes.map(\.1), ["Updated"])
+    }
+
+    func testSubmenuCancelClosesWithoutChangingValue() {
+        let list = PiTUISettingsList(
+            items: [
+                .init(
+                    id: "mode",
+                    label: "Mode",
+                    currentValue: "Old",
+                    submenu: { _, done in FakeSubmenu(onDone: done) }
+                )
+            ],
+            theme: theme
+        )
+        var changes = 0
+        list.onChange = { _, _ in changes += 1 }
+
+        list.handleInput("\r")
+        XCTAssertEqual(list.render(width: 40), ["SUBMENU"])
+
+        list.handleInput("\u{001B}")
+        XCTAssertEqual(list.getSelectedItem()?.currentValue, "Old")
+        XCTAssertEqual(changes, 0)
+        XCTAssertTrue(list.render(width: 40).joined(separator: "\n").contains("Mode"))
     }
 }
