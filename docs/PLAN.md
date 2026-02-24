@@ -412,13 +412,18 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-2: Built-in tool protocol and core tools (`read`/`write`/`edit`/`bash`)
-- Status: TODO
+- Status: DONE
 - Depends On: P5-1, P3-5
 - Scope:
   - Tool registration/dispatch; first make the four core tools work end-to-end
 - Test Plan:
   - Tool behavior comparison tests
   - Error-path tests
+- Verification:
+  - Tests: `swift test --filter PiCodingAgentTests` passed (24 `PiCodingAgent` tests) on 2026-02-24
+  - Build: `swift build` passed on 2026-02-24
+  - Regression: Added dispatch + `read`/`write`/`edit`/`bash` success and error-path coverage in `PiCodingAgentToolsTests`
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-3: Session management (`save`/`resume`/`continue`)
 - Status: TODO
@@ -539,4 +544,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P5-2` (`pi-coding-agent` built-in tool protocol and core tools). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P5-3` (`pi-coding-agent` session management save/resume/continue). Continue following the strict test-first implementation cadence and atomic-commit rule.

@@ -263,6 +263,114 @@ public struct PiFileEditTool: PiCodingAgentTool, @unchecked Sendable {
     }
 }
 
+public struct PiBashTool: PiCodingAgentTool, @unchecked Sendable {
+    public struct Configuration: Equatable, Sendable {
+        public var workingDirectory: String
+        public var shellPath: String
+        public var commandPrefix: String?
+        public var defaultTimeoutSeconds: TimeInterval
+        public var maxOutputBytes: Int
+
+        public init(
+            workingDirectory: String,
+            shellPath: String = "/bin/zsh",
+            commandPrefix: String? = nil,
+            defaultTimeoutSeconds: TimeInterval = 10,
+            maxOutputBytes: Int = 32_768
+        ) {
+            self.workingDirectory = workingDirectory
+            self.shellPath = shellPath
+            self.commandPrefix = commandPrefix
+            self.defaultTimeoutSeconds = defaultTimeoutSeconds
+            self.maxOutputBytes = max(256, maxOutputBytes)
+        }
+    }
+
+    public let configuration: Configuration
+    private let fileManager: FileManager
+
+    public init(configuration: Configuration, fileManager: FileManager = .default) {
+        self.configuration = configuration
+        self.fileManager = fileManager
+    }
+
+    public var definition: PiToolDefinition {
+        .init(
+            name: "bash",
+            description: "Execute a shell command",
+            parameters: .init(
+                type: .object,
+                properties: [
+                    "command": .init(type: .string),
+                    "timeout": .init(type: .number),
+                ],
+                required: ["command"],
+                additionalProperties: false
+            )
+        )
+    }
+
+    public func execute(toolCallID: String, arguments: JSONValue) throws -> PiCodingAgentToolResult {
+        let object = try requireObject(arguments)
+        let command = try requireString(object, key: "command")
+        let timeout = doubleValue(object["timeout"]) ?? configuration.defaultTimeoutSeconds
+
+        var isDir: ObjCBool = false
+        guard fileManager.fileExists(atPath: configuration.workingDirectory, isDirectory: &isDir), isDir.boolValue else {
+            throw PiCodingAgentToolError.io("Working directory not found: \(configuration.workingDirectory)")
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: configuration.shellPath)
+        process.currentDirectoryURL = URL(fileURLWithPath: configuration.workingDirectory)
+
+        let composedCommand: String = {
+            if let commandPrefix = configuration.commandPrefix, !commandPrefix.isEmpty {
+                return commandPrefix + "\n" + command
+            }
+            return command
+        }()
+        process.arguments = ["-lc", composedCommand]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        do {
+            try process.run()
+        } catch {
+            throw PiCodingAgentToolError.io("Failed to spawn shell: \(configuration.shellPath)")
+        }
+
+        let sema = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in sema.signal() }
+        let waitResult = sema.wait(timeout: .now() + max(0.1, timeout))
+        if waitResult == .timedOut {
+            process.terminate()
+            _ = sema.wait(timeout: .now() + 1)
+            throw PiCodingAgentToolError.io("Command timed out after \(Int(timeout))s")
+        }
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        var output = String(data: data, encoding: .utf8) ?? String(decoding: data, as: UTF8.self)
+        var details: [String: JSONValue] = [
+            "exitCode": .number(Double(process.terminationStatus))
+        ]
+
+        if output.utf8.count > configuration.maxOutputBytes {
+            let suffixData = Data(output.utf8.suffix(configuration.maxOutputBytes))
+            output = String(data: suffixData, encoding: .utf8) ?? String(decoding: suffixData, as: UTF8.self)
+            details["truncated"] = .bool(true)
+        }
+
+        if process.terminationStatus != 0 {
+            throw PiCodingAgentToolError.io("Command failed with exit code \(process.terminationStatus): \(output)")
+        }
+
+        return .init(content: [.text(.init(text: output))], details: .object(details))
+    }
+}
+
 private func requireObject(_ value: JSONValue) throws -> [String: JSONValue] {
     guard case .object(let obj) = value else {
         throw PiCodingAgentToolError.invalidArguments("expected object arguments")
@@ -287,6 +395,18 @@ private func intValue(_ value: JSONValue?) -> Int? {
         return Int(n)
     case .string(let s):
         return Int(s)
+    default:
+        return nil
+    }
+}
+
+private func doubleValue(_ value: JSONValue?) -> Double? {
+    guard let value else { return nil }
+    switch value {
+    case .number(let n):
+        return n
+    case .string(let s):
+        return Double(s)
     default:
         return nil
     }

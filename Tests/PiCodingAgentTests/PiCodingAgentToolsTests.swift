@@ -92,6 +92,78 @@ final class PiCodingAgentToolsTests: XCTestCase {
         }
     }
 
+    func testBashToolRunsCommandAndReturnsOutput() throws {
+        let tool = PiBashTool(configuration: .init(workingDirectory: tempDir.path, shellPath: "/bin/zsh"))
+        let result = try tool.execute(
+            toolCallID: "1",
+            arguments: .object(["command": .string("printf 'hello'")])
+        )
+        XCTAssertEqual(extractText(result), "hello")
+        if case .object(let details)? = result.details {
+            XCTAssertEqual(details["exitCode"], .number(0))
+        } else {
+            XCTFail("Missing bash details")
+        }
+    }
+
+    func testBashToolCommandPrefixIsPrepended() throws {
+        let tool = PiBashTool(configuration: .init(
+            workingDirectory: tempDir.path,
+            shellPath: "/bin/zsh",
+            commandPrefix: "export FOO=bar"
+        ))
+        let result = try tool.execute(
+            toolCallID: "1",
+            arguments: .object(["command": .string("printf \"$FOO\"")])
+        )
+        XCTAssertEqual(extractText(result), "bar")
+    }
+
+    func testBashToolErrorsOnNonZeroExit() {
+        let tool = PiBashTool(configuration: .init(workingDirectory: tempDir.path, shellPath: "/bin/zsh"))
+        XCTAssertThrowsError(try tool.execute(
+            toolCallID: "1",
+            arguments: .object(["command": .string("printf err && exit 7")])
+        )) { error in
+            let message = (error as? PiCodingAgentToolError)?.description ?? ""
+            XCTAssertTrue(message.contains("exit code 7"))
+        }
+    }
+
+    func testBashToolErrorsOnTimeout() {
+        let tool = PiBashTool(configuration: .init(workingDirectory: tempDir.path, shellPath: "/bin/zsh"))
+        XCTAssertThrowsError(try tool.execute(
+            toolCallID: "1",
+            arguments: .object([
+                "command": .string("sleep 2"),
+                "timeout": .number(0.2)
+            ])
+        )) { error in
+            XCTAssertEqual(error as? PiCodingAgentToolError, .io("Command timed out after 0s"))
+        }
+    }
+
+    func testBashToolErrorsWhenWorkingDirectoryMissing() {
+        let missing = tempDir.appendingPathComponent("missing").path
+        let tool = PiBashTool(configuration: .init(workingDirectory: missing, shellPath: "/bin/zsh"))
+        XCTAssertThrowsError(try tool.execute(
+            toolCallID: "1",
+            arguments: .object(["command": .string("pwd")])
+        )) { error in
+            XCTAssertEqual(error as? PiCodingAgentToolError, .io("Working directory not found: \(missing)"))
+        }
+    }
+
+    func testBashToolErrorsWhenShellInvalid() {
+        let tool = PiBashTool(configuration: .init(workingDirectory: tempDir.path, shellPath: "/path/does/not/exist"))
+        XCTAssertThrowsError(try tool.execute(
+            toolCallID: "1",
+            arguments: .object(["command": .string("pwd")])
+        )) { error in
+            XCTAssertEqual(error as? PiCodingAgentToolError, .io("Failed to spawn shell: /path/does/not/exist"))
+        }
+    }
+
     func testEditToolReplacesUniqueMatchAndReturnsDiffDetails() throws {
         let url = tempDir.appendingPathComponent("edit.txt")
         try "hello\nworld\n".write(to: url, atomically: true, encoding: .utf8)

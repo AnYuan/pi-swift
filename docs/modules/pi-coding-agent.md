@@ -70,6 +70,11 @@ Implemented in this slice:
   - unique text replacement in UTF-8 files
   - explicit errors for no match / multiple matches
   - simple diff summary in `details.diff`
+- built-in `bash` tool (`PiBashTool`)
+  - shell execution via `Process`
+  - configurable working directory / shell path / timeout / commandPrefix
+  - non-zero exit and timeout error handling
+  - merged stdout/stderr capture with max-output truncation flag in details
 
 Tests added:
 
@@ -79,3 +84,12 @@ Tests added:
 - `write` parent-directory creation and file output
 - unknown tool error
 - `edit` success diff details + no-match + multi-match errors
+- `bash` happy path / commandPrefix / non-zero / timeout / missing cwd / invalid shell
+
+## `P5-2` Verification
+
+- `swift test --filter PiCodingAgentTests` passed (24 `PiCodingAgent` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24
+- `P5-2` scope covered in Swift foundation:
+  - tool protocol + registry/dispatch
+  - `read`, `write`, `edit`, `bash` core tools
