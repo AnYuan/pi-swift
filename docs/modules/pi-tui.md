@@ -377,3 +377,12 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - Kitty render rows + cached image ID reuse
   - iTerm2 render width parameter (`ch`) and encoded name
   - encoder helper + row calculation coverage
+
+## `P4-4` Verification
+
+- `swift test --filter PiTUITests` passed (156 `PiTUI` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24
+- `P4-4` scope now covered in Swift foundations:
+  - `PiTUIMarkdown`
+  - `PiTUITerminalImage` + `PiTUIImage`
+  - `PiTUICombinedAutocompleteProvider`

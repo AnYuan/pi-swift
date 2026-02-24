@@ -370,12 +370,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-tui.md`, `README.md`, `docs/PLAN.md`
 
 ### P4-4: Markdown/images/autocomplete
-- Status: TODO
+- Status: DONE
 - Depends On: P4-1
 - Scope:
   - Markdown rendering, terminal images, autocomplete
 - Test Plan:
   - Markdown wrapping, image protocol, path autocomplete tests
+- Verification:
+  - Tests: `swift test --filter PiTUITests` passed (156 `PiTUI` tests) on 2026-02-24
+  - Build: `swift build` passed on 2026-02-24
+  - Regression: Added markdown wrapping/cache/image-line passthrough tests, terminal image protocol detection + rendering foundation tests, and local path autocomplete quoting/apply-completion tests
+  - Docs updated: `docs/modules/pi-tui.md`, `README.md`, `docs/PLAN.md`
 
 ### P4-5: `pi-tui` regression test completion
 - Status: TODO
@@ -523,4 +528,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P4-4` (`pi-tui` markdown/images/autocomplete). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P4-5` (`pi-tui` regression test completion). Continue following the strict test-first implementation cadence and atomic-commit rule.
