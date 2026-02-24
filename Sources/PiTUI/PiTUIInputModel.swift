@@ -48,6 +48,7 @@ public final class PiTUIInputModel {
     }
 
     public func handleInput(_ data: String) {
+        let kb = PiTUIEditorKeybindings.get()
         var data = data
 
         if data.contains(Self.pasteStart) {
@@ -71,67 +72,63 @@ public final class PiTUIInputModel {
             return
         }
 
-        if PiTUIKeys.matchesKey(data, "undo") || data == "\u{001A}" {
+        if kb.matches(data, action: .undo) || data == "\u{001A}" {
             undo()
             return
         }
-        if PiTUIKeys.matchesKey(data, "ctrl+z") {
-            undo()
-            return
-        }
-        if PiTUIKeys.matchesKey(data, "cursorLeft") || PiTUIKeys.matchesKey(data, "left") {
+        if kb.matches(data, action: .cursorLeft) {
             moveCursorLeft()
             return
         }
-        if PiTUIKeys.matchesKey(data, "cursorRight") || PiTUIKeys.matchesKey(data, "right") {
+        if kb.matches(data, action: .cursorRight) {
             moveCursorRight()
             return
         }
-        if PiTUIKeys.matchesKey(data, "cursorLineStart") || PiTUIKeys.matchesKey(data, "home") || PiTUIKeys.matchesKey(data, "ctrl+a") {
+        if kb.matches(data, action: .cursorLineStart) {
             moveCursorToStart()
             return
         }
-        if PiTUIKeys.matchesKey(data, "cursorLineEnd") || PiTUIKeys.matchesKey(data, "end") || PiTUIKeys.matchesKey(data, "ctrl+e") {
+        if kb.matches(data, action: .cursorLineEnd) {
             moveCursorToEnd()
             return
         }
-        if PiTUIKeys.matchesKey(data, "deleteCharBackward") || PiTUIKeys.matchesKey(data, "backspace") {
+        if kb.matches(data, action: .deleteCharBackward) {
             backspace()
             return
         }
-        if data == "\u{001B}[3~" {
+        if kb.matches(data, action: .deleteCharForward) || data == "\u{001B}[3~" {
             deleteForward()
             return
         }
-        if PiTUIKeys.matchesKey(data, "ctrl+w") || PiTUIKeys.matchesKey(data, "alt+backspace") {
+        if kb.matches(data, action: .deleteWordBackward) {
             deleteWordBackward()
             return
         }
-        if PiTUIKeys.matchesKey(data, "alt+d") {
+        if kb.matches(data, action: .deleteWordForward) {
             deleteWordForward()
             return
         }
-        if PiTUIKeys.matchesKey(data, "ctrl+u") {
+        if kb.matches(data, action: .deleteToLineStart) {
             deleteToLineStart()
             return
         }
-        if PiTUIKeys.matchesKey(data, "ctrl+k") {
+        if kb.matches(data, action: .deleteToLineEnd) {
             deleteToLineEnd()
             return
         }
-        if PiTUIKeys.matchesKey(data, "ctrl+y") {
+        if kb.matches(data, action: .yank) {
             yank()
             return
         }
-        if PiTUIKeys.matchesKey(data, "alt+y") {
+        if kb.matches(data, action: .yankPop) {
             yankPop()
             return
         }
-        if PiTUIKeys.matchesKey(data, "alt+left") {
+        if kb.matches(data, action: .cursorWordLeft) {
             moveWordBackward()
             return
         }
-        if PiTUIKeys.matchesKey(data, "alt+right") {
+        if kb.matches(data, action: .cursorWordRight) {
             moveWordForward()
             return
         }

@@ -23,11 +23,12 @@ public final class PiTUIInputComponent: PiTUIComponent {
     }
 
     public func handleInput(_ data: String) {
-        if PiTUIKeys.matchesKey(data, "enter") || data == "\n" || data == "\r" {
+        let kb = PiTUIEditorKeybindings.get()
+        if kb.matches(data, action: .submit) || data == "\n" || data == "\r" {
             onSubmit?(model.value)
             return
         }
-        if PiTUIKeys.matchesKey(data, "escape") || PiTUIKeys.matchesKey(data, "esc") {
+        if kb.matches(data, action: .selectCancel) || PiTUIKeys.matchesKey(data, "escape") || PiTUIKeys.matchesKey(data, "esc") {
             onEscape?()
             return
         }

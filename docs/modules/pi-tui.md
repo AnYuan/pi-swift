@@ -202,3 +202,11 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - dedupe/trim/limit semantics
   - history browse up/down and draft restore
   - exiting history mode when current draft updates
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIEditorKeybindings.swift`
+  - editor action -> keybinding manager (subset of `pi-mono` editor actions)
+  - default bindings + override config + replaceable global manager
+  - `InputModel` / `InputComponent` now use action-based matching instead of hard-coded key checks
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIEditorKeybindingsTests.swift`
+  - default binding matches
+  - custom override behavior
+  - replaceable global manager behavior
