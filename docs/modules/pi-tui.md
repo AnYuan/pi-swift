@@ -340,3 +340,11 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - quoted path suggestion generation and continuation
   - quoted completion application without duplicate closing quote
   - `@` attachment file/directory completion application semantics
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUITerminalImage.swift`
+  - `PiTUITerminalImage.isImageLine(_:)` helper for Kitty/iTerm2 image protocol line detection
+  - intended for markdown/image rendering paths to avoid wrapping image payload rows as text
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUITerminalImageTests.swift`
+  - iTerm2 and Kitty detection in start/middle/end positions
+  - very long line regression coverage
+  - mixed ANSI + image sequences
+  - negative cases (plain text / ANSI-only / partial sequences)
