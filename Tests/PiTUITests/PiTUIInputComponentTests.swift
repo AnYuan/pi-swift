@@ -59,4 +59,35 @@ final class PiTUIInputComponentTests: XCTestCase {
         XCTAssertEqual(terminal.viewport()[0], "> ab")
         XCTAssertEqual(terminal.cursorPosition, .init(row: 0, column: 4))
     }
+
+    func testHistoryNavigationUpDownRestoresDraft() {
+        let input = PiTUIInputComponent()
+        input.addToHistory("older")
+        input.addToHistory("newer")
+        input.setValue("")
+
+        input.handleInput("\u{001B}[A") // up -> newer
+        XCTAssertEqual(input.getValue(), "newer")
+        input.handleInput("\u{001B}[A") // up -> older
+        XCTAssertEqual(input.getValue(), "older")
+        input.handleInput("\u{001B}[B") // down -> newer
+        XCTAssertEqual(input.getValue(), "newer")
+        input.handleInput("\u{001B}[B") // down -> draft ("")
+        XCTAssertEqual(input.getValue(), "")
+    }
+
+    func testTypingExitsHistoryBrowsingMode() {
+        let input = PiTUIInputComponent()
+        input.addToHistory("hello")
+        input.setValue("")
+
+        input.handleInput("\u{001B}[A")
+        XCTAssertEqual(input.getValue(), "hello")
+
+        input.handleInput("!")
+        XCTAssertEqual(input.getValue(), "hello!")
+
+        input.handleInput("\u{001B}[B") // should not re-enter or change because browsing exited
+        XCTAssertEqual(input.getValue(), "hello!")
+    }
 }

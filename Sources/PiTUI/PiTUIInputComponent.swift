@@ -6,6 +6,8 @@ public final class PiTUIInputComponent: PiTUIComponent {
     public var onSubmit: ((String) -> Void)?
     public var onEscape: (() -> Void)?
 
+    private let history = PiTUIEditorHistory()
+
     public init(
         model: PiTUIInputModel = PiTUIInputModel(),
         prompt: String = "> "
@@ -20,6 +22,11 @@ public final class PiTUIInputComponent: PiTUIComponent {
 
     public func setValue(_ value: String) {
         model.setValue(value)
+        history.updateCurrentDraft(value)
+    }
+
+    public func addToHistory(_ text: String) {
+        history.addToHistory(text)
     }
 
     public func handleInput(_ data: String) {
@@ -32,7 +39,27 @@ public final class PiTUIInputComponent: PiTUIComponent {
             onEscape?()
             return
         }
+        if PiTUIKeys.matchesKey(data, "up") {
+            let current = model.value
+            if (history.isBrowsing || current.isEmpty), let next = history.navigateUp(currentText: current) {
+                model.setValue(next)
+                model.moveCursorToEnd()
+            }
+            return
+        }
+        if PiTUIKeys.matchesKey(data, "down") {
+            let current = model.value
+            if history.isBrowsing, let next = history.navigateDown(currentText: current) {
+                model.setValue(next)
+                model.moveCursorToEnd()
+            }
+            return
+        }
+        let before = model.value
         model.handleInput(data)
+        if model.value != before {
+            history.updateCurrentDraft(model.value)
+        }
     }
 
     public func invalidate() {}

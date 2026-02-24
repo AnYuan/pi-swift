@@ -188,11 +188,14 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - minimal single-line input component wrapper around `PiTUIInputModel`
   - prompt rendering + `PiTUICursor.marker` insertion for hardware cursor projection
   - submit/escape callbacks
+  - prompt history navigation integration (`up`/`down`) via `PiTUIEditorHistory`
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIInputComponentTests.swift`
   - prompt/cursor-marker rendering
   - input delegation to model
   - submit/escape callbacks
   - integration with `PiTUI` hardware cursor positioning
+  - history browse up/down + draft restore
+  - typing exits history browsing mode
 - Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIEditorHistory.swift`
   - prompt history storage/navigation model for editor-like components
   - trimmed history entries, consecutive-duplicate suppression, max-100 retention
