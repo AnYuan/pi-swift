@@ -275,3 +275,15 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - anchor/offset/margin clamping
   - percent row/column placement on remaining space
   - max-height percent resolution + viewport clamp
+- Extended `/Users/anyuan/Development/pi-swift/Sources/PiTUI/TUI.swift`
+  - overlay stack support via `showOverlay(...)` / `hideOverlay()`
+  - viewport-time overlay compositing with later overlays rendered on top
+  - overlay width/maxHeight application using `PiTUIOverlayLayoutPlanner`
+  - hide-top-overlay restores previous overlay visibility without restarting `PiTUI`
+  - ANSI-stripping visible-cell compositing path (safety-first foundation for overlay rendering over styled base content)
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIOverlayCompositionTests.swift`
+  - resolved-width percentage passed to overlay component render
+  - stacked overlay z-order and hide-restore behavior
+  - non-interfering overlays at different anchors
+  - `maxHeight` truncation in TUI composition path
+  - no-crash overlay compositing over ANSI-styled base content and wide characters

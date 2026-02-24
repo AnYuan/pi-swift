@@ -9,6 +9,7 @@ public final class PiTUI: PiTUIContainer {
     private var renderRequested = false
     private var showHardwareCursor = false
     private var renderGeneration: UInt64 = 0
+    private var overlays: [PiTUIOverlayEntry] = []
 
     public init(
         terminal: PiTUITerminal,
@@ -80,16 +81,34 @@ public final class PiTUI: PiTUIContainer {
         }
     }
 
+    public func showOverlay(_ component: PiTUIComponent, options: PiTUIOverlayOptions = .init()) {
+        overlays.append(.init(component: component, options: options))
+        if started {
+            requestRender()
+        }
+    }
+
+    @discardableResult
+    public func hideOverlay() -> Bool {
+        guard !overlays.isEmpty else { return false }
+        overlays.removeLast()
+        if started {
+            requestRender()
+        }
+        return true
+    }
+
     private func doRender() {
         guard started else { return }
         var renderedLines = render(width: terminal.columns)
         let cursorPosition = extractCursorPosition(from: &renderedLines)
         renderedLines = sanitizeRenderedLines(renderedLines, width: terminal.columns)
         let viewport = projectToViewport(lines: renderedLines, cursorPosition: cursorPosition, rows: terminal.rows)
+        let compositedViewportLines = compositeOverlays(on: viewport.lines)
 
         let step = renderBuffer.makeStep(
             width: terminal.columns,
-            newLines: viewport.lines,
+            newLines: compositedViewportLines,
             clearOnShrink: clearOnShrink
         )
 
@@ -182,6 +201,52 @@ public final class PiTUI: PiTUIContainer {
         terminal.setCursorPosition(row: cursorPosition.row, column: cursorPosition.column)
         terminal.showCursor()
     }
+
+    private func compositeOverlays(on viewportLines: [String]) -> [String] {
+        guard !overlays.isEmpty else { return viewportLines }
+
+        let rows = max(1, terminal.rows)
+        let cols = max(1, terminal.columns)
+        var canvas = Array(repeating: Array(repeating: "", count: cols), count: rows)
+
+        for row in 0..<min(rows, viewportLines.count) {
+            canvas[row] = visibleCells(from: viewportLines[row], columns: cols)
+        }
+
+        for entry in overlays {
+            let provisional = PiTUIOverlayLayoutPlanner.resolve(
+                options: entry.options,
+                overlayHeight: 0,
+                termWidth: cols,
+                termHeight: rows
+            )
+            var overlayLines = entry.component.render(width: provisional.width)
+
+            let layout = PiTUIOverlayLayoutPlanner.resolve(
+                options: entry.options,
+                overlayHeight: overlayLines.count,
+                termWidth: cols,
+                termHeight: rows
+            )
+
+            if let maxHeight = layout.maxHeight, overlayLines.count > maxHeight {
+                overlayLines = Array(overlayLines.prefix(maxHeight))
+            }
+
+            for (index, line) in overlayLines.enumerated() {
+                let targetRow = layout.row + index
+                guard targetRow >= 0, targetRow < rows else { continue }
+                let overlayCells = visibleCells(from: line, columns: layout.width)
+                for (offset, cell) in overlayCells.enumerated() where !cell.isEmpty {
+                    let targetCol = layout.col + offset
+                    guard targetCol >= 0, targetCol < cols else { continue }
+                    canvas[targetRow][targetCol] = cell
+                }
+            }
+        }
+
+        return canvas.map { trimTrailingSpaces(from: $0) }
+    }
 }
 
 private struct PiTUITerminalCursorPosition {
@@ -192,4 +257,97 @@ private struct PiTUITerminalCursorPosition {
 private struct PiTUIViewportProjection {
     var lines: [String]
     var cursorPosition: PiTUITerminalCursorPosition?
+}
+
+private struct PiTUIOverlayEntry {
+    var component: PiTUIComponent
+    var options: PiTUIOverlayOptions
+}
+
+private func visibleCells(from line: String, columns: Int) -> [String] {
+    let stripped = stripANSIEscapeSequences(line)
+    var cells = Array(repeating: "", count: max(0, columns))
+    var col = 0
+
+    for ch in stripped {
+        guard col < cells.count else { break }
+        if ch == "\n" || ch == "\r" { continue }
+        let text = String(ch)
+        let width = max(0, PiTUIANSIText.visibleWidth(text))
+        if width == 0 { continue }
+        if width == 1 {
+            cells[col] = text
+            col += 1
+            continue
+        }
+
+        // Wide glyphs occupy two columns; keep a placeholder in the trailing cell.
+        if col + 1 >= cells.count { break }
+        cells[col] = text
+        cells[col + 1] = ""
+        col += 2
+    }
+
+    return cells
+}
+
+private func trimTrailingSpaces(from cells: [String]) -> String {
+    var end = cells.count
+    while end > 0 {
+        let value = cells[end - 1]
+        if value.isEmpty || value == " " {
+            end -= 1
+            continue
+        }
+        break
+    }
+    return cells.prefix(end).joined()
+}
+
+private func stripANSIEscapeSequences(_ value: String) -> String {
+    var output = String.UnicodeScalarView()
+    var scalars = Array(value.unicodeScalars)
+    var index = 0
+
+    func next() -> UnicodeScalar? {
+        guard index < scalars.count else { return nil }
+        defer { index += 1 }
+        return scalars[index]
+    }
+
+    func peek() -> UnicodeScalar? {
+        guard index < scalars.count else { return nil }
+        return scalars[index]
+    }
+
+    while let scalar = next() {
+        if scalar != "\u{001B}" {
+            output.append(scalar)
+            continue
+        }
+
+        guard let kind = peek() else { break }
+        if kind == "[" {
+            _ = next()
+            while let part = next() {
+                if (0x40...0x7E).contains(part.value) { break }
+            }
+            continue
+        }
+        if kind == "]" {
+            _ = next()
+            while let part = next() {
+                if part == "\u{0007}" { break }
+                if part == "\u{001B}", peek() == "\\" {
+                    _ = next()
+                    break
+                }
+            }
+            continue
+        }
+
+        _ = next()
+    }
+
+    return String(output)
 }
