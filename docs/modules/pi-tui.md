@@ -225,3 +225,15 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - grapheme-aware delete/backspace
   - cross-line cursor movement
   - undo across multiline edits
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIEditorComponent.swift`
+  - minimal multiline editor component wrapper around `PiTUIEditorModel`
+  - prompt-on-first-line rendering + cursor marker insertion
+  - submit/escape callbacks
+  - basic navigation/edit handling via editor keybindings manager (`up/down/left/right`, line start/end, delete/backspace, undo)
+  - `shift+enter` inserts newline (via `PiTUIKeys` kitty-aware parsing)
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIEditorComponentTests.swift`
+  - multiline render output with cursor marker
+  - typing/newline/submit flow
+  - multi-line arrow navigation
+  - onChange behavior
+  - `PiTUI` hardware cursor integration on non-first line

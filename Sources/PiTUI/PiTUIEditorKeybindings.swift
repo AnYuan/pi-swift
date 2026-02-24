@@ -3,6 +3,8 @@ import Foundation
 public typealias PiTUIKeyID = String
 
 public enum PiTUIEditorAction: String, CaseIterable, Sendable {
+    case cursorUp
+    case cursorDown
     case cursorLeft
     case cursorRight
     case cursorWordLeft
@@ -26,6 +28,8 @@ public typealias PiTUIEditorKeybindingsConfig = [PiTUIEditorAction: [PiTUIKeyID]
 
 public final class PiTUIEditorKeybindingsManager {
     public static let defaultBindings: [PiTUIEditorAction: [PiTUIKeyID]] = [
+        .cursorUp: ["up"],
+        .cursorDown: ["down"],
         .cursorLeft: ["left", "ctrl+b"],
         .cursorRight: ["right", "ctrl+f"],
         .cursorWordLeft: ["alt+left", "alt+b"],
@@ -39,6 +43,7 @@ public final class PiTUIEditorKeybindingsManager {
         .deleteToLineStart: ["ctrl+u"],
         .deleteToLineEnd: ["ctrl+k"],
         .submit: ["enter"],
+        // newline is handled as shift+enter in components/models that support multi-line editing
         .selectCancel: ["escape", "ctrl+c"],
         .yank: ["ctrl+y"],
         .yankPop: ["alt+y"],
