@@ -273,6 +273,18 @@ Verification (slice):
 
 - `swift test --filter PiCodingAgentSettingsTests` passed on 2026-02-24
 
+## `P5-10` Verification (Completed)
+
+- `swift test --filter PiCodingAgentTests` passed (100 `PiCodingAgent` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24
+- `P5-10` scope covered in current Swift implementation:
+  - file argument processing (`@file` text + image attachment extraction)
+  - image-related settings semantics (`images.autoResize`, `images.blockImages`)
+  - HTML export foundation for session `.json` files
+  - CLI `--export` flow (`--export <session.json> [output.html]`)
+- Known remaining parity gap deferred to `P5-11`/future slices:
+  - `pi-mono` `.jsonl` export/session format compatibility is not yet implemented
+
 ## `P5-7` Progress (Auth Storage Slice, In Progress)
 
 Files:
