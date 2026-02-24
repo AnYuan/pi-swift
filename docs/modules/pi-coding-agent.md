@@ -531,6 +531,35 @@ Verification (slice):
 - `swift test --filter PiCodingAgentCLITests` passed on 2026-02-24
 - `swift test --filter PiCodingAgentCLIExecutionTests` passed on 2026-02-24
 
+## `P5-9` Progress (RPC Tool Integration Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Modes.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentModesTests.swift`
+
+Implemented in this slice:
+
+- RPC tool protocol integration in `PiCodingAgentModeRunner`
+  - `tools.list` returns registered tool definitions
+  - `tools.execute` executes via `PiCodingAgentToolRegistry` and returns structured result envelope
+  - RPC error envelopes for missing tool registry, invalid params, and tool execution failures
+- SDK tool facade (`PiCodingAgentSDK`)
+  - `listTools()`
+  - `executeTool(_:)`
+
+Tests added:
+
+- RPC `tools.list` returns tool definitions
+- RPC `tools.execute` runs built-in tools and returns structured results
+- SDK tool facade can list and execute tools
+
+## `P5-9` Verification (Completed)
+
+- `swift test --filter PiCodingAgentTests` passed (85 `PiCodingAgent` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24
+- `swift run pi-swift --mode json hello` emitted structured JSON events on 2026-02-24
+
 ## `P5-9` Progress (Modes / RPC / SDK Foundation Slice, In Progress)
 
 Files:

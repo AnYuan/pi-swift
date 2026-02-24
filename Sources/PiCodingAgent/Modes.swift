@@ -36,9 +36,11 @@ private struct PiCodingAgentRPCResponseEnvelope: Codable, Equatable {
 public final class PiCodingAgentModeRunner {
     public let version: String
     private let encoder: JSONEncoder
+    private let toolRegistry: PiCodingAgentToolRegistry?
 
-    public init(version: String = PiCodingAgentCLIApp.versionString) {
+    public init(version: String = PiCodingAgentCLIApp.versionString, toolRegistry: PiCodingAgentToolRegistry? = nil) {
         self.version = version
+        self.toolRegistry = toolRegistry
         self.encoder = JSONEncoder()
         self.encoder.outputFormatting = [.sortedKeys]
     }
@@ -105,6 +107,36 @@ public final class PiCodingAgentModeRunner {
             response = .init(id: request.id, result: [
                 "output": .string(runJSON(input))
             ], error: nil)
+        case "tools.list":
+            let definitions = toolRegistry?.listDefinitions() ?? []
+            response = .init(id: request.id, result: [
+                "tools": .array(definitions.compactMap { jsonValue(fromCodable: $0) })
+            ], error: nil)
+        case "tools.execute":
+            guard let toolRegistry else {
+                response = .init(id: request.id, result: nil, error: .init(code: "tooling_unavailable", message: "No tool registry configured"))
+                break
+            }
+            guard let name = request.params?["name"]?.stringValue else {
+                response = .init(id: request.id, result: nil, error: .init(code: "invalid_params", message: "Missing tools.execute param: name"))
+                break
+            }
+            let toolCallID = request.params?["id"]?.stringValue ?? UUID().uuidString
+            let arguments = request.params?["arguments"] ?? .object([:])
+            do {
+                let result = try toolRegistry.execute(.init(id: toolCallID, name: name, arguments: arguments))
+                response = .init(id: request.id, result: [
+                    "toolCallID": .string(toolCallID),
+                    "text": .string(extractToolText(result)),
+                    "details": result.details ?? .null
+                ], error: nil)
+            } catch {
+                response = .init(
+                    id: request.id,
+                    result: nil,
+                    error: .init(code: "tool_error", message: String(describing: error))
+                )
+            }
         default:
             response = .init(
                 id: request.id,
@@ -135,5 +167,54 @@ public struct PiCodingAgentSDK {
 
     public func handleRPC(_ requestJSON: String) throws -> String {
         try runner.handleRPC(requestJSON)
+    }
+
+    public func listTools() -> [PiToolDefinition] {
+        runner.listTools()
+    }
+
+    public func executeTool(_ call: PiToolCall) throws -> PiCodingAgentToolResult {
+        try runner.executeTool(call)
+    }
+}
+
+extension PiCodingAgentModeRunner {
+    public func listTools() -> [PiToolDefinition] {
+        toolRegistry?.listDefinitions() ?? []
+    }
+
+    public func executeTool(_ call: PiToolCall) throws -> PiCodingAgentToolResult {
+        guard let toolRegistry else {
+            throw PiCodingAgentToolError.io("No tool registry configured")
+        }
+        return try toolRegistry.execute(call)
+    }
+}
+
+private func extractToolText(_ result: PiCodingAgentToolResult) -> String {
+    result.content.compactMap { part -> String? in
+        if case .text(let content) = part { return content.text }
+        return nil
+    }.joined(separator: "\n")
+}
+
+private func jsonValue(fromCodable value: some Encodable) -> JSONValue? {
+    let encoder = JSONEncoder()
+    guard let data = try? encoder.encode(AnyEncodable(value)),
+          let object = try? JSONDecoder().decode(JSONValue.self, from: data) else {
+        return nil
+    }
+    return object
+}
+
+private struct AnyEncodable: Encodable {
+    let encodeFunc: (Encoder) throws -> Void
+
+    init(_ wrapped: some Encodable) {
+        self.encodeFunc = wrapped.encode
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try encodeFunc(encoder)
     }
 }
