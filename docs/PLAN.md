@@ -532,12 +532,19 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-11: `pi-coding-agent` regression test completion and coverage push
-- Status: TODO
+- Status: DONE
 - Depends On: P5-4, P5-5, P5-6, P5-7, P5-8, P5-9, P5-10
 - Scope:
   - Align critical behaviors with `../pi-mono/packages/coding-agent/test`
 - Test Plan:
   - Full module test run + coverage
+- Verification:
+  - Tests: `swift test --filter PiCodingAgentTests` passed (100 `PiCodingAgent` tests) on 2026-02-24
+  - Coverage: `swift test --enable-code-coverage --filter PiCodingAgentTests` passed on 2026-02-24
+  - Coverage report: `docs/reports/pi-coding-agent-coverage.md`
+  - Coverage snapshot (`Sources/PiCodingAgent/*`): Regions `76.49%`, Functions `83.89%`, Lines `86.02%`
+  - Regression: Expanded `PiCodingAgent` regression surface across CLI/modes/tools/settings/resources/interactive/session/attachments/export and documented remaining lower-coverage hotspots
+  - Docs updated: `README.md`, `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`, `docs/reports/pi-coding-agent-coverage.md`
 
 ## P6 Peripheral Capabilities (Incremental by dependency/platform)
 
@@ -586,4 +593,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P5-11` (`pi-coding-agent` regression test completion and coverage push). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P6-1` (`pi-web-ui` feature mapping and Swift platform-equivalent design). Continue following the strict test-first implementation cadence and atomic-commit rule.

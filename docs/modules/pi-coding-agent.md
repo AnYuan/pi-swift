@@ -285,6 +285,24 @@ Verification (slice):
 - Known remaining parity gap deferred to `P5-11`/future slices:
   - `pi-mono` `.jsonl` export/session format compatibility is not yet implemented
 
+## `P5-11` Verification (Completed)
+
+- `swift test --filter PiCodingAgentTests` passed (100 `PiCodingAgent` tests) on 2026-02-24
+- `swift test --enable-code-coverage --filter PiCodingAgentTests` passed on 2026-02-24
+- Coverage report generated: `/Users/anyuan/Development/pi-swift/docs/reports/pi-coding-agent-coverage.md`
+- Coverage snapshot (`Sources/PiCodingAgent/*`):
+  - Regions: `76.49%`
+  - Functions: `83.89%`
+  - Lines: `86.02%`
+- Regression surface now includes:
+  - CLI args/startup/execution (`print`/`json`/`rpc`/`--export`)
+  - tools (`read`/`write`/`edit`/`bash`)
+  - session store/tree
+  - settings/auth/model resolver
+  - resources loader
+  - interactive mode/session
+  - file attachment processing and HTML export
+
 ## `P5-7` Progress (Auth Storage Slice, In Progress)
 
 Files:
