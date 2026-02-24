@@ -1,0 +1,12 @@
+{
+  "name": "pkg-good",
+  "pi": {
+    "extensions": ["dist/main.js"],
+    "skills": ["skills"],
+    "prompts": ["prompts"],
+    "themes": ["themes"],
+    "tools": ["tool-alpha"],
+    "commands": ["cmd-alpha"],
+    "flags": ["--alpha"]
+  }
+}

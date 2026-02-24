@@ -465,12 +465,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-6: Skills / Prompt Templates / Themes / Extensions discovery and loading
-- Status: TODO
+- Status: DONE
 - Depends On: P5-1
 - Scope:
   - Resource discovery, frontmatter parsing, conflict handling, validation rules
 - Test Plan:
   - Fixture-driven regression tests (skill collisions, invalid frontmatter, etc.)
+- Verification:
+  - Tests: `swift test --filter PiCodingAgentTests` passed (44 `PiCodingAgent` tests) on 2026-02-24
+  - Build: `swift build` passed on 2026-02-24
+  - Regression: Added fixture-driven resource loader coverage for skills/prompts/themes/extensions + frontmatter/arg substitution in `PiCodingAgentResourcesTests`
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-7: Settings / Auth Storage / Model Registry & Resolver
 - Status: TODO
@@ -559,4 +564,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P5-6` (`pi-coding-agent` skills / prompt templates / themes / extensions discovery and loading). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P5-7` (`pi-coding-agent` settings / auth storage / model registry & resolver). Continue following the strict test-first implementation cadence and atomic-commit rule.

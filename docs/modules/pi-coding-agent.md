@@ -188,3 +188,50 @@ Tests added:
 
 - `swift test --filter PiCodingAgentTests` passed (37 `PiCodingAgent` tests) on 2026-02-24
 - `swift build` passed on 2026-02-24
+
+## `P5-6` Progress (Skills / Prompt Templates / Themes / Extensions Resource Loading)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Resources.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentResourcesTests.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/Fixtures/pi-coding-agent/resources/...`
+
+Implemented in this slice:
+
+- resource loader foundation (`PiCodingAgentResourceLoader`)
+  - skills / prompt templates / themes / extensions discovery from filesystem paths
+  - frontmatter parsing (`PiCodingAgentFrontmatterParser`)
+  - duplicate resource handling with diagnostics (`skill` / `prompt` / `theme`)
+  - extension conflict detection (`tools`, `commands`, `flags`)
+- skill loading rules
+  - `SKILL.md` and top-level `.md` discovery
+  - resource-name validation
+  - required description validation
+  - `disable-model-invocation` frontmatter flag parsing
+- prompt template loading
+  - frontmatter description parsing
+  - first-line description fallback (truncated to 60 chars)
+  - command arg parsing + `$1`, `$@`, `${@:n}` substitution helpers
+- theme loading
+  - JSON parsing
+  - required `name`
+  - required `colors.text` and `colors.background`
+- extension discovery/loading
+  - standalone `.js` / `.ts`
+  - directory `index.js` / `index.ts`
+  - `package.json` with `pi.*` resource/command/tool metadata
+
+Tests added:
+
+- frontmatter parse success + malformed frontmatter fallback
+- prompt arg parsing and substitution helpers
+- skills: invalid name / missing description / duplicate-name diagnostics
+- prompts: description fallback + duplicate prompt-name handling
+- themes: required-color validation + duplicate theme-name handling
+- extensions: standalone + package discovery, metadata mapping, parse failure diagnostics, tool-conflict rejection
+
+## `P5-6` Verification
+
+- `swift test --filter PiCodingAgentTests` passed (44 `PiCodingAgent` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24

@@ -1,0 +1,8 @@
+{
+  "name": "solarized",
+  "colors": {
+    "text": "#839496",
+    "background": "#002b36",
+    "accent": "#b58900"
+  }
+}

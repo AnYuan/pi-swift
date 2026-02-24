@@ -1,0 +1,9 @@
+{
+  "name": "pkg-conflict",
+  "pi": {
+    "extensions": ["index.js"],
+    "tools": ["tool-alpha"],
+    "commands": ["cmd-beta"],
+    "flags": ["--beta"]
+  }
+}

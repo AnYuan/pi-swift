@@ -1,0 +1,12 @@
+{
+  "name": "pkg-meta",
+  "pi": {
+    "extensions": ["dist/main.js"],
+    "skills": ["skills"],
+    "prompts": ["prompts"],
+    "themes": ["themes"],
+    "tools": ["tool-meta"],
+    "commands": ["cmd-meta"],
+    "flags": ["--meta"]
+  }
+}
