@@ -492,6 +492,39 @@ Verification (slice):
 
 - `swift test --filter PiCodingAgentModesTests` passed on 2026-02-24
 
+## `P5-10` Progress (File Argument / Image Attachment Processing Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/FileProcessor.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentFileProcessorTests.swift`
+
+Implemented in this slice:
+
+- file argument processor foundation (`PiCodingAgentFileProcessor`)
+  - processes CLI file arguments into:
+    - wrapped text payload (`<file name="...">...</file>`)
+    - image attachments (`PiAIImageContent`)
+  - resolves absolute / relative / `~` paths
+  - skips empty files
+  - detects common image formats (PNG/JPEG/GIF/WebP/BMP) by signature with extension fallback
+  - throws structured errors for missing files, read failures, and non-UTF8 non-image files
+- parity note:
+  - image auto-resize option is represented in the API but resizing behavior is deferred to a later `P5-10` slice
+
+Tests added:
+
+- text-file wrapping
+- image attachment extraction + MIME/base64 encoding
+- empty-file skip behavior
+- missing-file error path
+- non-UTF8 non-image error path
+- relative + tilde path resolution
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentFileProcessorTests` passed on 2026-02-24
+
 ## `P5-9` Progress (CLI Non-Interactive Execution Slice, In Progress)
 
 Files:
