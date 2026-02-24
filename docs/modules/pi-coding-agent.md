@@ -43,3 +43,34 @@ Implemented behavior:
 ## Notes / Decisions
 
 - `P5-1` intentionally ports a minimal CLI surface first (args/help/startup-mode orchestration) and defers the full `pi-mono` command set (`install/remove/update/list/config`, extensions, sessions, resume picker) to later `P5` tasks.
+
+## `P5-2` Progress (Built-in Tools Foundation)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Tools.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentToolsTests.swift`
+
+Implemented in this slice:
+
+- tool protocol + registry/dispatch foundation
+  - `PiCodingAgentTool`
+  - `PiCodingAgentToolRegistry`
+  - `PiCodingAgentToolResult`
+  - `PiCodingAgentToolError`
+- built-in `read` tool (`PiFileReadTool`)
+  - path read under a base directory
+  - line-based `offset` / `limit`
+  - truncation hint text + `details.truncation`
+  - error when offset is beyond EOF
+- built-in `write` tool (`PiFileWriteTool`)
+  - parent directory creation
+  - UTF-8 write + success confirmation text
+
+Tests added:
+
+- registry definition listing and dispatch
+- `read` success + truncation details
+- `read` offset-beyond-EOF error
+- `write` parent-directory creation and file output
+- unknown tool error

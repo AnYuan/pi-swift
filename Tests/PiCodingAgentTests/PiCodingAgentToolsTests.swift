@@ -1,0 +1,100 @@
+import XCTest
+import Foundation
+import PiCoreTypes
+@testable import PiCodingAgent
+
+final class PiCodingAgentToolsTests: XCTestCase {
+    private var tempDir: URL!
+
+    override func setUpWithError() throws {
+        tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+    }
+
+    override func tearDownWithError() throws {
+        if let tempDir { try? FileManager.default.removeItem(at: tempDir) }
+    }
+
+    func testRegistryListsDefinitionsAndDispatchesReadTool() throws {
+        let fileURL = tempDir.appendingPathComponent("notes.txt")
+        try "line1\nline2\nline3".write(to: fileURL, atomically: true, encoding: .utf8)
+
+        let registry = PiCodingAgentToolRegistry(tools: [PiFileReadTool(baseDirectory: tempDir.path)])
+        XCTAssertEqual(registry.listDefinitions().map(\.name), ["read"])
+
+        let result = try registry.execute(.init(
+            id: "1",
+            name: "read",
+            arguments: .object(["path": .string("notes.txt")])
+        ))
+        XCTAssertEqual(result.content, [.text(.init(text: "line1\nline2\nline3"))])
+    }
+
+    func testReadToolSupportsOffsetAndLimitWithTruncationDetails() throws {
+        try "a\nb\nc\nd".write(to: tempDir.appendingPathComponent("f.txt"), atomically: true, encoding: .utf8)
+        let tool = PiFileReadTool(baseDirectory: tempDir.path)
+
+        let result = try tool.execute(
+            toolCallID: "1",
+            arguments: .object([
+                "path": .string("f.txt"),
+                "offset": .number(1),
+                "limit": .number(2),
+            ])
+        )
+
+        let text = try XCTUnwrap(extractText(result))
+        XCTAssertTrue(text.contains("b\nc"))
+        XCTAssertTrue(text.contains("truncated"))
+        if case .object(let details)? = result.details,
+           case .object(let truncation)? = details["truncation"] {
+            XCTAssertEqual(truncation["offset"], .number(1))
+            XCTAssertEqual(truncation["limit"], .number(2))
+        } else {
+            XCTFail("Expected truncation details")
+        }
+    }
+
+    func testReadToolErrorsWhenOffsetBeyondEOF() throws {
+        try "x".write(to: tempDir.appendingPathComponent("f.txt"), atomically: true, encoding: .utf8)
+        let tool = PiFileReadTool(baseDirectory: tempDir.path)
+
+        XCTAssertThrowsError(try tool.execute(
+            toolCallID: "1",
+            arguments: .object([
+                "path": .string("f.txt"),
+                "offset": .number(5)
+            ])
+        )) { error in
+            XCTAssertEqual(error as? PiCodingAgentToolError, .io("offset 5 is beyond end of file"))
+        }
+    }
+
+    func testWriteToolCreatesParentDirectoriesAndWritesFile() throws {
+        let tool = PiFileWriteTool(baseDirectory: tempDir.path)
+        let result = try tool.execute(
+            toolCallID: "1",
+            arguments: .object([
+                "path": .string("nested/dir/out.txt"),
+                "content": .string("hello")
+            ])
+        )
+
+        let written = try String(contentsOf: tempDir.appendingPathComponent("nested/dir/out.txt"), encoding: .utf8)
+        XCTAssertEqual(written, "hello")
+        XCTAssertEqual(extractText(result), "Wrote 5 bytes to nested/dir/out.txt")
+    }
+
+    func testRegistryErrorsForUnknownTool() {
+        let registry = PiCodingAgentToolRegistry()
+        XCTAssertThrowsError(try registry.execute(.init(id: "1", name: "missing", arguments: .object([:])))) { error in
+            XCTAssertEqual(error as? PiCodingAgentToolError, .unknownTool("missing"))
+        }
+    }
+
+    private func extractText(_ result: PiCodingAgentToolResult) -> String? {
+        guard result.content.count == 1 else { return nil }
+        guard case .text(let content) = result.content[0] else { return nil }
+        return content.text
+    }
+}
