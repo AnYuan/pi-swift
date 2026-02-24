@@ -360,3 +360,20 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - heading/list/quote/link rendering smoke coverage
   - image-line no-wrap regression
   - cache-by-width + invalidate behavior
+- Extended `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUITerminalImage.swift`
+  - terminal image capability/data types (`Capabilities`, `ImageProtocol`, dimensions)
+  - Kitty/iTerm2 encoder helpers
+  - image row calculation helper
+  - image fallback label helper
+  - Kitty image ID allocator
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIImage.swift`
+  - `PiTUIImage` component foundation with:
+    - width-aware render caching
+    - fallback rendering when image protocol unavailable
+    - Kitty/iTerm2 inline sequence rendering with row placeholders
+    - injected capabilities provider + image ID allocator for deterministic tests
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIImageTests.swift`
+  - fallback output
+  - Kitty render rows + cached image ID reuse
+  - iTerm2 render width parameter (`ch`) and encoded name
+  - encoder helper + row calculation coverage
