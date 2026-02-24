@@ -272,3 +272,38 @@ Tests added:
 Verification (slice):
 
 - `swift test --filter PiCodingAgentSettingsTests` passed on 2026-02-24
+
+## `P5-7` Progress (Auth Storage Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/AuthStorage.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentAuthStorageTests.swift`
+
+Implemented in this slice:
+
+- auth storage backends
+  - file-backed auth storage backend (`PiCodingAgentFileAuthStorageBackend`)
+  - in-memory auth storage backend (`PiCodingAgentInMemoryAuthStorageBackend`)
+- credential model
+  - `api_key` credentials
+  - OAuth credentials (compatible `type: "oauth"` JSON shape using `PiAIOAuthCredentials`)
+- auth storage foundation (`PiCodingAgentAuthStorage`)
+  - set/get/remove/list/has
+  - runtime API key overrides (for CLI/session injection)
+  - provider-derived env key fallback (e.g. `OPENAI_API_KEY`)
+  - explicit env-var-name and command (`!cmd`) API key resolution
+  - fallback resolver hook for custom providers
+  - OAuth API key resolution via `PiAIOAuthCredentialService` with refreshed credential persistence
+
+Tests added:
+
+- CRUD/list behavior for stored credentials
+- runtime override precedence over stored literal keys
+- env-var-name / command / literal API key resolution
+- OAuth refresh path updates in-memory persisted credentials
+- `hasAuth` behavior for env-derived and fallback-resolved providers
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentAuthStorageTests` passed on 2026-02-24
