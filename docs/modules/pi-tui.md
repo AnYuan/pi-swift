@@ -287,3 +287,23 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - non-interfering overlays at different anchors
   - `maxHeight` truncation in TUI composition path
   - no-crash overlay compositing over ANSI-styled base content and wide characters
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUISettingsList.swift`
+  - `SettingsList`-style component foundation (`PiTUISettingsList`) with:
+    - aligned label/value rendering
+    - up/down selection wrap navigation
+    - Enter/Space value cycling (`values`)
+    - description rendering + hint lines
+    - optional inline search query + filtered view + no-match handling
+    - `updateValue(id:newValue:)` support
+  - supporting types:
+    - `PiTUISettingItem`
+    - `PiTUISettingsListTheme`
+    - `PiTUISettingsListOptions`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUISettingsListTests.swift`
+  - aligned render + hint presence
+  - wrapped up/down navigation
+  - Enter/Space value cycling + `onChange`
+  - cancel callback
+  - search filter/backspace and no-match rendering
+  - selected description wrapping
+  - scroll indicator rendering
