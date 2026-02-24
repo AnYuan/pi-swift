@@ -492,6 +492,40 @@ Verification (slice):
 
 - `swift test --filter PiCodingAgentModesTests` passed on 2026-02-24
 
+## `P5-10` Progress (HTML Export Foundation Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/HTMLExporter.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentHTMLExporterTests.swift`
+
+Implemented in this slice:
+
+- HTML export foundation (`PiCodingAgentHTMLExporter`)
+  - renders `PiCodingAgentSessionRecord` into a standalone HTML document
+  - displays:
+    - session metadata + system prompt
+    - user / assistant / tool-result / custom messages
+    - embedded image attachments (`data:` URLs)
+    - tool-call arguments and tool-result details as formatted JSON
+  - HTML escaping for text payloads and JSON blocks
+- file export entrypoint
+  - exports from current Swift session-store `.json` files
+  - default output path (`session.json` -> `session.html`)
+  - explicit output path support
+  - structured errors for unsupported formats / read / decode / write failures
+
+Tests added:
+
+- HTML render includes escaped text, embedded image, and tool-result details
+- export writes default output file and returns path
+- export supports explicit output path
+- unsupported `.jsonl` input currently rejected (future parity slice)
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentHTMLExporterTests` passed on 2026-02-24
+
 ## `P5-10` Progress (File Argument / Image Attachment Processing Slice, In Progress)
 
 Files:
