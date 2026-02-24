@@ -114,10 +114,42 @@ Verification (slice):
 
 - `swift test --filter PiMomToolBridgeTests` passed on 2026-02-24
 
+## `P6-2` Progress (Channel Store / Attachment Queue Foundation Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiMom/Store.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiMomTests/PiMomChannelStoreTests.swift`
+
+Implemented in this slice:
+
+- channel workspace persistence foundation (`PiMomChannelStore`)
+  - per-channel directory creation
+  - Slack attachment local filename generation (timestamp-based + sanitized)
+  - attachment metadata extraction + background-download queue staging
+  - drainable attachment download processing via injected downloader
+  - `log.jsonl` append for channel messages
+  - duplicate log suppression (channel + timestamp)
+  - `lastTimestamp(channelID:)`
+  - bot response logging helper
+- testable attachment downloader abstraction
+  - `PiMomAttachmentDownloading`
+  - default URLSession-based downloader (`PiMomURLSessionAttachmentDownloader`)
+
+Tests added:
+
+- attachment filename sanitization + Slack timestamp -> ms conversion
+- attachment processing queue + download draining writes files
+- log message dedupe + `lastTimestamp` + date auto-fill
+
+Verification (slice):
+
+- `swift test --filter PiMomChannelStoreTests` passed on 2026-02-24
+
 ## Notes / Parity Gaps (Pending)
 
 - Slack Socket Mode integration
 - Slack Socket Mode integration and event parsing adapters
 - event file watcher / scheduler
-- workspace log/context store parity
+- context sync / log-context split parity (`log.jsonl` + `context.jsonl`)
 - full Slack socket/web client adapter
