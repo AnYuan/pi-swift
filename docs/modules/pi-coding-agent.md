@@ -379,3 +379,30 @@ Tests added:
 Verification (slice):
 
 - `swift test --filter PiCodingAgentInteractiveModeTests` passed on 2026-02-24
+
+## `P5-8` Progress (Interactive Mode Slice 2, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/InteractiveMode.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentInteractiveModeTests.swift`
+
+Implemented in this slice:
+
+- raw input routing (`handleInput(_:)`)
+  - integrates `PiTUIKeys.parseKey(...)`
+  - maps `ctrl+s` -> settings shortcut and `ctrl+m` -> model selector shortcut
+  - routes arrow keys / enter / escape through the overlay key-state machine
+  - falls back to editor input for printable text and other non-shortcut inputs
+- overlay interactions via parsed ANSI key sequences
+  - arrow navigation in model selector
+  - escape close behavior
+
+Tests added:
+
+- raw text + enter submission path via `handleInput(_:)`
+- arrow + escape routing inside model selector via ANSI sequences
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentInteractiveModeTests` passed on 2026-02-24

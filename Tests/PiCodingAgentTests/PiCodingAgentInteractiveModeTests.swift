@@ -74,4 +74,36 @@ final class PiCodingAgentInteractiveModeTests: XCTestCase {
         XCTAssertEqual(snapshot.editorText, "")
         XCTAssertTrue(mode.render(width: 80).contains(where: { $0.contains("Submitted prompt") }))
     }
+
+    func testHandleRawInputRoutesTextAndEnterToEditorSubmit() {
+        let mode = PiCodingAgentInteractiveMode(
+            settings: .init(storage: PiCodingAgentInMemorySettingsStorage()),
+            modelRegistry: .init(models: makeModels())
+        )
+
+        mode.handleInput("h")
+        mode.handleInput("i")
+        XCTAssertEqual(mode.snapshot().editorText, "hi")
+
+        mode.handleInput("\r")
+        XCTAssertEqual(mode.snapshot().submittedPrompts, ["hi"])
+        XCTAssertEqual(mode.snapshot().editorText, "")
+    }
+
+    func testHandleRawInputParsesArrowAndEscapeInModelSelector() {
+        let settings = PiCodingAgentSettingsManager(storage: PiCodingAgentInMemorySettingsStorage())
+        settings.setDefaultProvider("openai")
+        settings.setDefaultModel("gpt-4o")
+        let mode = PiCodingAgentInteractiveMode(settings: settings, modelRegistry: .init(models: makeModels()))
+
+        mode.handleKeyID("f3")
+        mode.handleInput("\u{001B}[A") // up -> wrap to anthropic from openai
+        mode.handleInput("\u{001B}") // escape closes
+        XCTAssertEqual(mode.snapshot().overlay, .none)
+
+        mode.handleKeyID("f3")
+        mode.handleInput("\u{001B}[A")
+        mode.handleInput("\r")
+        XCTAssertEqual(mode.snapshot().currentModelQualifiedID, "anthropic/claude-sonnet-4-5")
+    }
 }

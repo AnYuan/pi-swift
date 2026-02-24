@@ -73,6 +73,26 @@ public final class PiCodingAgentInteractiveMode {
         editor.handleInput(data)
     }
 
+    public func handleInput(_ data: String) {
+        if let keyID = PiTUIKeys.parseKey(data) {
+            switch keyID {
+            case "ctrl+s":
+                handleKeyID("f2")
+                return
+            case "ctrl+m":
+                handleKeyID("f3")
+                return
+            case "up", "down", "left", "right", "enter", "escape", "tab", "backspace":
+                handleKeyID(keyID)
+                return
+            default:
+                break
+            }
+        }
+        guard overlay == .none else { return }
+        editor.handleInput(data)
+    }
+
     public func handleKeyID(_ keyID: String) {
         let normalized = keyID.lowercased()
 
