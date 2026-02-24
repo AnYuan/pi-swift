@@ -439,12 +439,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-4: Session tree / branching / traversal
-- Status: TODO
+- Status: DONE
 - Depends On: P5-3
 - Scope:
   - Branching session tree and navigation
 - Test Plan:
   - Branching/tree traversal regression tests
+- Verification:
+  - Tests: `swift test --filter PiCodingAgentTests` passed (32 `PiCodingAgent` tests) on 2026-02-24
+  - Build: `swift build` passed on 2026-02-24
+  - Regression: Added session tree branching + traversal coverage in `PiCodingAgentSessionTreeTests`
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-5: Compaction (including auto-compaction queue)
 - Status: TODO
@@ -549,4 +554,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P5-4` (`pi-coding-agent` session tree / branching / traversal). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P5-5` (`pi-coding-agent` compaction including auto-compaction queue). Continue following the strict test-first implementation cadence and atomic-commit rule.

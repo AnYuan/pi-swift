@@ -125,3 +125,33 @@ Tests added:
 
 - `swift test --filter PiCodingAgentTests` passed (29 `PiCodingAgent` tests) on 2026-02-24
 - `swift build` passed on 2026-02-24
+
+## `P5-4` Progress (Session Tree / Branching / Traversal)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/SessionTree.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentSessionTreeTests.swift`
+
+Implemented in this slice:
+
+- session tree index persistence (`PiCodingAgentSessionTreeStore`)
+  - `createRoot(sessionID:)`
+  - `branch(from:childID:)`
+  - `node(id:)`
+  - `children(of:)`
+  - `ancestors(of:)`
+  - `pathToRoot(of:)`
+- persistent node model (`PiCodingAgentSessionNode`) with parent/children edges
+- JSON-backed index file storage and error handling
+
+Tests added:
+
+- root + multi-branch persistence
+- children/ancestors/path traversal
+- duplicate-node and missing-parent error paths
+
+## `P5-4` Verification
+
+- `swift test --filter PiCodingAgentTests` passed (32 `PiCodingAgent` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24
