@@ -383,12 +383,18 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-tui.md`, `README.md`, `docs/PLAN.md`
 
 ### P4-5: `pi-tui` regression test completion
-- Status: TODO
+- Status: DONE
 - Depends On: P4-2, P4-3, P4-4
 - Scope:
   - Align with `../pi-mono/packages/tui/test`
 - Test Plan:
   - Full module test run + coverage
+- Verification:
+  - Tests: `swift test --filter PiTUITests` passed (156 `PiTUI` tests) on 2026-02-24
+  - Coverage: `swift test --enable-code-coverage --filter PiTUITests` passed on 2026-02-24
+  - Coverage report: `docs/reports/pi-tui-coverage.md`
+  - Build: `swift build` passed on 2026-02-24
+  - Docs updated: `docs/modules/pi-tui.md`, `docs/reports/pi-tui-coverage.md`, `README.md`, `docs/PLAN.md`
 
 ## P5 `pi-coding-agent` Migration (Core Product)
 
@@ -528,4 +534,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P4-5` (`pi-tui` regression test completion). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P5-1` (`pi-coding-agent` CLI args/help and minimum startup flow). Continue following the strict test-first implementation cadence and atomic-commit rule.

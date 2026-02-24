@@ -386,3 +386,11 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - `PiTUIMarkdown`
   - `PiTUITerminalImage` + `PiTUIImage`
   - `PiTUICombinedAutocompleteProvider`
+
+## `P4-5` Verification (Regression Completion)
+
+- `swift test --filter PiTUITests` passed (156 `PiTUI` tests) on 2026-02-24
+- `swift test --enable-code-coverage --filter PiTUITests` passed on 2026-02-24
+- `swift build` passed on 2026-02-24
+- Coverage report added: `/Users/anyuan/Development/pi-swift/docs/reports/pi-tui-coverage.md`
+- `P4` (`pi-tui`) is now complete in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`
