@@ -160,3 +160,12 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - bracketed paste complete/chunked flows
   - high-byte input compatibility conversion
   - flush/empty-input compatibility behavior
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIKeys.swift`
+  - minimal key parsing/matching foundation for legacy terminal input
+  - supports printable chars, common specials, arrows/home/end (CSI + SS3), legacy ctrl combos, and selected alt-prefixed sequences
+  - includes kitty-protocol-active toggle for compatibility gating of legacy alt-prefixed parsing (subset behavior)
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIKeysTests.swift`
+  - legacy/SS3 navigation keys
+  - ctrl-letter/symbol parsing
+  - alt-prefixed parsing gating with kitty protocol flag
+  - alias-aware `matchesKey` normalization (`esc`/`escape`, `return`/`enter`, modifier order)
