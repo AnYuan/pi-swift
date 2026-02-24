@@ -169,3 +169,14 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - ctrl-letter/symbol parsing
   - alt-prefixed parsing gating with kitty protocol flag
   - alias-aware `matchesKey` normalization (`esc`/`escape`, `return`/`enter`, modifier order)
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIInputModel.swift`
+  - single-line text input state model (value + UTF-16 cursor offset)
+  - grapheme-aware left/right movement, backspace, forward delete
+  - undo snapshots via `PiUndoStack`
+  - bracketed paste buffering/atomic insertion
+  - minimal `handleInput` integration with `PiTUIKeys` subset (`left/right/home/end`, `ctrl+a/e/z`, backspace, delete)
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIInputModelTests.swift`
+  - insertion and cursor movement
+  - grapheme-aware emoji cursor/deletion behavior
+  - atomic undo for chunked bracketed paste
+  - control-character filtering
