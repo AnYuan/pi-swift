@@ -121,7 +121,9 @@
 - Process terminal scaffold coverage:
   - host writer receives delegated ANSI output
   - host input/resize callbacks bridge to `PiTUIProcessTerminal` callbacks and dimension updates
-  - stop delegation
+  - `start()` / `stop()` host lifecycle delegation
+  - idempotent `start()` / `stop()` host lifecycle calls
+  - late host callbacks after `stop()` are ignored (no stale input/resize delivery)
   - `PiTUIStandardIOHost` writer injection + dimension clamping
 
 ## Not Yet Implemented in `P4-1`

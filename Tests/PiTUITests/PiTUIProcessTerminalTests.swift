@@ -8,6 +8,9 @@ final class PiTUIProcessTerminalTests: XCTestCase {
         var writes: [String] = []
         var started = false
         var stopped = false
+        var startCalls = 0
+        var stopCalls = 0
+        var clearCallbacksOnStop = true
 
         private var onInput: ((String) -> Void)?
         private var onResize: ((Int, Int) -> Void)?
@@ -22,14 +25,18 @@ final class PiTUIProcessTerminalTests: XCTestCase {
             onResize: @escaping (Int, Int) -> Void
         ) {
             started = true
+            startCalls += 1
             self.onInput = onInput
             self.onResize = onResize
         }
 
         func stop() {
             stopped = true
-            onInput = nil
-            onResize = nil
+            stopCalls += 1
+            if clearCallbacksOnStop {
+                onInput = nil
+                onResize = nil
+            }
         }
 
         func write(_ output: String) {
@@ -86,10 +93,11 @@ final class PiTUIProcessTerminalTests: XCTestCase {
         XCTAssertEqual(terminal.rows, 30)
     }
 
-    func testStopDelegatesToHost() {
+    func testStopDelegatesToHostAfterStart() {
         let host = MockHost()
         let terminal = PiTUIProcessTerminal(host: host)
 
+        terminal.start(onInput: { _ in }, onResize: {})
         terminal.stop()
 
         XCTAssertTrue(host.stopped)
@@ -110,5 +118,40 @@ final class PiTUIProcessTerminalTests: XCTestCase {
         host.updateSize(columns: 0, rows: 2)
         XCTAssertEqual(host.columns, 1)
         XCTAssertEqual(host.rows, 2)
+    }
+
+    func testStartAndStopAreIdempotentForHostLifecycle() {
+        let host = MockHost()
+        let terminal = PiTUIProcessTerminal(host: host)
+
+        terminal.start(onInput: { _ in }, onResize: {})
+        terminal.start(onInput: { _ in }, onResize: {})
+        terminal.stop()
+        terminal.stop()
+
+        XCTAssertEqual(host.startCalls, 1)
+        XCTAssertEqual(host.stopCalls, 1)
+    }
+
+    func testLateHostCallbacksAfterStopAreIgnored() {
+        let host = MockHost(columns: 40, rows: 10)
+        host.clearCallbacksOnStop = false
+        let terminal = PiTUIProcessTerminal(host: host)
+        var inputs: [String] = []
+        var resizeCount = 0
+
+        terminal.start(
+            onInput: { inputs.append($0) },
+            onResize: { resizeCount += 1 }
+        )
+        terminal.stop()
+
+        host.simulateInput("late")
+        host.simulateResize(columns: 100, rows: 30)
+
+        XCTAssertTrue(inputs.isEmpty)
+        XCTAssertEqual(resizeCount, 0)
+        XCTAssertEqual(terminal.columns, 40)
+        XCTAssertEqual(terminal.rows, 10)
     }
 }

@@ -18,6 +18,8 @@ public final class PiTUIProcessTerminal: PiTUITerminal {
 
     private let host: PiTUITerminalHost
     private let ansiTerminal: PiTUIANSITerminal
+    private var started = false
+    private var sessionGeneration: UInt64 = 0
 
     public init(host: PiTUITerminalHost) {
         self.host = host
@@ -29,10 +31,19 @@ public final class PiTUIProcessTerminal: PiTUITerminal {
     }
 
     public func start(onInput: @escaping (String) -> Void, onResize: @escaping () -> Void) {
+        guard !started else { return }
+        started = true
+        sessionGeneration &+= 1
+        let generation = sessionGeneration
         host.start(
-            onInput: onInput,
+            onInput: { [weak self] value in
+                guard let self else { return }
+                guard self.started, self.sessionGeneration == generation else { return }
+                onInput(value)
+            },
             onResize: { [weak self] columns, rows in
                 guard let self else { return }
+                guard self.started, self.sessionGeneration == generation else { return }
                 let c = max(1, columns)
                 let r = max(1, rows)
                 self.columns = c
@@ -44,6 +55,9 @@ public final class PiTUIProcessTerminal: PiTUITerminal {
     }
 
     public func stop() {
+        guard started else { return }
+        started = false
+        sessionGeneration &+= 1
         host.stop()
     }
 
