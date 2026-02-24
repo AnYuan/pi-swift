@@ -155,3 +155,36 @@ Tests added:
 
 - `swift test --filter PiCodingAgentTests` passed (32 `PiCodingAgent` tests) on 2026-02-24
 - `swift build` passed on 2026-02-24
+
+## `P5-5` Progress (Compaction + Auto-Compaction Queue Foundation)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Compaction.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentCompactionTests.swift`
+
+Implemented in this slice:
+
+- compaction strategy helpers (`PiCodingAgentCompactionEngine`)
+  - context token estimation heuristic
+  - threshold / overflow auto-compaction decision
+  - compaction application (summary message insertion + tail retention)
+- compaction log persistence (`PiCodingAgentCompactionLogStore`)
+  - append/list/latest per-session compaction entries
+- auto-compaction queue (`PiCodingAgentAutoCompactionQueue`)
+  - queue while compacting, ordered flush after compaction
+- compaction orchestration (`PiCodingAgentCompactionCoordinator`)
+  - loads session, decides/executes compaction, saves compacted state, appends compaction log entry
+
+Tests added:
+
+- threshold/overflow trigger detection
+- compaction apply result + summary-message injection
+- compaction log append/latest persistence
+- queue deferral and ordered flush behavior
+- coordinator auto-compaction end-to-end persistence/update flow
+
+## `P5-5` Verification
+
+- `swift test --filter PiCodingAgentTests` passed (37 `PiCodingAgent` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24
