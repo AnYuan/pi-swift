@@ -184,3 +184,12 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - word movement/deletion behavior
   - kill ring line-delete + yank flow and yank-pop cycling
   - control-character filtering
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIInputComponent.swift`
+  - minimal single-line input component wrapper around `PiTUIInputModel`
+  - prompt rendering + `PiTUICursor.marker` insertion for hardware cursor projection
+  - submit/escape callbacks
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIInputComponentTests.swift`
+  - prompt/cursor-marker rendering
+  - input delegation to model
+  - submit/escape callbacks
+  - integration with `PiTUI` hardware cursor positioning
