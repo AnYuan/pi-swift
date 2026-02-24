@@ -150,3 +150,13 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - undo stack push/pop/clear
   - clone-on-push detachment via custom clone closure
   - kill-ring accumulation and yank-pop rotation semantics
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIStdinBuffer.swift`
+  - chunked escape-sequence buffering/splitting (CSI/OSC/DCS/APC/SS3 + SGR mouse)
+  - bracketed-paste extraction with dedicated paste callback
+  - high-byte `Data([byte > 127])` compatibility conversion to `ESC` meta sequence
+  - `flush`, `clear`, `destroy`, and `getBuffer` helpers
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIStdinBufferTests.swift`
+  - chunked CSI/OSC/SGR mouse sequence completeness handling
+  - bracketed paste complete/chunked flows
+  - high-byte input compatibility conversion
+  - flush/empty-input compatibility behavior
