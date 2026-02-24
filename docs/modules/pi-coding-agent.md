@@ -456,3 +456,74 @@ Implemented in this slice:
 
 - `swift test --filter PiCodingAgentTests` passed (71 `PiCodingAgent` tests) on 2026-02-24
 - `swift build` passed on 2026-02-24
+
+## `P5-9` Progress (Modes / RPC / SDK Foundation Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Modes.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentModesTests.swift`
+
+Implemented in this slice:
+
+- `PiCodingAgentModeRunner`
+  - deterministic print-mode output formatter (`runPrint`)
+  - JSON mode event stream formatter (`runJSON`) using line-delimited JSON events
+  - minimal RPC envelope handler (`handleRPC`) with:
+    - `ping`
+    - `run.print`
+    - `run.json`
+    - unknown-method error envelope
+- `PiCodingAgentSDK` facade for programmatic use
+  - `runPrint`
+  - `runJSON`
+  - `handleRPC`
+
+Tests added:
+
+- print mode deterministic output
+- JSON mode structured event emission
+- RPC ping result envelope
+- RPC `run.print` delegation
+- RPC unknown-method error envelope
+- SDK facade methods for print/JSON
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentModesTests` passed on 2026-02-24
+
+## `P5-9` Progress (Modes / RPC / SDK Foundation Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Modes.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentModesTests.swift`
+
+Implemented in this slice:
+
+- mode runner foundation (`PiCodingAgentModeRunner`)
+  - deterministic `print` mode output
+  - newline-delimited `json` mode event output (`mode.start`, `input`, `result`)
+- RPC foundation
+  - request envelope parsing (`id`, `method`, `params`)
+  - `ping`
+  - `run.print`
+  - `run.json`
+  - method-not-found error envelope
+- SDK facade foundation (`PiCodingAgentSDK`)
+  - `runPrint(...)`
+  - `runJSON(...)`
+  - `handleRPC(...)`
+
+Tests added:
+
+- print mode output shape
+- JSON mode event stream shape
+- RPC `ping` result envelope
+- RPC `run.print` delegation
+- RPC unknown-method error envelope
+- SDK facade accessors for print/json modes
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentModesTests` passed on 2026-02-24
