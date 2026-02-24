@@ -257,3 +257,21 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - wrapped navigation + selection-change callback
   - confirm/cancel callbacks
   - scroll-info rendering when list is clipped
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIOverlayLayout.swift`
+  - overlay geometry planner (`PiTUIOverlayLayoutPlanner`) with:
+    - centered/default placement
+    - anchor-based placement (`topLeft`, `topRight`, `bottomLeft`, `bottomRight`, `center`)
+    - absolute and percent row/column positioning
+    - width/height/min/max resolution via `PiTUISizeValue`
+    - margin-aware viewport clamping and offset handling
+  - supporting types:
+    - `PiTUIOverlayOptions`
+    - `PiTUIOverlayAnchor`
+    - `PiTUIOverlayMargin`
+    - `PiTUIOverlayResolvedLayout`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIOverlayLayoutTests.swift`
+  - default centering and width clamp behavior
+  - percent width + min-width resolution
+  - anchor/offset/margin clamping
+  - percent row/column placement on remaining space
+  - max-height percent resolution + viewport clamp
