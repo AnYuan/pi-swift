@@ -235,3 +235,40 @@ Tests added:
 
 - `swift test --filter PiCodingAgentTests` passed (44 `PiCodingAgent` tests) on 2026-02-24
 - `swift build` passed on 2026-02-24
+
+## `P5-7` Progress (Settings Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Settings.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentSettingsTests.swift`
+
+Implemented in this slice:
+
+- settings storage backends
+  - file-backed settings storage (`PiCodingAgentFileSettingsStorage`)
+  - in-memory settings storage (`PiCodingAgentInMemorySettingsStorage`)
+- settings manager foundation (`PiCodingAgentSettingsManager`)
+  - global + project settings loading
+  - recursive deep-merge for nested objects
+  - `reload()` with parse-error retention behavior (keeps previous valid settings)
+  - `flush()` that preserves externally-added fields by reloading current file before applying modified keys
+  - per-scope error tracking via `drainErrors()`
+- initial settings getters/setters needed by `pi-coding-agent`
+  - `theme`
+  - `defaultModel`
+  - `defaultThinkingLevel`
+  - `shellCommandPrefix`
+  - `extensions`
+  - `enabledModels`
+
+Tests added:
+
+- global/project deep merge behavior for nested settings objects
+- external edits preserved across `flush()` while in-memory changes win for modified keys
+- reload invalid-JSON fallback + error draining
+- project-scoped theme override persistence + `shellCommandPrefix` getter
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentSettingsTests` passed on 2026-02-24
