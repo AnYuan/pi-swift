@@ -93,3 +93,35 @@ Tests added:
 - `P5-2` scope covered in Swift foundation:
   - tool protocol + registry/dispatch
   - `read`, `write`, `edit`, `bash` core tools
+
+## `P5-3` Progress (Session Management Foundation)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/SessionStore.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentSessionStoreTests.swift`
+
+Implemented in this slice:
+
+- JSON-backed session persistence (`PiCodingAgentSessionStore`)
+  - `saveNew(...)`
+  - `save(id:...)` with `createdAt` preservation + `updatedAt` refresh
+  - `load(id:)`
+  - `listSessions()` sorted by `updatedAt` desc
+  - `latestSession()`
+  - `resolveContinue(sessionID:)` (explicit id or latest session)
+- session record model (`PiCodingAgentSessionRecord`) carrying `PiAgentState`
+- deterministic test injection hooks (clock + id generator)
+
+Tests added:
+
+- save/load round-trip
+- update timestamp semantics
+- session listing sort order
+- continue resolution (explicit + latest)
+- no-sessions error path
+
+## `P5-3` Verification
+
+- `swift test --filter PiCodingAgentTests` passed (29 `PiCodingAgent` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24

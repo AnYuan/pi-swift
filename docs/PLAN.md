@@ -426,12 +426,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-3: Session management (`save`/`resume`/`continue`)
-- Status: TODO
+- Status: DONE
 - Depends On: P5-1
 - Scope:
   - Session storage/load and basic resume selection capability
 - Test Plan:
   - File operations, timestamps, migration tests
+- Verification:
+  - Tests: `swift test --filter PiCodingAgentTests` passed (29 `PiCodingAgent` tests) on 2026-02-24
+  - Build: `swift build` passed on 2026-02-24
+  - Regression: Added JSON session store persistence/timestamp/order/continue-resolution coverage in `PiCodingAgentSessionStoreTests`
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-4: Session tree / branching / traversal
 - Status: TODO
@@ -544,4 +549,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P5-3` (`pi-coding-agent` session management save/resume/continue). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P5-4` (`pi-coding-agent` session tree / branching / traversal). Continue following the strict test-first implementation cadence and atomic-commit rule.
