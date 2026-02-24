@@ -310,3 +310,12 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - selected description wrapping
   - scroll indicator rendering
   - submenu render/delegate/done update and cancel flows
+
+## `P4-3` Verification
+
+- `swift test --filter PiTUITests` passed (136 `PiTUI` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24
+- `P4-3` scope now covered in Swift:
+  - `PiTUISelectList`
+  - `PiTUISettingsList`
+  - overlay options/layout planner + overlay visibility/stack composition in `PiTUI`
