@@ -213,3 +213,15 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - default binding matches
   - custom override behavior
   - replaceable global manager behavior
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIEditorModel.swift`
+  - multiline text editor state foundation (`lines` + cursor line/UTF-16 column)
+  - newline normalization in `setText`
+  - single/multi-line insertion at cursor
+  - newline split, grapheme-aware backspace/delete, cross-line merge behavior
+  - cursor left/right/up/down and undo snapshots
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIEditorModelTests.swift`
+  - newline normalization and cursor placement
+  - multiline insertion/splitting
+  - grapheme-aware delete/backspace
+  - cross-line cursor movement
+  - undo across multiline edits
