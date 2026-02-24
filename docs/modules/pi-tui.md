@@ -348,3 +348,15 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - very long line regression coverage
   - mixed ANSI + image sequences
   - negative cases (plain text / ANSI-only / partial sequences)
+- Added `/Users/anyuan/Development/pi-swift/Sources/PiTUI/PiTUIMarkdown.swift`
+  - `PiTUIMarkdown` component foundation with:
+    - width-aware render caching + `invalidate`
+    - paragraph wrapping
+    - basic heading/list/quote line rendering
+    - simple inline formatting normalization (`**`, `` ` ``, links -> `text (url)`)
+    - image protocol line passthrough using `PiTUITerminalImage.isImageLine(_:)`
+- Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIMarkdownTests.swift`
+  - paragraph wrapping width constraints
+  - heading/list/quote/link rendering smoke coverage
+  - image-line no-wrap regression
+  - cache-by-width + invalidate behavior
