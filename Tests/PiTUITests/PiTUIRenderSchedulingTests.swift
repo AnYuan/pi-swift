@@ -110,4 +110,27 @@ final class PiTUIRenderSchedulingTests: XCTestCase {
             [.writeLine(row: 0, content: "Second session")]
         )
     }
+
+    func testRestartForcesFreshRenderEvenWhenContentDidNotChange() {
+        let scheduler = PiTUIManualRenderScheduler()
+        let terminal = PiTUIVirtualTerminal(columns: 40, rows: 10)
+        let tui = PiTUI(terminal: terminal, scheduler: scheduler)
+        let component = TestComponent()
+        tui.addChild(component)
+
+        component.lines = ["Stable"]
+        tui.start()
+        scheduler.flush()
+        XCTAssertEqual(terminal.viewport()[0], "Stable")
+
+        tui.stop()
+        terminal.clearScreen() // simulate terminal content being cleared while app is stopped
+        terminal.clearOperationLog()
+
+        tui.start()
+        scheduler.flush()
+
+        XCTAssertEqual(terminal.viewport()[0], "Stable")
+        XCTAssertTrue(terminal.operationLog.contains(.writeLine(row: 0, content: "Stable")))
+    }
 }

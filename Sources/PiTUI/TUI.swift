@@ -59,6 +59,7 @@ public final class PiTUI: PiTUIContainer {
         terminal.stop()
         started = false
         renderRequested = false
+        renderBuffer.reset()
         renderGeneration &+= 1
     }
 

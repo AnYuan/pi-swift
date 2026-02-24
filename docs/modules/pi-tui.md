@@ -57,6 +57,7 @@
   - `requestRender(force:)` with scheduler-driven coalescing (default immediate scheduler)
   - test-only/manual scheduler for deterministic render queue flushing
   - scheduler-generation isolation so stale pending renders are ignored across `stop()` / restart boundaries
+  - render-buffer cache reset on `stop()` so restart always performs a fresh redraw
   - `clearOnShrink` toggle
   - `fullRedraws` counter (regression observability)
   - cursor-marker extraction + optional hardware cursor positioning
@@ -107,6 +108,7 @@
   - resize-triggered render coalesces with explicit render request
   - pending scheduled render is ignored after `stop()`
   - stale scheduled render from previous session does not run after restart
+  - restart forces a fresh render even when content is unchanged (cache invalidated across sessions)
 - Cursor handling coverage:
   - cursor marker removal from rendered output
   - cursor row/column positioning in virtual terminal
