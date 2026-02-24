@@ -50,11 +50,18 @@ final class PiCodingAgentCLITests: XCTestCase {
         XCTAssertEqual(result.action, .startRPC)
     }
 
+    func testJSONModeSelectsJSONStartupAction() {
+        let result = PiCodingAgentModule.runCLI(argv: ["--mode", "json", "hello"])
+
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertEqual(result.action, .startJSON(prompt: "hello", pipedInput: nil))
+    }
+
     func testInvalidModeReturnsUsageError() {
         let result = PiCodingAgentModule.runCLI(argv: ["--mode", "invalid"])
 
         XCTAssertEqual(result.exitCode, 2)
-        XCTAssertEqual(result.action, .usageError(message: "Invalid mode: invalid. Expected one of: text, rpc"))
+        XCTAssertEqual(result.action, .usageError(message: "Invalid mode: invalid. Expected one of: text, rpc, json"))
         XCTAssertTrue(result.stderr.contains("Invalid mode"))
         XCTAssertTrue(result.stderr.contains("Usage:"))
     }

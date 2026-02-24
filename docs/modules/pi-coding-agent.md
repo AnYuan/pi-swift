@@ -492,6 +492,45 @@ Verification (slice):
 
 - `swift test --filter PiCodingAgentModesTests` passed on 2026-02-24
 
+## `P5-9` Progress (CLI Non-Interactive Execution Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/CLIArgs.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/CLIApp.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/CLIExecutor.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiSwiftCLI/main.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentCLITests.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentCLIExecutionTests.swift`
+
+Implemented in this slice:
+
+- CLI mode surface extended with `--mode json`
+  - parser + help text + validation error messages updated
+  - startup action extended with `startJSON(...)`
+- `PiCodingAgentCLIExecutor`
+  - composes `PiCodingAgentCLIApp` + `PiCodingAgentModeRunner`
+  - renders `print` and `json` outputs directly into `stdout`
+  - handles single-request RPC from piped stdin
+  - returns structured invalid-request RPC error envelopes for malformed JSON input
+- executable entrypoint integration (`PiSwiftCLI/main.swift`)
+  - real stdin/tty detection
+  - piped stdin forwarding into `PiCodingAgentCLIExecutor`
+  - falls back to legacy placeholder messages only when no protocol output is produced
+
+Tests added:
+
+- CLI parse/startup action for `--mode json`
+- CLI invalid mode error text (including `json`)
+- CLI executor output for print mode
+- CLI executor output for JSON mode
+- CLI executor RPC request handling and malformed-request error envelope
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentCLITests` passed on 2026-02-24
+- `swift test --filter PiCodingAgentCLIExecutionTests` passed on 2026-02-24
+
 ## `P5-9` Progress (Modes / RPC / SDK Foundation Slice, In Progress)
 
 Files:

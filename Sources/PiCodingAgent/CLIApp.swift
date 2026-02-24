@@ -5,6 +5,7 @@ public enum PiCodingAgentStartupAction: Equatable, Sendable {
     case showVersion
     case startInteractive(prompt: String?)
     case startPrint(prompt: String?, pipedInput: String?)
+    case startJSON(prompt: String?, pipedInput: String?)
     case startRPC
     case usageError(message: String)
 }
@@ -70,6 +71,9 @@ public enum PiCodingAgentCLIApp {
 
         if parsed.mode == .rpc {
             return .init(exitCode: 0, action: .startRPC)
+        }
+        if parsed.mode == .json {
+            return .init(exitCode: 0, action: .startJSON(prompt: parsed.prompt, pipedInput: pipedInput))
         }
 
         if effectivePrint {

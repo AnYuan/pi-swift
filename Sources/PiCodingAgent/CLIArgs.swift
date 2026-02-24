@@ -3,6 +3,7 @@ import Foundation
 public enum PiCodingAgentCLIMode: String, CaseIterable, Equatable, Sendable {
     case text
     case rpc
+    case json
 }
 
 public struct PiCodingAgentCLIArgs: Equatable, Sendable {
@@ -30,7 +31,7 @@ public enum PiCodingAgentCLIParseError: Error, Equatable, CustomStringConvertibl
         case .missingValue(let flag):
             return "Missing value for option: \(flag)"
         case .invalidMode(let value):
-            return "Invalid mode: \(value). Expected one of: text, rpc"
+            return "Invalid mode: \(value). Expected one of: text, rpc, json"
         case .unexpectedArgument(let value):
             return "Unexpected argument: \(value)"
         }
@@ -85,7 +86,7 @@ public enum PiCodingAgentCLIArgsParser {
           -h, --help            Show help
           -v, --version         Show version
               --print           Run in print mode
-              --mode <mode>     Startup mode (text|rpc)
+              --mode <mode>     Startup mode (text|rpc|json)
               --provider <id>   Provider override
               --model <id>      Model override
 
