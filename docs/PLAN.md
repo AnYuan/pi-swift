@@ -549,12 +549,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
 ## P6 Peripheral Capabilities (Incremental by dependency/platform)
 
 ### P6-1: `pi-web-ui` feature mapping and Swift platform-equivalent design
-- Status: TODO
+- Status: DONE
 - Depends On: P2-8, P3-5
 - Scope:
   - Define how Web Components functionality maps to Swift surfaces (SwiftUI/WebView/client apps)
 - Test Plan:
   - Design review and sample validation
+- Verification:
+  - Design review: Completed against `../pi-mono/packages/web-ui` README, exports, `ChatPanel`, `AgentInterface`, storage types, and sandbox runtime bridge sources on 2026-02-24
+  - Sample validation: Chat/streaming/tools/artifacts/persistence end-to-end flow mapped to Swift architecture and documented
+  - Docs updated: `docs/modules/pi-web-ui.md`, `docs/PLAN.md`, `README.md`
+  - No runtime tests (docs/design-only task)
 
 ### P6-2: `pi-mom` (Slack bot) migration
 - Status: TODO
@@ -593,4 +598,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P6-1` (`pi-web-ui` feature mapping and Swift platform-equivalent design). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P6-2` (`pi-mom` Slack bot migration). Continue following the strict test-first implementation cadence and atomic-commit rule.
