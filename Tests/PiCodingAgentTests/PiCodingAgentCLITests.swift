@@ -57,6 +57,13 @@ final class PiCodingAgentCLITests: XCTestCase {
         XCTAssertEqual(result.action, .startJSON(prompt: "hello", pipedInput: nil))
     }
 
+    func testExportFlagSelectsExportStartupAction() {
+        let result = PiCodingAgentModule.runCLI(argv: ["--export", "session.json", "out.html"])
+
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertEqual(result.action, .exportHTML(inputPath: "session.json", outputPath: "out.html"))
+    }
+
     func testInvalidModeReturnsUsageError() {
         let result = PiCodingAgentModule.runCLI(argv: ["--mode", "invalid"])
 
@@ -79,5 +86,12 @@ final class PiCodingAgentCLITests: XCTestCase {
         XCTAssertEqual(parsed.model, "gpt-5")
         XCTAssertEqual(parsed.prompt, "hello")
         XCTAssertFalse(parsed.printMode)
+    }
+
+    func testArgsParserParsesExportWithOptionalOutputPath() throws {
+        let parsed = try PiCodingAgentCLIArgsParser.parse(["--export", "session.json", "exported.html"])
+        XCTAssertEqual(parsed.exportPath, "session.json")
+        XCTAssertEqual(parsed.exportOutputPath, "exported.html")
+        XCTAssertNil(parsed.prompt)
     }
 }

@@ -526,6 +526,42 @@ Verification (slice):
 
 - `swift test --filter PiCodingAgentHTMLExporterTests` passed on 2026-02-24
 
+## `P5-10` Progress (CLI `--export` Integration Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/CLIArgs.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/CLIApp.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/CLIExecutor.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiSwiftCLI/main.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentCLITests.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentCLIExecutionTests.swift`
+
+Implemented in this slice:
+
+- CLI parser support for `--export <session.json> [output.html]`
+  - stores export input path plus optional output path positional
+  - keeps existing prompt parsing behavior when `--export` is absent
+- startup action routing
+  - `PiCodingAgentStartupAction.exportHTML(inputPath:outputPath:)`
+  - `PiCodingAgentCLIApp` prioritizes export mode before interactive/print/json/rpc startup
+- executor integration
+  - `PiCodingAgentCLIExecutor` invokes `PiCodingAgentHTMLExporter.exportSessionFile(...)`
+  - success path prints the exported HTML path
+  - exporter failures return non-zero exit code and stderr message
+- executable compatibility
+  - `PiSwiftCLI/main.swift` updated to handle export action exhaustively
+
+Tests added:
+
+- CLI parser export input/output path parsing
+- CLI startup action selection for `--export`
+- CLI executor end-to-end export path output + file creation
+
+Verification (slice):
+
+- `swift test --filter 'PiCodingAgentCLITests|PiCodingAgentCLIExecutionTests'` passed on 2026-02-24
+
 ## `P5-10` Progress (File Argument / Image Attachment Processing Slice, In Progress)
 
 Files:

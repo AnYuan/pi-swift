@@ -3,6 +3,7 @@ import Foundation
 public enum PiCodingAgentStartupAction: Equatable, Sendable {
     case showHelp
     case showVersion
+    case exportHTML(inputPath: String, outputPath: String?)
     case startInteractive(prompt: String?)
     case startPrint(prompt: String?, pipedInput: String?)
     case startJSON(prompt: String?, pipedInput: String?)
@@ -64,6 +65,10 @@ public enum PiCodingAgentCLIApp {
 
         if parsed.version {
             return .init(exitCode: 0, stdout: versionString + "\n", action: .showVersion)
+        }
+
+        if let exportPath = parsed.exportPath {
+            return .init(exitCode: 0, action: .exportHTML(inputPath: exportPath, outputPath: parsed.exportOutputPath))
         }
 
         let pipedInput = (env.stdinIsTTY ? nil : env.pipedStdin?.isEmpty == false ? env.pipedStdin : nil)

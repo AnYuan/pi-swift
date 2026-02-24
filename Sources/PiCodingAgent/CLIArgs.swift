@@ -13,6 +13,8 @@ public struct PiCodingAgentCLIArgs: Equatable, Sendable {
     public var mode: PiCodingAgentCLIMode?
     public var provider: String?
     public var model: String?
+    public var exportPath: String?
+    public var exportOutputPath: String?
     public var prompt: String?
 
     public init() {}
@@ -42,6 +44,7 @@ public enum PiCodingAgentCLIArgsParser {
     public static func parse(_ argv: [String]) throws -> PiCodingAgentCLIArgs {
         var args = PiCodingAgentCLIArgs()
         var iterator = argv.makeIterator()
+        var positionalArguments: [String] = []
 
         while let token = iterator.next() {
             switch token {
@@ -63,16 +66,27 @@ public enum PiCodingAgentCLIArgsParser {
                     throw PiCodingAgentCLIParseError.invalidMode(value)
                 }
                 args.mode = mode
+            case "--export":
+                guard let value = iterator.next() else { throw PiCodingAgentCLIParseError.missingValue(token) }
+                args.exportPath = value
             default:
                 if token.hasPrefix("-") {
                     throw PiCodingAgentCLIParseError.unknownFlag(token)
                 }
-                if args.prompt == nil {
-                    args.prompt = token
-                } else {
-                    throw PiCodingAgentCLIParseError.unexpectedArgument(token)
-                }
+                positionalArguments.append(token)
             }
+        }
+
+        if args.exportPath != nil {
+            if positionalArguments.count > 1 {
+                throw PiCodingAgentCLIParseError.unexpectedArgument(positionalArguments[1])
+            }
+            args.exportOutputPath = positionalArguments.first
+        } else {
+            if positionalArguments.count > 1 {
+                throw PiCodingAgentCLIParseError.unexpectedArgument(positionalArguments[1])
+            }
+            args.prompt = positionalArguments.first
         }
 
         return args
@@ -89,11 +103,13 @@ public enum PiCodingAgentCLIArgsParser {
               --mode <mode>     Startup mode (text|rpc|json)
               --provider <id>   Provider override
               --model <id>      Model override
+              --export <file>   Export session .json file to HTML (optional output path positional)
 
         Examples:
           \(executableName) --help
           \(executableName) --print \"Summarize this repo\"
           \(executableName) --mode rpc
+          \(executableName) --export session.json session.html
         """
     }
 }

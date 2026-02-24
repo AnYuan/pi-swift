@@ -11,6 +11,14 @@ public enum PiCodingAgentCLIExecutor {
         guard result.exitCode == 0 else { return result }
 
         switch result.action {
+        case .exportHTML(let inputPath, let outputPath):
+            do {
+                let exportedPath = try PiCodingAgentHTMLExporter.exportSessionFile(at: inputPath, outputPath: outputPath)
+                result.stdout += exportedPath + "\n"
+            } catch {
+                result.exitCode = 1
+                result.stderr += String(describing: error) + "\n"
+            }
         case .startPrint(let prompt, let pipedInput):
             result.stdout += modeRunner.runPrint(.init(prompt: prompt, pipedInput: pipedInput)) + "\n"
         case .startJSON(let prompt, let pipedInput):

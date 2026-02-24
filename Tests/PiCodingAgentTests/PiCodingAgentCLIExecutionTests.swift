@@ -1,4 +1,7 @@
 import XCTest
+import Foundation
+import PiAI
+import PiAgentCore
 @testable import PiCodingAgent
 
 final class PiCodingAgentCLIExecutionTests: XCTestCase {
@@ -54,4 +57,51 @@ final class PiCodingAgentCLIExecutionTests: XCTestCase {
         XCTAssertTrue(result.stdout.contains("\"error\""))
         XCTAssertTrue(result.stdout.contains("invalid_request"))
     }
+
+    func testExecuteExportModeWritesHTMLAndPrintsOutputPath() throws {
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+
+        let sessionURL = tempDir.appendingPathComponent("session.json")
+        let outputURL = tempDir.appendingPathComponent("session-export.html")
+        try writeSessionFixture(to: sessionURL)
+
+        let result = PiCodingAgentCLIExecutor.execute(
+            argv: ["--export", sessionURL.path, outputURL.path],
+            env: .init(),
+            modeRunner: .init(version: "pi-swift test")
+        )
+
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertEqual(result.action, .exportHTML(inputPath: sessionURL.path, outputPath: outputURL.path))
+        XCTAssertTrue(result.stdout.contains(outputURL.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: outputURL.path))
+    }
+}
+
+private func writeSessionFixture(to url: URL) throws {
+    let state = PiAgentState.empty(model: .init(provider: "openai", id: "gpt-5"), systemPrompt: "demo")
+    let record = PiCodingAgentSessionRecord(
+        id: "cli-export",
+        title: "CLI Export",
+        createdAt: Date(timeIntervalSince1970: 0),
+        updatedAt: Date(timeIntervalSince1970: 1),
+        state: .init(
+            systemPrompt: state.systemPrompt,
+            model: state.model,
+            thinkingLevel: state.thinkingLevel,
+            tools: [],
+            messages: [.user(.init(content: .text("hello"), timestamp: 1))],
+            isStreaming: false,
+            streamMessage: nil,
+            pendingToolCalls: [],
+            error: nil
+        )
+    )
+
+    let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
+    let data = try encoder.encode(record)
+    try data.write(to: url)
 }

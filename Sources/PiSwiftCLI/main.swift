@@ -29,6 +29,8 @@ if result.exitCode != 0 {
 }
 
 switch result.action {
+case .exportHTML:
+    break
 case .startInteractive(let prompt):
     let promptSuffix = prompt.map { " prompt=\($0)" } ?? ""
     print("PiCodingAgent interactive mode\(promptSuffix)")
