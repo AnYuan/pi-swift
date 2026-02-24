@@ -478,12 +478,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-7: Settings / Auth Storage / Model Registry & Resolver
-- Status: TODO
+- Status: DONE
 - Depends On: P5-1, P2-8
 - Scope:
   - Settings, credentials, model parsing and resolution logic
 - Test Plan:
   - Settings/auth/model resolver regression tests
+- Verification:
+  - Tests: `swift test --filter PiCodingAgentTests` passed (60 `PiCodingAgent` tests) on 2026-02-24
+  - Build: `swift build` passed on 2026-02-24
+  - Regression: Added `PiCodingAgentSettingsTests`, `PiCodingAgentAuthStorageTests`, and `PiCodingAgentModelResolverTests`
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-8: Interactive TUI mode and key interactions (status bar, selectors, shortcuts)
 - Status: TODO
@@ -564,4 +569,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P5-7` (`pi-coding-agent` settings / auth storage / model registry & resolver). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P5-8` (`pi-coding-agent` interactive TUI mode and key interactions). Continue following the strict test-first implementation cadence and atomic-commit rule.

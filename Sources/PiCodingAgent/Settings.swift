@@ -129,6 +129,14 @@ public final class PiCodingAgentSettingsManager: @unchecked Sendable {
         stringValue(forKey: "defaultModel")
     }
 
+    public func getDefaultProvider() -> String? {
+        stringValue(forKey: "defaultProvider")
+    }
+
+    public func setDefaultProvider(_ value: String?, scope: PiCodingAgentSettingsScope = .global) {
+        set(value.map(JSONValue.string), forKey: "defaultProvider", scope: scope)
+    }
+
     public func setDefaultModel(_ value: String?, scope: PiCodingAgentSettingsScope = .global) {
         set(value.map(JSONValue.string), forKey: "defaultModel", scope: scope)
     }

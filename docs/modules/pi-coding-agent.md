@@ -307,3 +307,40 @@ Tests added:
 Verification (slice):
 
 - `swift test --filter PiCodingAgentAuthStorageTests` passed on 2026-02-24
+
+## `P5-7` Progress (Model Registry & Resolver Slice, Completed)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/ModelResolver.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Settings.swift` (extended `defaultProvider`)
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentModelResolverTests.swift`
+
+Implemented in this slice:
+
+- `PiCodingAgentModelRegistry`
+  - wraps `PiAIModelRegistry`
+  - `getAll()` / `getAvailable()` (auth-filtered via `PiCodingAgentAuthStorage`)
+  - provider/model lookup and provider API key passthrough
+- `PiCodingAgentModelResolver`
+  - CLI provider/model resolution
+  - `parseModelPattern(...)` with thinking suffix parsing (`off|minimal|low|medium|high|xhigh`)
+  - OpenRouter-style model IDs with embedded `:` handling (exact ID match before thinking suffix split)
+  - invalid thinking-level fallback warning behavior
+  - initial model selection using settings defaults and provider default map
+- `SettingsManager` extension for `defaultProvider` getter/setter
+
+Tests added:
+
+- alias-vs-dated preference for fuzzy model matching
+- OpenRouter-style `:` IDs with optional thinking suffix
+- invalid thinking suffix warning path
+- CLI resolution with explicit provider and `provider/model` patterns
+- unknown-provider error path
+- auth-filtered available model list + provider API key passthrough
+- initial model selection from settings and provider defaults
+
+## `P5-7` Verification (Completed)
+
+- `swift test --filter PiCodingAgentTests` passed (60 `PiCodingAgent` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24
