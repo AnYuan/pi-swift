@@ -174,9 +174,13 @@ These are tracked as follow-on work and do not block `P4-1` completion.
   - grapheme-aware left/right movement, backspace, forward delete
   - undo snapshots via `PiUndoStack`
   - bracketed paste buffering/atomic insertion
-  - minimal `handleInput` integration with `PiTUIKeys` subset (`left/right/home/end`, `ctrl+a/e/z`, backspace, delete)
+  - word movement/deletion (`alt+left/right`, `ctrl+w`, `alt+d`) and line kills (`ctrl+u`, `ctrl+k`)
+  - kill ring integration with yank / yank-pop (`ctrl+y`, `alt+y`)
+  - minimal `handleInput` integration with `PiTUIKeys` subset (`left/right/home/end`, `ctrl+a/e/z`, backspace, delete, word/kill/yank commands)
 - Added `/Users/anyuan/Development/pi-swift/Tests/PiTUITests/PiTUIInputModelTests.swift`
   - insertion and cursor movement
   - grapheme-aware emoji cursor/deletion behavior
   - atomic undo for chunked bracketed paste
+  - word movement/deletion behavior
+  - kill ring line-delete + yank flow and yank-pop cycling
   - control-character filtering

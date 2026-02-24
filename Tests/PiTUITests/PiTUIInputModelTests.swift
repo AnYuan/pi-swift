@@ -88,6 +88,54 @@ final class PiTUIInputModelTests: XCTestCase {
         XCTAssertEqual(input.value, "abc")
     }
 
+    func testWordMovementAndDeletionCommands() {
+        let input = PiTUIInputModel(value: "one two three")
+        input.moveCursorToEnd()
+
+        input.moveWordBackward()
+        XCTAssertEqual(input.cursorUTF16, "one two ".utf16.count)
+
+        input.deleteWordBackward()
+        XCTAssertEqual(input.value, "one three")
+        XCTAssertEqual(input.cursorUTF16, "one ".utf16.count)
+    }
+
+    func testKillRingLineDeleteAndYankFlow() {
+        let input = PiTUIInputModel(value: "alpha beta gamma")
+        input.setCursorUTF16("alpha ".utf16.count)
+
+        input.deleteToLineEnd()
+        XCTAssertEqual(input.value, "alpha ")
+
+        input.yank()
+        XCTAssertEqual(input.value, "alpha beta gamma")
+
+        input.undo()
+        XCTAssertEqual(input.value, "alpha ")
+    }
+
+    func testYankPopCyclesBetweenMultipleKills() {
+        let input = PiTUIInputModel(value: "alpha beta")
+        input.moveCursorToEnd()
+        input.handleInput("\u{0017}") // kill beta
+        XCTAssertEqual(input.value, "alpha ")
+
+        input.handleInput("x")
+        input.handleInput("\u{0017}") // kill x
+        XCTAssertEqual(input.value, "alpha ")
+
+        input.handleInput("\u{0019}") // yank latest "x"
+        XCTAssertEqual(input.value, "alpha x")
+        input.handleInput("\u{001B}y") // yank-pop -> "beta"
+        XCTAssertEqual(input.value, "alpha beta")
+    }
+
+    func testBracketedPasteStripsNewlinesLikeInputComponent() {
+        let input = PiTUIInputModel()
+        input.handleInput("\u{001B}[200~a\r\nb\nc\r\u{001B}[201~")
+        XCTAssertEqual(input.value, "abc")
+    }
+
     func testControlCharactersAreIgnoredAsTextInput() {
         let input = PiTUIInputModel()
         input.handleInput("\u{0002}") // ctrl+b (movement/control)
