@@ -106,4 +106,29 @@ final class PiCodingAgentInteractiveModeTests: XCTestCase {
         mode.handleInput("\r")
         XCTAssertEqual(mode.snapshot().currentModelQualifiedID, "anthropic/claude-sonnet-4-5")
     }
+
+    func testSettingsOverlayUsesInteractiveSettingsListAndPersistsChanges() {
+        let settings = PiCodingAgentSettingsManager(storage: PiCodingAgentInMemorySettingsStorage())
+        settings.setTheme("dark")
+        settings.setDefaultThinkingLevel("medium")
+        let mode = PiCodingAgentInteractiveMode(settings: settings, modelRegistry: .init(models: makeModels()))
+
+        mode.handleKeyID("f2")
+        XCTAssertEqual(mode.snapshot().overlay, .settings)
+        let before = mode.render(width: 100).joined(separator: "\n")
+        XCTAssertTrue(before.contains("theme"))
+        XCTAssertTrue(before.contains("dark"))
+        XCTAssertTrue(before.contains("defaultThinkingLevel"))
+
+        mode.handleInput("\r") // first item (theme) cycles
+        XCTAssertEqual(settings.getTheme(), "light")
+
+        mode.handleInput("\u{001B}[B") // down to defaultThinkingLevel
+        mode.handleInput("\r")
+        XCTAssertEqual(settings.getDefaultThinkingLevel(), "high")
+
+        let after = mode.render(width: 100).joined(separator: "\n")
+        XCTAssertTrue(after.contains("light"))
+        XCTAssertTrue(after.contains("high"))
+    }
 }

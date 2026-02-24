@@ -491,12 +491,17 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-8: Interactive TUI mode and key interactions (status bar, selectors, shortcuts)
-- Status: TODO
+- Status: DONE
 - Depends On: P5-3, P5-6, P4-5
 - Scope:
   - Core interactive UI flows
 - Test Plan:
   - Interactive state and rendering behavior tests
+- Verification:
+  - Tests: `swift test --filter PiCodingAgentTests` passed (71 `PiCodingAgent` tests) on 2026-02-24
+  - Build: `swift build` passed on 2026-02-24
+  - Regression: Added `PiCodingAgentInteractiveModeTests` and `PiCodingAgentInteractiveSessionTests`
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `README.md`, `docs/PLAN.md`
 
 ### P5-9: RPC / JSON / Print / SDK modes
 - Status: TODO
@@ -569,4 +574,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P5-8` (`pi-coding-agent` interactive TUI mode and key interactions). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P5-9` (`pi-coding-agent` RPC / JSON / Print / SDK modes). Continue following the strict test-first implementation cadence and atomic-commit rule.

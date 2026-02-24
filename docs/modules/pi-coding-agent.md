@@ -391,7 +391,7 @@ Implemented in this slice:
 
 - raw input routing (`handleInput(_:)`)
   - integrates `PiTUIKeys.parseKey(...)`
-  - maps `ctrl+s` -> settings shortcut and `ctrl+m` -> model selector shortcut
+  - maps raw shortcuts (`ctrl+s`, `ctrl+p`) to interactive overlays
   - routes arrow keys / enter / escape through the overlay key-state machine
   - falls back to editor input for printable text and other non-shortcut inputs
 - overlay interactions via parsed ANSI key sequences
@@ -406,3 +406,53 @@ Tests added:
 Verification (slice):
 
 - `swift test --filter PiCodingAgentInteractiveModeTests` passed on 2026-02-24
+
+## `P5-8` Progress (Interactive Mode Slice 3, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/InteractiveMode.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentInteractiveModeTests.swift`
+
+Implemented in this slice:
+
+- component-driven overlays (replacing ad-hoc text overlays)
+  - settings overlay now uses `PiTUISettingsList`
+  - model selector overlay now uses `PiTUISelectList`
+- settings interactions
+  - interactive cycling for `theme` and `defaultThinkingLevel`
+  - live persistence back into `PiCodingAgentSettingsManager`
+  - status-message updates after setting changes
+- key-id compatibility retained for tests/manual triggers by translating key IDs to raw terminal input
+
+Tests added:
+
+- settings overlay interaction test validating `theme` and `defaultThinkingLevel` changes via list navigation
+
+Verification (slice):
+
+- `swift test --filter PiCodingAgentInteractiveModeTests` passed on 2026-02-24
+
+## `P5-8` Progress (Interactive Session Runtime Slice, Completed)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/InteractiveSession.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/InteractiveMode.swift` (PiTUIComponent conformance)
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentInteractiveSessionTests.swift`
+
+Implemented in this slice:
+
+- `PiCodingAgentInteractiveSession`
+  - mounts `PiCodingAgentInteractiveMode` into `PiTUI`
+  - start/stop lifecycle
+  - input/key forwarding with render requests
+- virtual-terminal driven interactive integration coverage
+  - initial status bar render
+  - prompt submit render updates
+  - shortcut-driven overlay activation (`ctrl+s` settings, `ctrl+p` models)
+
+## `P5-8` Verification (Completed)
+
+- `swift test --filter PiCodingAgentTests` passed (71 `PiCodingAgent` tests) on 2026-02-24
+- `swift build` passed on 2026-02-24

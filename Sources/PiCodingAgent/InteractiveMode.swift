@@ -27,17 +27,18 @@ public struct PiCodingAgentInteractiveSnapshot: Equatable, Sendable {
     }
 }
 
-public final class PiCodingAgentInteractiveMode {
+public final class PiCodingAgentInteractiveMode: PiTUIComponent {
     private let settings: PiCodingAgentSettingsManager
     private let modelRegistry: PiCodingAgentModelRegistry
     private let editor = PiTUIEditorComponent()
+    private var settingsList: PiTUISettingsList?
+    private var modelSelectorList: PiTUISelectList?
 
     private var overlay: PiCodingAgentInteractiveOverlay = .none
     private var statusMessage: String = "Ready"
     private var submittedPrompts: [String] = []
     private var currentModel: PiAIModel?
-    private var modelSelectorItems: [PiAIModel] = []
-    private var modelSelectorIndex: Int = 0
+    private var modelSelectorItemsByValue: [String: PiAIModel] = [:]
 
     public init(
         settings: PiCodingAgentSettingsManager,
@@ -74,12 +75,29 @@ public final class PiCodingAgentInteractiveMode {
     }
 
     public func handleInput(_ data: String) {
+        if overlay == .settings {
+            if let keyID = PiTUIKeys.parseKey(data), keyID == "f2" {
+                handleKeyID("f2")
+                return
+            }
+            settingsList?.handleInput(data)
+            return
+        }
+        if overlay == .modelSelector {
+            if let keyID = PiTUIKeys.parseKey(data), keyID == "f3" {
+                handleKeyID("f3")
+                return
+            }
+            modelSelectorList?.handleInput(data)
+            return
+        }
+
         if let keyID = PiTUIKeys.parseKey(data) {
             switch keyID {
             case "ctrl+s":
                 handleKeyID("f2")
                 return
-            case "ctrl+m":
+            case "ctrl+p":
                 handleKeyID("f3")
                 return
             case "up", "down", "left", "right", "enter", "escape", "tab", "backspace":
@@ -98,13 +116,20 @@ public final class PiCodingAgentInteractiveMode {
 
         switch overlay {
         case .settings:
-            if normalized == "escape" || normalized == "f2" {
+            if let raw = rawInput(forKeyID: normalized) {
+                settingsList?.handleInput(raw)
+            } else if normalized == "f2" {
                 overlay = .none
                 statusMessage = "Closed settings"
             }
             return
         case .modelSelector:
-            handleModelSelectorKey(normalized)
+            if let raw = rawInput(forKeyID: normalized) {
+                modelSelectorList?.handleInput(raw)
+            } else if normalized == "f3" {
+                overlay = .none
+                statusMessage = "Closed model selector"
+            }
             return
         case .none:
             break
@@ -145,6 +170,8 @@ public final class PiCodingAgentInteractiveMode {
         return lines.map { PiTUIANSIText.truncateToVisibleWidth($0, maxWidth: width) }
     }
 
+    public func invalidate() {}
+
     private func transcriptLines(width: Int) -> [String] {
         guard !submittedPrompts.isEmpty else { return [] }
         let recent = submittedPrompts.suffix(3)
@@ -161,77 +188,120 @@ public final class PiCodingAgentInteractiveMode {
     }
 
     private func renderSettingsOverlay(width: Int) -> [String] {
-        let theme = settings.getTheme() ?? "(default)"
-        let provider = settings.getDefaultProvider() ?? "(auto)"
-        let model = settings.getDefaultModel() ?? "(auto)"
-        return [
-            "Settings",
-            "  theme: \(theme)",
-            "  defaultProvider: \(provider)",
-            "  defaultModel: \(model)",
-            "  Esc/F2 to close",
-        ].map { PiTUIANSIText.truncateToVisibleWidth($0, maxWidth: width) }
+        ensureSettingsList()
+        var lines = ["Settings"]
+        lines.append(contentsOf: settingsList?.render(width: width) ?? ["  No settings available"])
+        return lines.map { PiTUIANSIText.truncateToVisibleWidth($0, maxWidth: width) }
     }
 
     private func renderModelSelectorOverlay(width: Int) -> [String] {
         var lines = ["Model Selector"]
-        if modelSelectorItems.isEmpty {
-            lines.append("  No models available")
-            return lines.map { PiTUIANSIText.truncateToVisibleWidth($0, maxWidth: width) }
-        }
-
-        let maxVisible = 6
-        let start = max(0, min(modelSelectorIndex - maxVisible / 2, max(0, modelSelectorItems.count - maxVisible)))
-        let end = min(modelSelectorItems.count, start + maxVisible)
-        for index in start..<end {
-            let item = modelSelectorItems[index]
-            let prefix = index == modelSelectorIndex ? "→ " : "  "
-            lines.append(prefix + item.qualifiedID)
-        }
-        lines.append("  Enter select · Esc cancel")
+        lines.append(contentsOf: modelSelectorList?.render(width: width) ?? ["  No models available"])
         return lines.map { PiTUIANSIText.truncateToVisibleWidth($0, maxWidth: width) }
     }
 
-    private func handleModelSelectorKey(_ keyID: String) {
-        guard !modelSelectorItems.isEmpty else {
-            if keyID == "escape" || keyID == "f3" { overlay = .none }
+    private func openModelSelector() {
+        var models = modelRegistry.getAvailable()
+        if models.isEmpty { models = modelRegistry.getAll() }
+        models.sort { $0.qualifiedID.localizedCaseInsensitiveCompare($1.qualifiedID) == .orderedAscending }
+        modelSelectorItemsByValue = Dictionary(uniqueKeysWithValues: models.map { ($0.qualifiedID, $0) })
+
+        let list = PiTUISelectList(
+            items: models.map { .init(value: $0.qualifiedID, label: $0.qualifiedID) },
+            maxVisible: 8
+        )
+        if let currentModel,
+           let idx = models.firstIndex(where: { $0.qualifiedID == currentModel.qualifiedID }) {
+            list.setSelectedIndex(idx)
+        }
+        list.onSelect = { [weak self] item in
+            guard let self, let selected = self.modelSelectorItemsByValue[item.value] else { return }
+            self.currentModel = selected
+            self.settings.setDefaultProvider(selected.provider)
+            self.settings.setDefaultModel(selected.id)
+            self.overlay = .none
+            self.statusMessage = "Selected model \(selected.qualifiedID)"
+        }
+        list.onCancel = { [weak self] in
+            self?.overlay = .none
+            self?.statusMessage = "Closed model selector"
+        }
+        modelSelectorList = list
+        overlay = .modelSelector
+        statusMessage = "Select a model"
+    }
+
+    private func ensureSettingsList() {
+        guard settingsList == nil else {
+            refreshSettingsListItems()
             return
         }
+        let list = PiTUISettingsList(
+            items: makeSettingsItems(),
+            maxVisible: 8,
+            options: .init(enableSearch: false)
+        )
+        list.onChange = { [weak self] id, value in
+            guard let self else { return }
+            self.applySettingChange(id: id, value: value)
+            self.statusMessage = "Updated \(id) = \(value)"
+            self.refreshSettingsListItems()
+        }
+        list.onCancel = { [weak self] in
+            self?.overlay = .none
+            self?.statusMessage = "Closed settings"
+        }
+        settingsList = list
+    }
 
-        switch keyID {
-        case "up":
-            modelSelectorIndex = modelSelectorIndex == 0 ? modelSelectorItems.count - 1 : modelSelectorIndex - 1
-        case "down":
-            modelSelectorIndex = modelSelectorIndex == modelSelectorItems.count - 1 ? 0 : modelSelectorIndex + 1
-        case "enter":
-            let selected = modelSelectorItems[modelSelectorIndex]
-            currentModel = selected
-            settings.setDefaultProvider(selected.provider)
-            settings.setDefaultModel(selected.id)
-            overlay = .none
-            statusMessage = "Selected model \(selected.qualifiedID)"
-        case "escape", "f3":
-            overlay = .none
-            statusMessage = "Closed model selector"
+    private func refreshSettingsListItems() {
+        settingsList?.setItems(makeSettingsItems())
+    }
+
+    private func makeSettingsItems() -> [PiTUISettingItem] {
+        [
+            .init(
+                id: "theme",
+                label: "theme",
+                description: "Color theme for interactive TUI rendering",
+                currentValue: settings.getTheme() ?? "dark",
+                values: ["dark", "light"]
+            ),
+            .init(
+                id: "defaultThinkingLevel",
+                label: "defaultThinkingLevel",
+                description: "Default reasoning level for interactive prompts",
+                currentValue: settings.getDefaultThinkingLevel() ?? "medium",
+                values: PiCodingAgentThinkingLevel.allCases.map(\.rawValue)
+            ),
+            .init(
+                id: "defaultProvider",
+                label: "defaultProvider",
+                description: "Provider used for initial model selection",
+                currentValue: settings.getDefaultProvider() ?? "(auto)"
+            ),
+            .init(
+                id: "defaultModel",
+                label: "defaultModel",
+                description: "Model used for initial session state",
+                currentValue: settings.getDefaultModel() ?? "(auto)"
+            ),
+        ]
+    }
+
+    private func applySettingChange(id: String, value: String) {
+        switch id {
+        case "theme":
+            settings.setTheme(value)
+        case "defaultThinkingLevel":
+            settings.setDefaultThinkingLevel(value)
+        case "defaultProvider":
+            settings.setDefaultProvider(value == "(auto)" ? nil : value)
+        case "defaultModel":
+            settings.setDefaultModel(value == "(auto)" ? nil : value)
         default:
             break
         }
-    }
-
-    private func openModelSelector() {
-        modelSelectorItems = modelRegistry.getAvailable()
-        if modelSelectorItems.isEmpty {
-            modelSelectorItems = modelRegistry.getAll()
-        }
-        modelSelectorItems.sort { $0.qualifiedID.localizedCaseInsensitiveCompare($1.qualifiedID) == .orderedAscending }
-        if let currentModel,
-           let idx = modelSelectorItems.firstIndex(where: { $0.qualifiedID == currentModel.qualifiedID }) {
-            modelSelectorIndex = idx
-        } else {
-            modelSelectorIndex = 0
-        }
-        overlay = .modelSelector
-        statusMessage = "Select a model"
     }
 
     private func submit(text: String) {
@@ -244,5 +314,18 @@ public final class PiCodingAgentInteractiveMode {
         editor.setText("")
         editor.addToHistory(trimmed)
         statusMessage = "Submitted prompt"
+    }
+
+    private func rawInput(forKeyID keyID: String) -> String? {
+        switch keyID {
+        case "up": return "\u{001B}[A"
+        case "down": return "\u{001B}[B"
+        case "left": return "\u{001B}[D"
+        case "right": return "\u{001B}[C"
+        case "enter": return "\r"
+        case "escape": return "\u{001B}"
+        case "space": return " "
+        default: return nil
+        }
     }
 }
