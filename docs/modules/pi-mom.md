@@ -80,10 +80,44 @@ Verification (slice):
 
 - `swift test --filter PiMomSlackDispatchTests` passed on 2026-02-24
 
+## `P6-2` Progress (Tool Delegation Bridge Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiMom/Tools.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiMomTests/PiMomToolBridgeTests.swift`
+
+Implemented in this slice:
+
+- `PiMom` -> `PiCodingAgent` tool bridge (`PiMomToolBridge`)
+  - reuses `PiCodingAgent` core tools: `read`, `write`, `edit`
+  - injects `PiMomBashTool` (sandbox-backed via `PiMomExecutor`)
+  - injects `PiMomAttachTool` (workspace-scoped upload callback)
+- sandbox-backed bash tool (`PiMomBashTool`)
+  - delegates command execution to `PiMomExecutor`
+  - supports optional timeout
+  - returns text output and surfaces non-zero exit as tool error
+- attach tool (`PiMomAttachTool`)
+  - validates path stays inside workspace
+  - validates file exists
+  - uploads via injected `PiMomFileUploading`
+  - returns deterministic confirmation text
+
+Tests added:
+
+- tool registry composition (`attach`, `bash`, `edit`, `read`, `write`)
+- sandboxed bash delegation + timeout passthrough
+- attach upload success path
+- attach path-outside-workspace rejection
+
+Verification (slice):
+
+- `swift test --filter PiMomToolBridgeTests` passed on 2026-02-24
+
 ## Notes / Parity Gaps (Pending)
 
 - Slack Socket Mode integration
 - Slack Socket Mode integration and event parsing adapters
 - event file watcher / scheduler
 - workspace log/context store parity
-- tool delegation and attach/upload flows
+- full Slack socket/web client adapter
