@@ -41,7 +41,45 @@ Verification (slice):
 
 ## Notes / Parity Gaps (Pending)
 
-- SSH command execution/parsing (`ssh.ts`)
-- model lifecycle command generation and GPU/port allocation (`commands/models.ts`)
+- SSH command execution/parsing (`ssh.ts`) runtime execution is pending, but command parsing/invocation planning is now implemented
+- model lifecycle command generation and GPU/port allocation (`commands/models.ts`) foundation is implemented (mockable planning), but remote execution/runtime log streaming is pending
 - CLI parsing/routing (`cli.ts`, `commands/pods.ts`, `commands/prompt.ts`)
 - interactive/streaming SSH execution runtime integration
+
+## `P6-3` Progress (SSH + Model Lifecycle Planning Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiPods/SSH.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiPods/ModelRegistry.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiPods/Lifecycle.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiPodsTests/PiPodsCommandPlanningTests.swift`
+
+Implemented in this slice:
+
+- SSH command parsing + invocation planning
+  - parse `ssh` command (`host`, `port`, `args`)
+  - SSH exec invocation builder (keepalive, force TTY)
+  - SCP invocation builder (`-P <port>`, `host:path`)
+- known-model registry foundation (subset catalog + injected registry for tests)
+  - known/unknown model detection
+  - GPU-count/GPU-type config resolution
+- model lifecycle planning (`PiPodsModelLifecyclePlanner`)
+  - active/override pod resolution
+  - next available port allocation (`8001+`)
+  - least-used GPU selection (round-robin-ish usage balancing)
+  - start plan generation (`vLLM args`, memory/context overrides, env exports, remote start/log commands)
+  - stop plan generation (single model or all tracked PIDs)
+
+Tests added:
+
+- SSH parse + exec/scp invocation generation
+- next-port and least-used GPU selection
+- known-model start plan with memory/context override command generation
+- unknown-model GPU override rejection
+- stop command generation for one/all models
+
+Verification (slice):
+
+- `swift test --filter PiPodsCommandPlanningTests` passed on 2026-02-25
+- `swift build` passed on 2026-02-25
