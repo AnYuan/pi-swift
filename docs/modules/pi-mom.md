@@ -148,8 +148,8 @@ Verification (slice):
 
 ## Notes / Parity Gaps (Pending)
 
+- context sync / log-context split parity (`log.jsonl` + `context.jsonl`) is now implemented as a foundation (`PiMomContextStore`) with dedupe/ordering tests, but is not yet wired into a full `PiMom` run coordinator
 - Slack Socket Mode integration
 - Slack Socket Mode integration and event parsing adapters
 - event file watcher / scheduler
-- context sync / log-context split parity (`log.jsonl` + `context.jsonl`)
 - full Slack socket/web client adapter
