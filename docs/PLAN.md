@@ -576,12 +576,18 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-mom.md`, `docs/PLAN.md`, `README.md`
 
 ### P6-3: `pods` (GPU pod CLI) migration
-- Status: TODO
+- Status: DONE
 - Depends On: P3-5
 - Scope:
   - CLI, SSH, model lifecycle, configuration management
 - Test Plan:
   - Config and command-generation tests, integration smoke test
+- Verification:
+  - Tests: `swift test --filter PiPodsTests` passed (16 `PiPods` tests) on 2026-02-25
+  - Build: `swift build` passed on 2026-02-25
+  - Regression: Added `PiPodsConfigStoreTests`, `PiPodsCommandPlanningTests`, and `PiPodsCLITests` covering config persistence, SSH/scp invocation generation, GPU/port planning, model start/stop command planning, and CLI routing/persistence integration
+  - Scope completion: `PiPods` now includes typed config store (`pods.json`), SSH invocation parser/builders, known-model registry + lifecycle planner, and a mock-runtime `PiPodsCLIApp` for `pods/ssh/start/stop/list/logs`
+  - Docs updated: `docs/modules/pi-pods.md`, `docs/PLAN.md`, `README.md`
 
 ## 6. Documentation Sync Tasks (Continuous)
 
@@ -604,4 +610,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P6-3` (`pods` GPU pod CLI migration). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: None. All tasks in the current plan are marked `DONE`. Continue by opening a new plan task (for example: `pi-mom` Slack Socket Mode runtime adapter, `pi-pods` `pods setup` remote bootstrap parity, or coverage/report pushes for `PiMom` / `PiPods`).

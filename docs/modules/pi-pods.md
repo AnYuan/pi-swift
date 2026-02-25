@@ -39,13 +39,6 @@ Verification (slice):
 - `swift test --filter PiPodsConfigStoreTests` passed on 2026-02-25
 - `swift build` passed on 2026-02-25
 
-## Notes / Parity Gaps (Pending)
-
-- SSH command execution/parsing (`ssh.ts`) runtime execution is pending, but command parsing/invocation planning is now implemented
-- model lifecycle command generation and GPU/port allocation (`commands/models.ts`) foundation is implemented (mockable planning), but remote execution/runtime log streaming is pending
-- CLI parsing/routing (`cli.ts`, `commands/pods.ts`, `commands/prompt.ts`)
-- interactive/streaming SSH execution runtime integration
-
 ## `P6-3` Progress (SSH + Model Lifecycle Planning Slice, In Progress)
 
 Files:
@@ -83,3 +76,47 @@ Verification (slice):
 
 - `swift test --filter PiPodsCommandPlanningTests` passed on 2026-02-25
 - `swift build` passed on 2026-02-25
+
+## `P6-3` Progress (CLI Parsing + Mock Runtime Integration Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiPods/CLI.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiPodsTests/PiPodsCLITests.swift`
+
+Implemented in this slice:
+
+- `PiPodsCLIApp` (mock-runtime-driven CLI integration)
+  - help/version
+  - `pods` list / `pods active` / `pods remove`
+  - `ssh [pod] "<command>"` routing via parsed SSH invocation
+  - `start <model> --name <name>` with lifecycle planner + config persistence
+  - `stop [name]` with lifecycle planner + config cleanup
+  - `list` (tracked local model processes)
+  - `logs <name>` (log-tail invocation planning)
+- CLI result/environment/runtime abstractions
+  - `PiPodsCLIResult`
+  - `PiPodsCLIEnvironment`
+  - `PiPodsCLIRuntime` / `PiPodsCLIRuntimeResponse`
+
+Tests added:
+
+- help/version smoke
+- pod list + active switching
+- SSH routing via runtime
+- `start` command planning + persisted model state
+- `logs`/`stop` routing and config update
+- usage-error handling
+
+Verification (slice):
+
+- `swift test --filter PiPodsCLITests` passed on 2026-02-25
+- `swift test --filter PiPodsTests` passed (16 `PiPods` tests) on 2026-02-25
+- `swift build` passed on 2026-02-25
+
+## Notes / Parity Gaps (Known Differences / Future Work)
+
+- real process-backed SSH/SCP execution runtime is still mock/runtime-abstracted in Swift (`PiPodsCLIRuntime`)
+- `pods setup` remote bootstrap flow (`pod_setup.sh`, GPU probing, SCP upload) is not yet ported
+- `prompt`/agent chat mode integration from `../pi-mono/packages/pods/src/commands/prompt.ts` is not yet ported
+- full `models.json` catalog parity is not yet ported (Swift includes a small built-in subset + injectable registry for tests)
