@@ -24,6 +24,7 @@ public struct PiMomSlackEvent: Codable, Equatable, Sendable {
     public var user: String
     public var text: String
     public var files: [PiMomSlackFileRef]?
+    public var attachments: [PiMomAttachment]?
 
     public init(
         type: PiMomSlackEventType,
@@ -31,7 +32,8 @@ public struct PiMomSlackEvent: Codable, Equatable, Sendable {
         ts: String,
         user: String,
         text: String,
-        files: [PiMomSlackFileRef]? = nil
+        files: [PiMomSlackFileRef]? = nil,
+        attachments: [PiMomAttachment]? = nil
     ) {
         self.type = type
         self.channel = channel
@@ -39,6 +41,7 @@ public struct PiMomSlackEvent: Codable, Equatable, Sendable {
         self.user = user
         self.text = text
         self.files = files
+        self.attachments = attachments
     }
 }
 

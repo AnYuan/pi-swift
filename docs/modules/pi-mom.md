@@ -146,10 +146,80 @@ Verification (slice):
 
 - `swift test --filter PiMomChannelStoreTests` passed on 2026-02-24
 
-## Notes / Parity Gaps (Pending)
+## `P6-2` Progress (Context Sync Foundation Slice, In Progress)
 
-- context sync / log-context split parity (`log.jsonl` + `context.jsonl`) is now implemented as a foundation (`PiMomContextStore`) with dedupe/ordering tests, but is not yet wired into a full `PiMom` run coordinator
-- Slack Socket Mode integration
-- Slack Socket Mode integration and event parsing adapters
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiMom/Context.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiMomTests/PiMomContextStoreTests.swift`
+
+Implemented in this slice:
+
+- `log.jsonl` -> `context.jsonl` sync foundation (`PiMomContextStore`)
+  - JSONL append/load for `PiAgentMessage`
+  - sync excludes current Slack message timestamp
+  - sync skips bot messages
+  - timestamp-ordered append
+  - user-message dedupe against existing context
+  - normalization parity helpers (timestamp prefix + `<slack_attachments>` stripping)
+
+Tests added:
+
+- log sync ordering / bot-skip behavior
+- exclude-current-message semantics
+- normalization-based dedupe (timestamp prefix + attachment block)
+
+Verification (slice):
+
+- `swift test --filter PiMomContextStoreTests` passed on 2026-02-25
+- `swift build` passed on 2026-02-25
+
+## `P6-2` Progress (Run Coordinator + Mock Slack Integration Slice, In Progress)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiMom/Coordinator.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiMom/SlackDispatch.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiMomTests/PiMomCoordinatorTests.swift`
+
+Implemented in this slice:
+
+- mockable Slack runtime integration contracts
+  - `PiMomSlackClient`
+  - `PiMomWorkScheduling`
+  - `PiMomRunner`
+- run result/stop semantics
+  - `PiMomRunResult`
+  - `PiMomRunStopReason`
+- Slack response context adapter (`PiMomSlackRunContext`)
+  - typing placeholder
+  - main message accumulation / replacement
+  - thread reply support
+  - working-indicator toggling
+  - file upload and delete hooks
+  - bot-response logging to `log.jsonl`
+- run orchestration (`PiMomRunCoordinator`)
+  - incoming user event preprocessing + attachment staging/logging
+  - `PiMomSlackEventDispatcher` integration
+  - per-channel runner lifecycle (`running`, `stopRequested`, `stopMessageTS`)
+  - stop command abort path (`_Stopping..._` -> `_Stopped_`)
+  - scheduled event drain after current run completes
+  - context sync execution before runner invocation
+
+Tests added:
+
+- user-event -> log -> context-sync -> run -> bot-response flow
+- running stop command abort + `_Stopped_` message update flow
+- scheduled event queued during run executes after completion
+
+Verification (slice):
+
+- `swift test --filter PiMomCoordinatorTests` passed on 2026-02-25
+- `swift test --filter PiMomTests` passed (25 `PiMom` tests) on 2026-02-25
+- `swift build` passed on 2026-02-25
+
+## Notes / Parity Gaps (Known Differences / Future Work)
+
+- real Slack Socket Mode / Web API runtime adapter (current implementation provides mockable integration contracts + coordinator only)
 - event file watcher / scheduler
-- full Slack socket/web client adapter
+- `pi-mono` full agent/session/runtime wiring (`agent.ts` feature surface) is not yet ported; `P6-2` currently covers the planned migration scope (Slack integration contracts, tool delegation, sandbox abstraction, persistence/context foundations, and mock-tested coordinator flow)

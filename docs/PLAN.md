@@ -562,12 +562,18 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - No runtime tests (docs/design-only task)
 
 ### P6-2: `pi-mom` (Slack bot) migration
-- Status: TODO
+- Status: DONE
 - Depends On: P3-5, P5-11
 - Scope:
   - Slack integration, tool delegation, sandbox abstraction
 - Test Plan:
   - Mock Slack event and command-execution tests
+- Verification:
+  - Tests: `swift test --filter PiMomTests` passed (25 `PiMom` tests) on 2026-02-25
+  - Build: `swift build` passed on 2026-02-25
+  - Regression: Added `PiMomContextStoreTests` and `PiMomCoordinatorTests` covering `log.jsonl` -> `context.jsonl` sync, stop/abort flow, scheduled-event queue drain, and mock Slack run coordination
+  - Scope completion: `PiMom` now includes sandbox abstraction, tool delegation bridge, channel store/attachment queue, context sync store, and mockable Slack run coordinator integration
+  - Docs updated: `docs/modules/pi-mom.md`, `docs/PLAN.md`, `README.md`
 
 ### P6-3: `pods` (GPU pod CLI) migration
 - Status: TODO
@@ -598,4 +604,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P6-2` (`pi-mom` Slack bot migration). Continue following the strict test-first implementation cadence and atomic-commit rule.
+Next recommended task: `P6-3` (`pods` GPU pod CLI migration). Continue following the strict test-first implementation cadence and atomic-commit rule.

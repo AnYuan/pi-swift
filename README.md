@@ -75,4 +75,4 @@ Project bootstrapping/planning docs are in place, and `P1` groundwork is underwa
 - `P3-4` `pi-agent-core` runtime controls (continue/retry entrypoint, steering/follow-up loops, abort controller, request-options plumbing): implemented and verified
 - `P3-5` `pi-agent-core` regression test completion + coverage report: implemented and verified (`/Users/anyuan/Development/pi-swift/docs/reports/pi-agent-core-coverage.md`)
 
-Next step: `P6-2` (`pi-mom` Slack bot migration) in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`.
+Next step: `P6-3` (`pods` GPU pod CLI migration) in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`.
