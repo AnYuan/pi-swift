@@ -131,6 +131,99 @@ final class PiPodsCLITests: XCTestCase {
         XCTAssertTrue(result.stderr.contains("Usage:"))
     }
 
+    func testListModelsWithPodOverride() throws {
+        var config = store.load()
+        config.pods["beta"]?.models["other"] = .init(model: "m2", port: 9000, gpu: [1], pid: 111)
+        try store.save(config)
+
+        let result = run(["list", "--pod", "beta"])
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertEqual(result.action, .listModels(pod: "beta"))
+        XCTAssertTrue(result.stdout.contains("other m2 port=9000 pid=111"))
+    }
+
+    func testListModelsEmpty() {
+        let result = run(["list"])
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertEqual(result.action, .listModels(pod: nil))
+        XCTAssertTrue(result.stdout.contains("(no models)"))
+    }
+
+    func testStopAllModelsReturnsCorrectCommand() throws {
+        var config = store.load()
+        config.pods["alpha"]?.models["coder"] = .init(model: "demo-model", port: 8001, gpu: [0], pid: 4242)
+        config.pods["alpha"]?.models["coder2"] = .init(model: "demo-model", port: 8002, gpu: [1], pid: 4243)
+        try store.save(config)
+
+        runtime.nextResponse = .init(stdout: "")
+        let stopAll = run(["stop"])
+        XCTAssertEqual(stopAll.exitCode, 0)
+        XCTAssertEqual(stopAll.action, .stop(instanceName: nil, pod: nil))
+        // stop without name plans stop all, killing 4242 and 4243
+        XCTAssertTrue(runtime.calls.last?.invocation.arguments.last?.contains("kill 4242") == true || runtime.calls.last?.invocation.arguments.last?.contains("kill 4243") == true)
+        
+        let loadedConfig = store.load()
+        XCTAssertTrue(loadedConfig.pods["alpha"]?.models.isEmpty == true)
+    }
+
+    func testStartArgumentParsingEdgeCases() {
+        // Missing value for --name
+        let result1 = run(["start", "model", "--name"])
+        XCTAssertEqual(result1.exitCode, 2)
+        XCTAssertTrue(result1.stderr.contains("Missing value for --name"))
+
+        // Missing value for --pod
+        let result2 = run(["start", "model", "--name", "n1", "--pod"])
+        XCTAssertEqual(result2.exitCode, 2)
+        XCTAssertTrue(result2.stderr.contains("Missing value for --pod"))
+
+        // Missing value for --memory
+        let result3 = run(["start", "model", "--name", "n1", "--memory"])
+        XCTAssertEqual(result3.exitCode, 2)
+        XCTAssertTrue(result3.stderr.contains("Missing value for --memory"))
+
+        // Missing value for --context
+        let result4 = run(["start", "model", "--name", "n1", "--context"])
+        XCTAssertEqual(result4.exitCode, 2)
+        XCTAssertTrue(result4.stderr.contains("Missing value for --context"))
+
+        // Invalid gpus type
+        let result5 = run(["start", "model", "--name", "n1", "--gpus", "abc"])
+        XCTAssertEqual(result5.exitCode, 2)
+        XCTAssertTrue(result5.stderr.contains("--gpus must be a positive number"))
+        
+        // Unknown option
+        let result6 = run(["start", "model", "--name", "n1", "--unknown-opt"])
+        XCTAssertEqual(result6.exitCode, 2)
+        XCTAssertTrue(result6.stderr.contains("Unknown option: --unknown-opt"))
+    }
+    
+    func testStartFailureDueToPlannerError() {
+        // Attempt to start unknown model with GPU override (unsupported)
+        let result = run(["start", "unknown-repo/model", "--name", "n1", "--gpus", "1"])
+        XCTAssertEqual(result.exitCode, 1)
+        XCTAssertTrue(result.stderr.contains("--gpus is only supported for known models"))
+    }
+
+    func testLogsForNonExistentModel() {
+        let logs = run(["logs", "non-existent"])
+        XCTAssertEqual(logs.exitCode, 1)
+        XCTAssertTrue(logs.stderr.contains("Model 'non-existent' not found."))
+    }
+
+    func testSSHActionCommandBuildingEdgeCases() {
+        // Run SSH against explicit pod
+        runtime.nextResponse = .init()
+        let result1 = run(["ssh", "beta", "echo pod override"])
+        XCTAssertEqual(result1.exitCode, 0)
+        XCTAssertEqual(result1.action, .ssh(pod: "beta", command: "echo pod override"))
+        
+        // Empty pod lookup failure
+        let result2 = run(["ssh", "unknown_pod", "echo fail"])
+        XCTAssertEqual(result2.exitCode, 1)
+        XCTAssertTrue(result2.stderr.contains("podNotFound") || result2.stderr.contains("not found"))
+    }
+
     private func run(_ argv: [String]) -> PiPodsCLIResult {
         PiPodsCLIApp.run(
             argv: argv,

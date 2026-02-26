@@ -114,4 +114,63 @@ final class PiCodingAgentAuthStorageTests: XCTestCase {
         XCTAssertTrue(storage.hasAuth(provider: "custom"))
         XCTAssertFalse(storage.hasAuth(provider: "missing"))
     }
+
+    func testFileBackendReadWrite() throws {
+        let tempFile = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+        defer { try? FileManager.default.removeItem(atPath: tempFile) }
+
+        let backend = PiCodingAgentFileAuthStorageBackend(path: tempFile)
+        
+        // Initial read before file exists
+        XCTAssertNil(try backend.read())
+        
+        let storage = PiCodingAgentAuthStorage(backend: backend)
+        storage.set(provider: "test-provider", credential: .apiKey("test-key"))
+        
+        let readBack = try backend.read()
+        XCTAssertNotNil(readBack)
+        XCTAssertTrue(readBack!.contains("test-key"))
+        
+        let newStorage = PiCodingAgentAuthStorage(backend: backend)
+        let credential = newStorage.get(provider: "test-provider")
+        XCTAssertEqual(credential, .apiKey("test-key"))
+    }
+
+    func testFileBackendInvalidFileReturnsEmpty() throws {
+        let tempFile = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).path
+        defer { try? FileManager.default.removeItem(atPath: tempFile) }
+
+        // Write invalid JSON
+        try "{ invalid json".write(toFile: tempFile, atomically: true, encoding: .utf8)
+        let backend = PiCodingAgentFileAuthStorageBackend(path: tempFile)
+        
+        let storage = PiCodingAgentAuthStorage(backend: backend)
+        XCTAssertTrue(storage.list().isEmpty)
+    }
+
+    func testAuthCredentialCodable() throws {
+        let apiKeyCred = PiCodingAgentAuthCredential.apiKey("my-api-key")
+        let oauthCred = PiCodingAgentAuthCredential.oauth(.init(refresh: "ref", access: "acc", expires: 12345, extra: ["custom": .string("val")]))
+        
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+        
+        // Encode and Decode API Key
+        let apiData = try encoder.encode(apiKeyCred)
+        let decodedAPI = try decoder.decode(PiCodingAgentAuthCredential.self, from: apiData)
+        XCTAssertEqual(apiKeyCred, decodedAPI)
+        
+        // Encode and Decode OAuth
+        let oauthData = try encoder.encode(oauthCred)
+        let decodedOAuth = try decoder.decode(PiCodingAgentAuthCredential.self, from: oauthData)
+        XCTAssertEqual(oauthCred, decodedOAuth)
+    }
+
+    func testDefaultCommandRunnerSucessAndFailure() {
+        let successResult = PiCodingAgentAuthStorage.defaultCommandRunner("echo 'hello cmd'")
+        XCTAssertEqual(successResult?.trimmingCharacters(in: .whitespacesAndNewlines), "hello cmd")
+        
+        let failureResult = PiCodingAgentAuthStorage.defaultCommandRunner("exit 1")
+        XCTAssertNil(failureResult)
+    }
 }

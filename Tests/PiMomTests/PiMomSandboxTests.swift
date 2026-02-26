@@ -49,6 +49,58 @@ final class PiMomSandboxTests: XCTestCase {
         XCTAssertTrue(runner.calls[0].arguments[1].contains("docker exec mom-box sh -c"))
         XCTAssertTrue(runner.calls[0].arguments[1].contains("'printf '\\''hi'\\'''"))
     }
+
+    func testParseErrorDescriptions() {
+        XCTAssertEqual(PiMomSandboxParseError.missingDockerContainerName.description, "docker sandbox requires container name (e.g., docker:mom-sandbox)")
+        XCTAssertEqual(PiMomSandboxParseError.invalidSandboxType("foo").description, "Invalid sandbox type 'foo'. Use 'host' or 'docker:<container-name>'")
+    }
+
+    func testExecutorFactoryMakeHost() {
+        let runner = RecordingRunner()
+        let executor = PiMomExecutorFactory.make(config: .host, runner: runner)
+        XCTAssertTrue(executor is PiMomHostExecutor)
+    }
+
+    func testExecutorFactoryMakeDocker() {
+        let runner = RecordingRunner()
+        let executor = PiMomExecutorFactory.make(config: .docker(container: "my-container"), runner: runner)
+        if let dockerExecutor = executor as? PiMomDockerExecutor {
+            XCTAssertEqual(dockerExecutor.container, "my-container")
+        } else {
+            XCTFail("Expected PiMomDockerExecutor")
+        }
+    }
+
+    func testDefaultProcessRunnerExecutesAndCapturesOutput() throws {
+        let runner = PiMomDefaultProcessRunner()
+        let result = try runner.run(executable: "/bin/sh", arguments: ["-c", "echo 'hello process'"], options: .init())
+        XCTAssertEqual(result.stdout, "hello process\n")
+        XCTAssertEqual(result.code, 0)
+    }
+
+    func testDefaultProcessRunnerCapturesStderr() throws {
+        let runner = PiMomDefaultProcessRunner()
+        let result = try runner.run(executable: "/bin/sh", arguments: ["-c", "echo 'error process' >&2"], options: .init())
+        XCTAssertEqual(result.stderr, "error process\n")
+        XCTAssertEqual(result.code, 0)
+    }
+
+    func testDefaultProcessRunnerThrowsOnInvalidExecutable() {
+        let runner = PiMomDefaultProcessRunner()
+        XCTAssertThrowsError(try runner.run(executable: "/usr/bin/nonexistent_executable_12345", arguments: [], options: .init())) { error in
+            XCTAssertTrue(error is NSError)
+        }
+    }
+
+    func testDefaultProcessRunnerHandlesTimeout() {
+        let runner = PiMomDefaultProcessRunner()
+        let options = PiMomExecOptions(timeoutSeconds: 0.1)
+        XCTAssertThrowsError(try runner.run(executable: "/bin/sh", arguments: ["-c", "sleep 1"], options: options)) { error in
+            let nsError = error as NSError
+            XCTAssertEqual(nsError.domain, "PiMomProcessRunner")
+            XCTAssertEqual(nsError.code, 2)
+        }
+    }
 }
 
 private final class RecordingRunner: PiMomProcessRunning, @unchecked Sendable {

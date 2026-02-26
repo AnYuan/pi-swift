@@ -1,0 +1,1222 @@
+[0/1] Planning build
+Building for debugging...
+[0/6] Write swift-version--58304C5D6DBC2206.txt
+[2/14] Compiling PiTestSupport PiTestSupport.swift
+[3/14] Emitting module PiTestSupport
+[4/17] Compiling PiCoreTypes PiToolTypes.swift
+[5/17] Compiling PiCoreTypes PiStreamEvent.swift
+[6/17] Compiling PiCoreTypes PiMessageTypes.swift
+[7/17] Compiling PiCoreTypes PiCoreTypes.swift
+[8/17] Compiling PiCoreTypes JSONValue.swift
+[9/17] Emitting module PiCoreTypes
+[10/60] Compiling PiTestSupportTests FixtureLoaderTests.swift
+[11/60] Emitting module PiTestSupportTests
+[12/60] Compiling PiTestSupportTests GoldenFileTests.swift
+[13/60] Compiling PiAI OAuthHelpers.swift
+[14/60] Compiling PiTUI PiTUICursor.swift
+[15/60] Compiling PiTUI PiTUIEditorComponent.swift
+[16/61] Compiling PiAI Overflow.swift
+[17/61] Compiling PiAI SSEParser.swift
+[18/61] Compiling PiAI Validation.swift
+[19/61] Compiling PiAI JSONParsing.swift
+[20/61] Compiling PiTUI PiTUIRenderBuffer.swift
+[21/61] Compiling PiTUI PiTUIRenderScheduler.swift
+[22/61] Emitting module PiTUI
+[23/61] Compiling PiTUI PiTUIEditorHistory.swift
+[24/61] Compiling PiTUI PiTUIEditorKeybindings.swift
+[25/61] Compiling PiTUI PiUndoStack.swift
+[26/61] Compiling PiTUI PiTUITerminalImage.swift
+[27/61] Emitting module PiCoreTypesTests
+[28/61] Compiling PiCoreTypesTests PiCoreTypesCodableTests.swift
+[29/61] Compiling PiCoreTypesTests PiCoreTypesSmokeTests.swift
+[30/61] Compiling PiTUI PiTUITerminal.swift
+[31/61] Compiling PiTUI PiTUIStdinBuffer.swift
+[32/61] Compiling PiTUI PiTUIEditorModel.swift
+[33/61] Compiling PiTUI PiTUIImage.swift
+[34/61] Compiling PiTUI PiTUIOverlayLayout.swift
+[35/61] Compiling PiTUI PiTUIProcessTerminal.swift
+[36/61] Compiling PiTUI PiTUIANSITerminal.swift
+[37/61] Compiling PiTUI PiTUIANSIText.swift
+[38/61] Compiling PiTUI PiKillRing.swift
+[39/61] Compiling PiTUI PiTUI.swift
+[40/61] Compiling PiTUI PiTUIAutocomplete.swift
+[41/61] Compiling PiTUI PiTUIComponent.swift
+[42/61] Compiling PiAI PiAI.swift
+[43/61] Compiling PiAI GoogleFamilyAdapter.swift
+[44/61] Compiling PiTUI PiTUIInputComponent.swift
+[45/61] Compiling PiTUI PiTUIInputModel.swift
+[46/61] Compiling PiTUI PiTUIKeys.swift
+[47/61] Compiling PiTUI PiTUIMarkdown.swift
+[48/61] Compiling PiTUI TUI.swift
+/Users/anyuan/Development/pi-swift/Sources/PiTUI/TUI.swift:309:9: warning: variable 'scalars' was never mutated; consider changing to 'let' constant
+307 | private func stripANSIEscapeSequences(_ value: String) -> String {
+308 |     var output = String.UnicodeScalarView()
+309 |     var scalars = Array(value.unicodeScalars)
+    |         `- warning: variable 'scalars' was never mutated; consider changing to 'let' constant
+310 |     var index = 0
+311 | 
+[49/61] Compiling PiTUI PiTUISelectList.swift
+[50/61] Compiling PiTUI PiTUISettingsList.swift
+[51/86] Compiling PiAI OpenAIResponsesAdapter.swift
+[52/86] Compiling PiAI ModelRegistry.swift
+[53/86] Compiling PiAI AssistantMessageEventStream.swift
+[54/86] Compiling PiAI AnthropicMessagesAdapter.swift
+[55/86] Emitting module PiAI
+[56/86] Compiling PiAI Types.swift
+[57/100] Compiling PiTUITests PiTUIEditorKeybindingsTests.swift
+[58/100] Compiling PiTUITests PiTUIEditorModelTests.swift
+[59/101] Compiling PiAgentCore PiAgentCore.swift
+[60/101] Compiling PiTUITests PiTUIStdinBufferTests.swift
+[61/101] Compiling PiTUITests PiTUISelectListTests.swift
+[62/101] Compiling PiTUITests PiTUIImageTests.swift
+[63/101] Compiling PiTUITests PiTUIInputComponentTests.swift
+[64/101] Compiling PiTUITests PiTUIMarkdownTests.swift
+[65/101] Compiling PiTUITests PiTUIOverlayCompositionTests.swift
+[66/101] Compiling PiTUITests PiTUIInputModelTests.swift
+[67/101] Compiling PiTUITests PiTUIKeysTests.swift
+[68/101] Compiling PiTUITests PiTUISynchronizedOutputTests.swift
+[69/101] Compiling PiTUITests PiTUIEditorComponentTests.swift
+[70/101] Compiling PiTUITests PiTUIEditorHistoryTests.swift
+[71/101] Compiling PiTUITests PiTUIOverlayLayoutTests.swift
+[72/101] Compiling PiTUITests PiTUIProcessTerminalTests.swift
+[73/101] Compiling PiTUITests PiTUIRenderSchedulingTests.swift
+[74/101] Compiling PiTUITests PiTUISmokeTests.swift
+[75/101] Compiling PiTUITests PiTUISettingsListTests.swift
+[76/101] Compiling PiTUITests PiTUIAutocompleteTests.swift
+[77/101] Compiling PiTUITests PiTUICursorTests.swift
+[78/101] Compiling PiTUITests PiTUIANSITerminalTests.swift
+[79/101] Compiling PiTUITests PiTUIANSITextTests.swift
+[80/101] Emitting module PiTUITests
+[81/101] Compiling PiTUITests PiTUIDifferentialRenderingTests.swift
+[82/101] Compiling PiTUITests PiTUIEditingPrimitivesTests.swift
+[83/101] Compiling PiAITests PiAIModelRegistryTests.swift
+[84/101] Compiling PiAITests PiAIUtilitiesTests.swift
+[85/101] Compiling PiTUITests PiTUITerminalImageTests.swift
+[86/101] Compiling PiAITests PiAISmokeTests.swift
+[87/101] Compiling PiAITests PiAITypesTests.swift
+[88/101] Compiling PiAITests PiAIRegressionCoverageTests.swift
+[89/101] Compiling PiAITests PiAIOpenAIResponsesProviderTests.swift
+[90/101] Compiling PiAITests PiAIAnthropicProviderTests.swift
+[91/101] Emitting module PiAITests
+[92/101] Compiling PiAITests PiAIGoogleFamilyProviderTests.swift
+[93/101] Compiling PiAITests PiAIOAuthHelpersTests.swift
+[94/101] Compiling PiAgentCore Types.swift
+[95/101] Compiling PiAgentCore AgentLoop.swift
+[96/101] Emitting module PiAgentCore
+[97/138] Compiling PiWebUIBridge PiWebUIBridge.swift
+[98/138] Emitting module PiWebUIBridge
+[99/138] Compiling PiCodingAgent PiCodingAgent.swift
+[100/141] Compiling PiCodingAgent CLIExecutor.swift
+[101/141] Compiling PiCodingAgent CLIArgs.swift
+[102/141] Compiling PiAgentCoreTests PiAgentLoopRequestOptionsTests.swift
+[103/141] Emitting module PiWebUIBridgeTests
+[104/141] Compiling PiWebUIBridgeTests PiWebUIBridgeSmokeTests.swift
+[105/141] Compiling PiAgentCoreTests PiAgentLoopSingleTurnTests.swift
+[106/141] Compiling PiPods Types.swift
+[107/141] Compiling PiPods SSH.swift
+[108/141] Compiling PiPods PiPods.swift
+[109/141] Compiling PiAgentCoreTests PiAgentCoreSmokeTests.swift
+[110/141] Compiling PiCodingAgent HTMLExporter.swift
+[111/141] Compiling PiAgentCoreTests PiAgentCoreTypesTests.swift
+[112/141] Compiling PiAgentCoreTests PiAgentLoopAbortTests.swift
+[113/141] Compiling PiCodingAgent SessionTree.swift
+[114/141] Compiling PiCodingAgent Settings.swift
+[115/141] Compiling PiAgentCoreTests PiAgentLoopRegressionTests.swift
+[116/141] Emitting module PiAgentCoreTests
+[117/141] Compiling PiAgentCoreTests PiAgentLoopContinueTests.swift
+[118/141] Compiling PiPods ModelRegistry.swift
+[119/141] Compiling PiAgentCoreTests PiAgentLoopToolExecutionTests.swift
+[120/141] Compiling PiCodingAgent SessionStore.swift
+[121/141] Compiling PiCodingAgent InteractiveMode.swift
+[122/141] Compiling PiPods Lifecycle.swift
+[123/141] Emitting module PiPods
+[124/141] Compiling PiPods CLI.swift
+[125/141] Compiling PiPods Config.swift
+[126/141] Compiling PiAgentCoreTests PiAgentLoopSteeringTests.swift
+[127/141] Emitting module PiCodingAgent
+[128/141] Compiling PiCodingAgent AuthStorage.swift
+[129/141] Compiling PiCodingAgent CLIApp.swift
+[130/141] Compiling PiCodingAgent FileProcessor.swift
+[131/141] Compiling PiCodingAgent Compaction.swift
+[132/141] Compiling PiCodingAgent Tools.swift
+[133/147] Compiling PiCodingAgent Modes.swift
+[134/147] Compiling PiCodingAgent InteractiveSession.swift
+[135/147] Compiling PiCodingAgent ModelResolver.swift
+[136/147] Compiling PiCodingAgent Resources.swift
+[137/147] Compiling PiPodsTests PiPodsModelRegistryTests.swift
+[138/147] Compiling PiPodsTests PiPodsSmokeTests.swift
+[139/147] Compiling PiPodsTests PiPodsConfigStoreTests.swift
+[140/173] Emitting module PiSwiftCLI
+[141/173] Compiling PiSwiftCLI main.swift
+[141/173] Write Objects.LinkFileList
+[143/173] Compiling PiPodsTests PiPodsCommandPlanningTests.swift
+[144/173] Emitting module PiPodsTests
+[145/173] Compiling PiPodsTests PiPodsCLITests.swift
+[146/173] Compiling PiCodingAgentTests PiCodingAgentSmokeTests.swift
+[147/174] Compiling PiCodingAgentTests PiCodingAgentSessionTreeTests.swift
+[148/174] Compiling PiCodingAgentTests PiCodingAgentInteractiveSessionTests.swift
+[149/174] Compiling PiCodingAgentTests PiCodingAgentSessionStoreTests.swift
+[150/174] Compiling PiCodingAgentTests PiCodingAgentFileProcessorTests.swift
+[151/174] Compiling PiCodingAgentTests PiCodingAgentHTMLExporterTests.swift
+[152/174] Emitting module PiCodingAgentTests
+[153/174] Compiling PiCodingAgentTests PiCodingAgentAuthStorageTests.swift
+[154/174] Compiling PiCodingAgentTests PiCodingAgentSettingsTests.swift
+[155/174] Compiling PiCodingAgentTests PiCodingAgentResourcesTests.swift
+[156/174] Compiling PiMom Sandbox.swift
+[157/174] Compiling PiMom PiMom.swift
+[158/174] Compiling PiMom SlackDispatch.swift
+[159/174] Compiling PiMom Coordinator.swift
+[160/174] Compiling PiMom Context.swift
+[161/174] Compiling PiMom Store.swift
+[162/174] Compiling PiMom Tools.swift
+[163/174] Emitting module PiMom
+[164/174] Compiling PiCodingAgentTests PiCodingAgentInteractiveModeTests.swift
+[165/174] Compiling PiCodingAgentTests PiCodingAgentModelResolverTests.swift
+[166/174] Compiling PiCodingAgentTests PiCodingAgentModesTests.swift
+[167/174] Compiling PiCodingAgentTests PiCodingAgentCompactionTests.swift
+[168/174] Compiling PiCodingAgentTests PiCodingAgentCLITests.swift
+[169/174] Compiling PiCodingAgentTests PiCodingAgentCLIExecutionTests.swift
+[169/174] Linking pi-swift
+[170/174] Applying pi-swift
+[172/182] Compiling PiCodingAgentTests PiCodingAgentToolsTests.swift
+[173/182] Compiling PiMomTests PiMomToolBridgeTests.swift
+[174/182] Compiling PiMomTests PiMomSandboxTests.swift
+/Users/anyuan/Development/pi-swift/Tests/PiMomTests/PiMomSandboxTests.swift:91:33: warning: 'is' test is always true
+ 89 |         let runner = PiMomDefaultProcessRunner()
+ 90 |         XCTAssertThrowsError(try runner.run(executable: "/usr/bin/nonexistent_executable_12345", arguments: [], options: .init())) { error in
+ 91 |             XCTAssertTrue(error is NSError)
+    |                                 `- warning: 'is' test is always true
+ 92 |         }
+ 93 |     }
+[175/182] Compiling PiMomTests PiMomSlackDispatchTests.swift
+[176/182] Compiling PiMomTests PiMomSmokeTests.swift
+[177/182] Compiling PiMomTests PiMomChannelStoreTests.swift
+[178/182] Compiling PiMomTests PiMomContextStoreTests.swift
+[179/182] Compiling PiMomTests PiMomCoordinatorTests.swift
+[180/182] Emitting module PiMomTests
+[181/184] Emitting module pi_swiftPackageTests
+[182/184] Compiling pi_swiftPackageTests runner.swift
+[182/184] Write Objects.LinkFileList
+[183/184] Linking pi-swiftPackageTests
+Build complete! (4.29s)
+Test Suite 'All tests' started at 2026-02-26 20:05:22.588.
+Test Suite 'pi-swiftPackageTests.xctest' started at 2026-02-26 20:05:22.588.
+Test Suite 'FixtureLoaderTests' started at 2026-02-26 20:05:22.588.
+Test Case '-[PiTestSupportTests.FixtureLoaderTests testLoadsTextFixtureFromRepositoryConventions]' started.
+Test Case '-[PiTestSupportTests.FixtureLoaderTests testLoadsTextFixtureFromRepositoryConventions]' passed (0.000 seconds).
+Test Case '-[PiTestSupportTests.FixtureLoaderTests testWritesAndReadsFixtureTextInTemporaryDirectory]' started.
+Test Case '-[PiTestSupportTests.FixtureLoaderTests testWritesAndReadsFixtureTextInTemporaryDirectory]' passed (0.002 seconds).
+Test Suite 'FixtureLoaderTests' passed at 2026-02-26 20:05:22.591.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'GoldenFileTests' started at 2026-02-26 20:05:22.591.
+Test Case '-[PiTestSupportTests.GoldenFileTests testCreatesAndUpdatesGoldenWhenUpdateModeAlways]' started.
+Test Case '-[PiTestSupportTests.GoldenFileTests testCreatesAndUpdatesGoldenWhenUpdateModeAlways]' passed (0.001 seconds).
+Test Case '-[PiTestSupportTests.GoldenFileTests testReturnsMatchedForExistingGolden]' started.
+Test Case '-[PiTestSupportTests.GoldenFileTests testReturnsMatchedForExistingGolden]' passed (0.000 seconds).
+Test Case '-[PiTestSupportTests.GoldenFileTests testThrowsMismatchWithDiffWhenGoldenDiffers]' started.
+Test Case '-[PiTestSupportTests.GoldenFileTests testThrowsMismatchWithDiffWhenGoldenDiffers]' passed (0.000 seconds).
+Test Suite 'GoldenFileTests' passed at 2026-02-26 20:05:22.592.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
+Test Suite 'PiAIAnthropicProviderTests' started at 2026-02-26 20:05:22.592.
+Test Case '-[PiAITests.PiAIAnthropicProviderTests testEmitsErrorTerminalEventWhenMockSourceThrows]' started.
+Test Case '-[PiAITests.PiAIAnthropicProviderTests testEmitsErrorTerminalEventWhenMockSourceThrows]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIAnthropicProviderTests testOAuthToolNameNormalizationKeepsCanonicalRoundTripAndDoesNotMapFindToGlob]' started.
+Test Case '-[PiAITests.PiAIAnthropicProviderTests testOAuthToolNameNormalizationKeepsCanonicalRoundTripAndDoesNotMapFindToGlob]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIAnthropicProviderTests testStreamsThinkingTextAndToolCallEventsInOrderFromMockSource]' started.
+Test Case '-[PiAITests.PiAIAnthropicProviderTests testStreamsThinkingTextAndToolCallEventsInOrderFromMockSource]' passed (0.000 seconds).
+Test Suite 'PiAIAnthropicProviderTests' passed at 2026-02-26 20:05:22.594.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiAIGoogleFamilyProviderTests' started at 2026-02-26 20:05:22.594.
+Test Case '-[PiAITests.PiAIGoogleFamilyProviderTests testDefaultsMissingToolCallArgumentsToEmptyObject]' started.
+Test Case '-[PiAITests.PiAIGoogleFamilyProviderTests testDefaultsMissingToolCallArgumentsToEmptyObject]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIGoogleFamilyProviderTests testRetriesEmptyStreamWithoutDuplicateStart]' started.
+Test Case '-[PiAITests.PiAIGoogleFamilyProviderTests testRetriesEmptyStreamWithoutDuplicateStart]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIGoogleFamilyProviderTests testStreamsThinkingTextAndToolCallEventsAndPreservesThinkingSignature]' started.
+Test Case '-[PiAITests.PiAIGoogleFamilyProviderTests testStreamsThinkingTextAndToolCallEventsAndPreservesThinkingSignature]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIGoogleFamilyProviderTests testThinkingSignatureHelpersMatchGoogleSemantics]' started.
+Test Case '-[PiAITests.PiAIGoogleFamilyProviderTests testThinkingSignatureHelpersMatchGoogleSemantics]' passed (0.000 seconds).
+Test Suite 'PiAIGoogleFamilyProviderTests' passed at 2026-02-26 20:05:22.594.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiAIModelRegistryTests' started at 2026-02-26 20:05:22.594.
+Test Case '-[PiAITests.PiAIModelRegistryTests testExactProviderAndModelLookup]' started.
+Test Case '-[PiAITests.PiAIModelRegistryTests testExactProviderAndModelLookup]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIModelRegistryTests testFuzzySearchPrefersIdPrefixThenContains]' started.
+Test Case '-[PiAITests.PiAIModelRegistryTests testFuzzySearchPrefersIdPrefixThenContains]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIModelRegistryTests testResolveReturnsExactProviderQualifiedMatch]' started.
+Test Case '-[PiAITests.PiAIModelRegistryTests testResolveReturnsExactProviderQualifiedMatch]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIModelRegistryTests testResolveThrowsAmbiguousErrorForMultipleMatches]' started.
+Test Case '-[PiAITests.PiAIModelRegistryTests testResolveThrowsAmbiguousErrorForMultipleMatches]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIModelRegistryTests testResolveThrowsNoMatchesError]' started.
+Test Case '-[PiAITests.PiAIModelRegistryTests testResolveThrowsNoMatchesError]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIModelRegistryTests testWildcardSearchMatchesProviderQualifiedPatterns]' started.
+Test Case '-[PiAITests.PiAIModelRegistryTests testWildcardSearchMatchesProviderQualifiedPatterns]' passed (0.000 seconds).
+Test Suite 'PiAIModelRegistryTests' passed at 2026-02-26 20:05:22.595.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiAIOAuthHelpersTests' started at 2026-02-26 20:05:22.595.
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyRefreshesExpiredToken]' started.
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyRefreshesExpiredToken]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyReturnsExistingTokenWhenNotExpired]' started.
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyReturnsExistingTokenWhenNotExpired]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyReturnsNilWhenNoCredentialsExist]' started.
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyReturnsNilWhenNoCredentialsExist]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyThrowsForUnknownProvider]' started.
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyThrowsForUnknownProvider]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyWrapsRefreshFailureWithProviderContext]' started.
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testGetOAuthAPIKeyWrapsRefreshFailureWithProviderContext]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testProviderRegistrySupportsRegisterLookupAndList]' started.
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testProviderRegistrySupportsRegisterLookupAndList]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testTokenInjectionIntoHeadersSupportsBearerAndCustomHeader]' started.
+Test Case '-[PiAITests.PiAIOAuthHelpersTests testTokenInjectionIntoHeadersSupportsBearerAndCustomHeader]' passed (0.000 seconds).
+Test Suite 'PiAIOAuthHelpersTests' passed at 2026-02-26 20:05:22.596.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiAIOpenAIResponsesProviderTests' started at 2026-02-26 20:05:22.596.
+Test Case '-[PiAITests.PiAIOpenAIResponsesProviderTests testEmitsErrorTerminalEventWhenMockSourceThrows]' started.
+Test Case '-[PiAITests.PiAIOpenAIResponsesProviderTests testEmitsErrorTerminalEventWhenMockSourceThrows]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIOpenAIResponsesProviderTests testStreamsTextAndToolCallEventsInOrderFromMockSource]' started.
+Test Case '-[PiAITests.PiAIOpenAIResponsesProviderTests testStreamsTextAndToolCallEventsInOrderFromMockSource]' passed (0.000 seconds).
+Test Suite 'PiAIOpenAIResponsesProviderTests' passed at 2026-02-26 20:05:22.597.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiAIRegressionCoverageTests' started at 2026-02-26 20:05:22.597.
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testAssistantMessageEventStreamEndWithResultAndIgnoresLaterPushes]' started.
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testAssistantMessageEventStreamEndWithResultAndIgnoresLaterPushes]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testAssistantMessageEventStreamResultAwaitsTerminalError]' started.
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testAssistantMessageEventStreamResultAwaitsTerminalError]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testOverflowCoversNoBodyStatusAndNonOverflowPaths]' started.
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testOverflowCoversNoBodyStatusAndNonOverflowPaths]' passed (0.001 seconds).
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testStreamingJSONParsesNestedArraysAndQuotedStrings]' started.
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testStreamingJSONParsesNestedArraysAndQuotedStrings]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testValidationCoversUnknownToolAndScalarSchemaBranches]' started.
+Test Case '-[PiAITests.PiAIRegressionCoverageTests testValidationCoversUnknownToolAndScalarSchemaBranches]' passed (0.000 seconds).
+Test Suite 'PiAIRegressionCoverageTests' passed at 2026-02-26 20:05:22.599.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'PiAISmokeTests' started at 2026-02-26 20:05:22.599.
+Test Case '-[PiAITests.PiAISmokeTests testModuleExposesDependencyMarker]' started.
+Test Case '-[PiAITests.PiAISmokeTests testModuleExposesDependencyMarker]' passed (0.000 seconds).
+Test Suite 'PiAISmokeTests' passed at 2026-02-26 20:05:22.599.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiAITypesTests' started at 2026-02-26 20:05:22.599.
+Test Case '-[PiAITests.PiAITypesTests testAssistantMessageEventsRoundTripAndGoldenEncoding]' started.
+Test Case '-[PiAITests.PiAITypesTests testAssistantMessageEventsRoundTripAndGoldenEncoding]' passed (0.001 seconds).
+Test Case '-[PiAITests.PiAITypesTests testContextRoundTripWithUserAssistantAndToolResultMessages]' started.
+Test Case '-[PiAITests.PiAITypesTests testContextRoundTripWithUserAssistantAndToolResultMessages]' passed (0.001 seconds).
+Test Suite 'PiAITypesTests' passed at 2026-02-26 20:05:22.601.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'PiAIUtilitiesTests' started at 2026-02-26 20:05:22.601.
+Test Case '-[PiAITests.PiAIUtilitiesTests testContextOverflowDetectionForErrorPatternAndSilentOverflow]' started.
+Test Case '-[PiAITests.PiAIUtilitiesTests testContextOverflowDetectionForErrorPatternAndSilentOverflow]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIUtilitiesTests testParseStreamingJSONHandlesCompletePartialAndInvalidInput]' started.
+Test Case '-[PiAITests.PiAIUtilitiesTests testParseStreamingJSONHandlesCompletePartialAndInvalidInput]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIUtilitiesTests testSSEParserParsesSingleAndChunkedEvents]' started.
+Test Case '-[PiAITests.PiAIUtilitiesTests testSSEParserParsesSingleAndChunkedEvents]' passed (0.000 seconds).
+Test Case '-[PiAITests.PiAIUtilitiesTests testValidateToolCallAcceptsValidArgumentsAndRejectsInvalid]' started.
+Test Case '-[PiAITests.PiAIUtilitiesTests testValidateToolCallAcceptsValidArgumentsAndRejectsInvalid]' passed (0.000 seconds).
+Test Suite 'PiAIUtilitiesTests' passed at 2026-02-26 20:05:22.601.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiAgentCoreSmokeTests' started at 2026-02-26 20:05:22.601.
+Test Case '-[PiAgentCoreTests.PiAgentCoreSmokeTests testDependenciesWireToAiAndCoreTypes]' started.
+Test Case '-[PiAgentCoreTests.PiAgentCoreSmokeTests testDependenciesWireToAiAndCoreTypes]' passed (0.000 seconds).
+Test Suite 'PiAgentCoreSmokeTests' passed at 2026-02-26 20:05:22.602.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiAgentCoreTypesTests' started at 2026-02-26 20:05:22.602.
+Test Case '-[PiAgentCoreTests.PiAgentCoreTypesTests testAgentEventsRoundTripAndGoldenEncoding]' started.
+Test Case '-[PiAgentCoreTests.PiAgentCoreTypesTests testAgentEventsRoundTripAndGoldenEncoding]' passed (0.001 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentCoreTypesTests testAgentMessageRoundTripAndStandardMessageConversion]' started.
+Test Case '-[PiAgentCoreTests.PiAgentCoreTypesTests testAgentMessageRoundTripAndStandardMessageConversion]' passed (0.001 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentCoreTypesTests testAgentStateEmptyInitializationMatchesExpectedDefaults]' started.
+Test Case '-[PiAgentCoreTests.PiAgentCoreTypesTests testAgentStateEmptyInitializationMatchesExpectedDefaults]' passed (0.000 seconds).
+Test Suite 'PiAgentCoreTypesTests' passed at 2026-02-26 20:05:22.604.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'PiAgentLoopAbortTests' started at 2026-02-26 20:05:22.604.
+Test Case '-[PiAgentCoreTests.PiAgentLoopAbortTests testAbortTriggeredByToolPreventsNextAssistantCall]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopAbortTests testAbortTriggeredByToolPreventsNextAssistantCall]' passed (0.000 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentLoopAbortTests testRunContinuePreAbortedStopsWithoutCallingAssistantFactory]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopAbortTests testRunContinuePreAbortedStopsWithoutCallingAssistantFactory]' passed (0.000 seconds).
+Test Suite 'PiAgentLoopAbortTests' passed at 2026-02-26 20:05:22.604.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiAgentLoopContinueTests' started at 2026-02-26 20:05:22.604.
+Test Case '-[PiAgentCoreTests.PiAgentLoopContinueTests testRunContinueAllowsCustomLastMessageWhenUsingCustomConverter]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopContinueTests testRunContinueAllowsCustomLastMessageWhenUsingCustomConverter]' passed (0.000 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentLoopContinueTests testRunContinueThrowsWhenContextHasNoMessages]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopContinueTests testRunContinueThrowsWhenContextHasNoMessages]' passed (0.000 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentLoopContinueTests testRunContinueThrowsWhenLastContextMessageIsAssistant]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopContinueTests testRunContinueThrowsWhenLastContextMessageIsAssistant]' passed (0.000 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentLoopContinueTests testRunContinueUsesExistingContextWithoutReEmittingUserPromptEvents]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopContinueTests testRunContinueUsesExistingContextWithoutReEmittingUserPromptEvents]' passed (0.000 seconds).
+Test Suite 'PiAgentLoopContinueTests' passed at 2026-02-26 20:05:22.605.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiAgentLoopRegressionTests' started at 2026-02-26 20:05:22.605.
+Test Case '-[PiAgentCoreTests.PiAgentLoopRegressionTests testCustomMessagesCanBeFilteredInConvertToLLMForRun]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopRegressionTests testCustomMessagesCanBeFilteredInConvertToLLMForRun]' passed (0.000 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentLoopRegressionTests testTransformContextRunsBeforeConvertToLLM]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopRegressionTests testTransformContextRunsBeforeConvertToLLM]' passed (0.000 seconds).
+Test Suite 'PiAgentLoopRegressionTests' passed at 2026-02-26 20:05:22.605.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiAgentLoopRequestOptionsTests' started at 2026-02-26 20:05:22.605.
+Test Case '-[PiAgentCoreTests.PiAgentLoopRequestOptionsTests testRunSingleTurnOmitsReasoningWhenThinkingLevelIsOff]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopRequestOptionsTests testRunSingleTurnOmitsReasoningWhenThinkingLevelIsOff]' passed (0.000 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentLoopRequestOptionsTests testRunSingleTurnPassesSessionIdThinkingBudgetsAndReasoningToFactoryOptions]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopRequestOptionsTests testRunSingleTurnPassesSessionIdThinkingBudgetsAndReasoningToFactoryOptions]' passed (0.000 seconds).
+Test Suite 'PiAgentLoopRequestOptionsTests' passed at 2026-02-26 20:05:22.606.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiAgentLoopSingleTurnTests' started at 2026-02-26 20:05:22.606.
+Test Case '-[PiAgentCoreTests.PiAgentLoopSingleTurnTests testSingleTurnLoopEmitsExpectedEventOrderAndReturnsPromptPlusAssistant]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopSingleTurnTests testSingleTurnLoopEmitsExpectedEventOrderAndReturnsPromptPlusAssistant]' passed (0.000 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentLoopSingleTurnTests testSingleTurnLoopHandlesTerminalAssistantMessageWithoutStartEvent]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopSingleTurnTests testSingleTurnLoopHandlesTerminalAssistantMessageWithoutStartEvent]' passed (0.000 seconds).
+Test Suite 'PiAgentLoopSingleTurnTests' passed at 2026-02-26 20:05:22.606.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiAgentLoopSteeringTests' started at 2026-02-26 20:05:22.606.
+Test Case '-[PiAgentCoreTests.PiAgentLoopSteeringTests testFollowUpMessagesContinueAfterAgentWouldStop]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopSteeringTests testFollowUpMessagesContinueAfterAgentWouldStop]' passed (0.000 seconds).
+Test Case '-[PiAgentCoreTests.PiAgentLoopSteeringTests testQueuedSteeringMessageSkipsRemainingToolCallsAndIsInjectedBeforeNextTurn]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopSteeringTests testQueuedSteeringMessageSkipsRemainingToolCallsAndIsInjectedBeforeNextTurn]' passed (0.000 seconds).
+Test Suite 'PiAgentLoopSteeringTests' passed at 2026-02-26 20:05:22.607.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiAgentLoopToolExecutionTests' started at 2026-02-26 20:05:22.607.
+Test Case '-[PiAgentCoreTests.PiAgentLoopToolExecutionTests testRunExecutesToolCallEmitsToolEventsAndContinuesToNextTurn]' started.
+Test Case '-[PiAgentCoreTests.PiAgentLoopToolExecutionTests testRunExecutesToolCallEmitsToolEventsAndContinuesToNextTurn]' passed (0.000 seconds).
+Test Suite 'PiAgentLoopToolExecutionTests' passed at 2026-02-26 20:05:22.607.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiCodingAgentAuthStorageTests' started at 2026-02-26 20:05:22.607.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testAPIKeyResolutionPrefersRuntimeOverrideThenStoredLiteral]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testAPIKeyResolutionPrefersRuntimeOverrideThenStoredLiteral]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testAPIKeyResolutionSupportsEnvVarNameAndCommandValues]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testAPIKeyResolutionSupportsEnvVarNameAndCommandValues]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testAuthCredentialCodable]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testAuthCredentialCodable]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testDefaultCommandRunnerSucessAndFailure]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testDefaultCommandRunnerSucessAndFailure]' passed (0.144 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testFileBackendInvalidFileReturnsEmpty]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testFileBackendInvalidFileReturnsEmpty]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testFileBackendReadWrite]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testFileBackendReadWrite]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testHasAuthIncludesFallbackAndProviderDerivedEnvKey]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testHasAuthIncludesFallbackAndProviderDerivedEnvKey]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testOAuthResolutionRefreshesExpiredCredentialsAndPersistsUpdatedToken]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testOAuthResolutionRefreshesExpiredCredentialsAndPersistsUpdatedToken]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testSetGetListAndRemoveCredentials]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentAuthStorageTests testSetGetListAndRemoveCredentials]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentAuthStorageTests' passed at 2026-02-26 20:05:22.754.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.146 (0.147) seconds
+Test Suite 'PiCodingAgentCLIExecutionTests' started at 2026-02-26 20:05:22.754.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecuteExportModeWritesHTMLAndPrintsOutputPath]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecuteExportModeWritesHTMLAndPrintsOutputPath]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecuteJSONModeReturnsStructuredJSONOutput]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecuteJSONModeReturnsStructuredJSONOutput]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecutePrintModeReturnsRenderedPrintOutput]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecutePrintModeReturnsRenderedPrintOutput]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecuteRPCModeHandlesSingleRequestFromPipedStdin]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecuteRPCModeHandlesSingleRequestFromPipedStdin]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecuteRPCModeReturnsProtocolErrorForInvalidJSONRequest]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLIExecutionTests testExecuteRPCModeReturnsProtocolErrorForInvalidJSONRequest]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentCLIExecutionTests' passed at 2026-02-26 20:05:22.756.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'PiCodingAgentCLITests' started at 2026-02-26 20:05:22.756.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testArgsParserParsesExportWithOptionalOutputPath]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testArgsParserParsesExportWithOptionalOutputPath]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testArgsParserParsesProviderModelAndPrompt]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testArgsParserParsesProviderModelAndPrompt]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testDefaultStartupIsInteractive]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testDefaultStartupIsInteractive]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testExportFlagSelectsExportStartupAction]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testExportFlagSelectsExportStartupAction]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testHelpFlagReturnsHelpText]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testHelpFlagReturnsHelpText]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testInvalidModeReturnsUsageError]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testInvalidModeReturnsUsageError]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testJSONModeSelectsJSONStartupAction]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testJSONModeSelectsJSONStartupAction]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testPipedStdinForcesPrintMode]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testPipedStdinForcesPrintMode]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testPrintFlagSelectsPrintMode]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testPrintFlagSelectsPrintMode]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testRPCModeSelectsRPCStartupAction]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testRPCModeSelectsRPCStartupAction]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testUnknownFlagReturnsUsageError]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testUnknownFlagReturnsUsageError]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testVersionFlagReturnsVersion]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCLITests testVersionFlagReturnsVersion]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentCLITests' passed at 2026-02-26 20:05:22.757.
+	 Executed 12 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiCodingAgentCompactionTests' started at 2026-02-26 20:05:22.757.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testApplyCompactionKeepsTailAndInjectsSummaryMessage]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testApplyCompactionKeepsTailAndInjectsSummaryMessage]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testAutoCompactionQueueQueuesDuringCompactionAndFlushesInOrder]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testAutoCompactionQueueQueuesDuringCompactionAndFlushesInOrder]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testCompactionLogStoreAppendAndLatest]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testCompactionLogStoreAppendAndLatest]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testCoordinatorAutoCompactsAndPersistsUpdatedSessionAndLog]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testCoordinatorAutoCompactsAndPersistsUpdatedSessionAndLog]' passed (0.002 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testFlattenAndTokenEstimateEdgeCases]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testFlattenAndTokenEstimateEdgeCases]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testShouldCompactTriggersThresholdAndOverflowModes]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testShouldCompactTriggersThresholdAndOverflowModes]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testStringifyHandlesAllJSONValueTypes]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentCompactionTests testStringifyHandlesAllJSONValueTypes]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentCompactionTests' passed at 2026-02-26 20:05:22.762.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'PiCodingAgentFileProcessorTests' started at 2026-02-26 20:05:22.762.
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testProcessesImageFilesIntoAttachmentsAndFileReferences]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testProcessesImageFilesIntoAttachmentsAndFileReferences]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testProcessesTextFilesIntoWrappedText]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testProcessesTextFilesIntoWrappedText]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testResolvesRelativeAndTildePaths]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testResolvesRelativeAndTildePaths]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testSkipsEmptyFiles]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testSkipsEmptyFiles]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testThrowsForMissingFileWithResolvedPath]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testThrowsForMissingFileWithResolvedPath]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testThrowsForNonUTF8NonImageFile]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentFileProcessorTests testThrowsForNonUTF8NonImageFile]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentFileProcessorTests' passed at 2026-02-26 20:05:22.764.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'PiCodingAgentHTMLExporterTests' started at 2026-02-26 20:05:22.764.
+Test Case '-[PiCodingAgentTests.PiCodingAgentHTMLExporterTests testExportSessionFileErrorsOnUnsupportedFileType]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentHTMLExporterTests testExportSessionFileErrorsOnUnsupportedFileType]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentHTMLExporterTests testExportSessionFileSupportsExplicitOutputPath]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentHTMLExporterTests testExportSessionFileSupportsExplicitOutputPath]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentHTMLExporterTests testExportSessionFileWritesHTMLAndReturnsOutputPath]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentHTMLExporterTests testExportSessionFileWritesHTMLAndReturnsOutputPath]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentHTMLExporterTests testRenderSessionHTMLIncludesEscapedMessagesAndImages]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentHTMLExporterTests testRenderSessionHTMLIncludesEscapedMessagesAndImages]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentHTMLExporterTests' passed at 2026-02-26 20:05:22.767.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'PiCodingAgentInteractiveModeTests' started at 2026-02-26 20:05:22.767.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testHandleRawInputParsesArrowAndEscapeInModelSelector]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testHandleRawInputParsesArrowAndEscapeInModelSelector]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testHandleRawInputRoutesTextAndEnterToEditorSubmit]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testHandleRawInputRoutesTextAndEnterToEditorSubmit]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testModelSelectorAppliesSelectedModelToSettings]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testModelSelectorAppliesSelectedModelToSettings]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testRenderShowsStatusBarWithCurrentModelAndShortcutHints]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testRenderShowsStatusBarWithCurrentModelAndShortcutHints]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testSettingsOverlayUsesInteractiveSettingsListAndPersistsChanges]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testSettingsOverlayUsesInteractiveSettingsListAndPersistsChanges]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testSettingsShortcutTogglesOverlayAndEscapeClosesIt]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testSettingsShortcutTogglesOverlayAndEscapeClosesIt]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testSubmitAppendsTranscriptAndClearsEditor]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveModeTests testSubmitAppendsTranscriptAndClearsEditor]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentInteractiveModeTests' passed at 2026-02-26 20:05:22.769.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'PiCodingAgentInteractiveSessionTests' started at 2026-02-26 20:05:22.769.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testCtrlPShortcutOpensModelSelectorThroughSessionInput]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testCtrlPShortcutOpensModelSelectorThroughSessionInput]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testCtrlSShortcutOpensSettingsOverlayThroughSessionInput]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testCtrlSShortcutOpensSettingsOverlayThroughSessionInput]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testHandleInputRequestsRenderAndUpdatesViewport]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testHandleInputRequestsRenderAndUpdatesViewport]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testStartRendersInitialStatusBarToVirtualTerminal]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testStartRendersInitialStatusBarToVirtualTerminal]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testStopSession]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentInteractiveSessionTests testStopSession]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentInteractiveSessionTests' passed at 2026-02-26 20:05:22.770.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiCodingAgentModelResolverTests' started at 2026-02-26 20:05:22.770.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testFindInitialModelUsesSettingsThenProviderDefault]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testFindInitialModelUsesSettingsThenProviderDefault]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testModelRegistryFiltersAvailableModelsByAuthAndResolvesAPIKey]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testModelRegistryFiltersAvailableModelsByAuthAndResolvesAPIKey]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testParseModelPatternSupportsModelIDsContainingColon]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testParseModelPatternSupportsModelIDsContainingColon]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testParseModelPatternSupportsThinkingSuffixAndPrefersAlias]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testParseModelPatternSupportsThinkingSuffixAndPrefersAlias]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testParseModelPatternWarnsOnInvalidThinkingSuffixAndFallsBack]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testParseModelPatternWarnsOnInvalidThinkingSuffixAndFallsBack]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testResolveCLIModelReturnsUnknownProviderError]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testResolveCLIModelReturnsUnknownProviderError]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testResolveCLIModelSupportsExplicitProviderAndProviderSlashModel]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModelResolverTests testResolveCLIModelSupportsExplicitProviderAndProviderSlashModel]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentModelResolverTests' passed at 2026-02-26 20:05:22.771.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiCodingAgentModesTests' started at 2026-02-26 20:05:22.771.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testJSONModeEmitsStructuredEvents]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testJSONModeEmitsStructuredEvents]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testPrintModeBuildsDeterministicOutput]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testPrintModeBuildsDeterministicOutput]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCPingReturnsOKResult]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCPingReturnsOKResult]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCRunPrintDelegatesToPrintMode]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCRunPrintDelegatesToPrintMode]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCToolsExecuteRunsToolAndReturnsStructuredResult]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCToolsExecuteRunsToolAndReturnsStructuredResult]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCToolsListReturnsToolDefinitions]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCToolsListReturnsToolDefinitions]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCUnknownMethodReturnsErrorEnvelope]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testRPCUnknownMethodReturnsErrorEnvelope]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testSDKFacadeCanListAndExecuteTools]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testSDKFacadeCanListAndExecuteTools]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testSDKFacadeExposesPrintAndJSONModes]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentModesTests testSDKFacadeExposesPrintAndJSONModes]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentModesTests' passed at 2026-02-26 20:05:22.774.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'PiCodingAgentResourcesTests' started at 2026-02-26 20:05:22.774.
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testFrontmatterParserFallsBackWhenFenceIsUnclosed]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testFrontmatterParserFallsBackWhenFenceIsUnclosed]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testFrontmatterParserParsesAttributesAndBody]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testFrontmatterParserParsesAttributesAndBody]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testLoadExtensionsDiscoversStandaloneAndPackageEntriesAndRejectsConflicts]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testLoadExtensionsDiscoversStandaloneAndPackageEntriesAndRejectsConflicts]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testLoadPromptsUsesDescriptionFallbackAndDedupesByFilename]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testLoadPromptsUsesDescriptionFallbackAndDedupesByFilename]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testLoadSkillsReportsInvalidAndDuplicateEntries]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testLoadSkillsReportsInvalidAndDuplicateEntries]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testLoadThemesValidatesRequiredColorsAndDedupesByName]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testLoadThemesValidatesRequiredColorsAndDedupesByName]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testPromptArgParsingAndSubstitution]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentResourcesTests testPromptArgParsingAndSubstitution]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentResourcesTests' passed at 2026-02-26 20:05:22.778.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+Test Suite 'PiCodingAgentSessionStoreTests' started at 2026-02-26 20:05:22.778.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testListSessionsSortsByUpdatedAtDescending]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testListSessionsSortsByUpdatedAtDescending]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testResolveContinueErrorsWhenNoSessionsExist]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testResolveContinueErrorsWhenNoSessionsExist]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testResolveContinueUsesExplicitIDOrLatest]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testResolveContinueUsesExplicitIDOrLatest]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testSaveNewAndLoadRoundTripsSessionState]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testSaveNewAndLoadRoundTripsSessionState]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testSaveUpdatesExistingSessionTimestampAndPreservesCreatedAt]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionStoreTests testSaveUpdatesExistingSessionTimestampAndPreservesCreatedAt]' passed (0.001 seconds).
+Test Suite 'PiCodingAgentSessionStoreTests' passed at 2026-02-26 20:05:22.781.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+Test Suite 'PiCodingAgentSessionTreeTests' started at 2026-02-26 20:05:22.781.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionTreeTests testChildrenAncestorsAndPathTraversal]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionTreeTests testChildrenAncestorsAndPathTraversal]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionTreeTests testCreateRootAndBranchPersistsNodes]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionTreeTests testCreateRootAndBranchPersistsNodes]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionTreeTests testErrorsOnDuplicateNodesAndMissingParents]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSessionTreeTests testErrorsOnDuplicateNodesAndMissingParents]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentSessionTreeTests' passed at 2026-02-26 20:05:22.784.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'PiCodingAgentSettingsTests' started at 2026-02-26 20:05:22.784.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testFlushPreservesExternallyAddedSettingsWhileApplyingInMemoryChanges]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testFlushPreservesExternallyAddedSettingsWhileApplyingInMemoryChanges]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testImageSettingsBlockImagesDefaultsAndPersists]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testImageSettingsBlockImagesDefaultsAndPersists]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testImageSettingsDeepMergeAcrossScopes]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testImageSettingsDeepMergeAcrossScopes]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testLoadsAndDeepMergesGlobalAndProjectSettings]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testLoadsAndDeepMergesGlobalAndProjectSettings]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testReloadKeepsPreviousSettingsWhenGlobalFileIsInvalidAndTracksError]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testReloadKeepsPreviousSettingsWhenGlobalFileIsInvalidAndTracksError]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testShellCommandPrefixGetterAndProjectScopedThemeOverride]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSettingsTests testShellCommandPrefixGetterAndProjectScopedThemeOverride]' passed (0.001 seconds).
+Test Suite 'PiCodingAgentSettingsTests' passed at 2026-02-26 20:05:22.789.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'PiCodingAgentSmokeTests' started at 2026-02-26 20:05:22.789.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSmokeTests testBootMessageAndDependencyGraph]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentSmokeTests testBootMessageAndDependencyGraph]' passed (0.000 seconds).
+Test Suite 'PiCodingAgentSmokeTests' passed at 2026-02-26 20:05:22.789.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiCodingAgentToolsTests' started at 2026-02-26 20:05:22.789.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolCommandPrefixIsPrepended]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolCommandPrefixIsPrepended]' passed (0.027 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolErrorsOnNonZeroExit]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolErrorsOnNonZeroExit]' passed (0.025 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolErrorsOnTimeout]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolErrorsOnTimeout]' passed (0.210 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolErrorsWhenShellInvalid]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolErrorsWhenShellInvalid]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolErrorsWhenWorkingDirectoryMissing]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolErrorsWhenWorkingDirectoryMissing]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolRunsCommandAndReturnsOutput]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testBashToolRunsCommandAndReturnsOutput]' passed (0.027 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testEditToolErrorsWhenOldTextMatchesMultipleLocations]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testEditToolErrorsWhenOldTextMatchesMultipleLocations]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testEditToolErrorsWhenOldTextMissing]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testEditToolErrorsWhenOldTextMissing]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testEditToolReplacesUniqueMatchAndReturnsDiffDetails]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testEditToolReplacesUniqueMatchAndReturnsDiffDetails]' passed (0.001 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testReadToolErrorsWhenOffsetBeyondEOF]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testReadToolErrorsWhenOffsetBeyondEOF]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testReadToolSupportsOffsetAndLimitWithTruncationDetails]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testReadToolSupportsOffsetAndLimitWithTruncationDetails]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testRegistryErrorsForUnknownTool]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testRegistryErrorsForUnknownTool]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testRegistryListsDefinitionsAndDispatchesReadTool]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testRegistryListsDefinitionsAndDispatchesReadTool]' passed (0.000 seconds).
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testWriteToolCreatesParentDirectoriesAndWritesFile]' started.
+Test Case '-[PiCodingAgentTests.PiCodingAgentToolsTests testWriteToolCreatesParentDirectoriesAndWritesFile]' passed (0.001 seconds).
+Test Suite 'PiCodingAgentToolsTests' passed at 2026-02-26 20:05:23.084.
+	 Executed 14 tests, with 0 failures (0 unexpected) in 0.294 (0.295) seconds
+Test Suite 'PiCoreTypesCodableTests' started at 2026-02-26 20:05:23.084.
+Test Case '-[PiCoreTypesTests.PiCoreTypesCodableTests testJSONValueRoundTripForNestedObject]' started.
+Test Case '-[PiCoreTypesTests.PiCoreTypesCodableTests testJSONValueRoundTripForNestedObject]' passed (0.000 seconds).
+Test Case '-[PiCoreTypesTests.PiCoreTypesCodableTests testMessageAndToolSchemaRoundTrip]' started.
+Test Case '-[PiCoreTypesTests.PiCoreTypesCodableTests testMessageAndToolSchemaRoundTrip]' passed (0.001 seconds).
+Test Case '-[PiCoreTypesTests.PiCoreTypesCodableTests testStreamEventEncodingMatchesGoldenFixture]' started.
+Test Case '-[PiCoreTypesTests.PiCoreTypesCodableTests testStreamEventEncodingMatchesGoldenFixture]' passed (0.000 seconds).
+Test Suite 'PiCoreTypesCodableTests' passed at 2026-02-26 20:05:23.085.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiCoreTypesSmokeTests' started at 2026-02-26 20:05:23.085.
+Test Case '-[PiCoreTypesTests.PiCoreTypesSmokeTests testMarkerRoundTrip]' started.
+Test Case '-[PiCoreTypesTests.PiCoreTypesSmokeTests testMarkerRoundTrip]' passed (0.000 seconds).
+Test Suite 'PiCoreTypesSmokeTests' passed at 2026-02-26 20:05:23.085.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiMomChannelStoreTests' started at 2026-02-26 20:05:23.085.
+Test Case '-[PiMomTests.PiMomChannelStoreTests testGenerateLocalFilenameSanitizesAndUsesSlackTimestampMillis]' started.
+Test Case '-[PiMomTests.PiMomChannelStoreTests testGenerateLocalFilenameSanitizesAndUsesSlackTimestampMillis]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomChannelStoreTests testLogMessageDedupeAndLastTimestamp]' started.
+Test Case '-[PiMomTests.PiMomChannelStoreTests testLogMessageDedupeAndLastTimestamp]' passed (0.001 seconds).
+Test Case '-[PiMomTests.PiMomChannelStoreTests testProcessAttachmentsQueuesDownloadsAndDrainWritesFiles]' started.
+Test Case '-[PiMomTests.PiMomChannelStoreTests testProcessAttachmentsQueuesDownloadsAndDrainWritesFiles]' passed (0.001 seconds).
+Test Suite 'PiMomChannelStoreTests' passed at 2026-02-26 20:05:23.087.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'PiMomContextStoreTests' started at 2026-02-26 20:05:23.087.
+Test Case '-[PiMomTests.PiMomContextStoreTests testSyncLogToContextAppendsOnlyNewUserMessagesSortedAndSkipsBots]' started.
+Test Case '-[PiMomTests.PiMomContextStoreTests testSyncLogToContextAppendsOnlyNewUserMessagesSortedAndSkipsBots]' passed (0.002 seconds).
+Test Case '-[PiMomTests.PiMomContextStoreTests testSyncLogToContextNormalizesTimestampPrefixAndAttachmentBlockForDedupe]' started.
+Test Case '-[PiMomTests.PiMomContextStoreTests testSyncLogToContextNormalizesTimestampPrefixAndAttachmentBlockForDedupe]' passed (0.001 seconds).
+Test Case '-[PiMomTests.PiMomContextStoreTests testSyncLogToContextSkipsExcludeSlackTimestampAndAvoidsDuplicateOnSecondSync]' started.
+Test Case '-[PiMomTests.PiMomContextStoreTests testSyncLogToContextSkipsExcludeSlackTimestampAndAvoidsDuplicateOnSecondSync]' passed (0.001 seconds).
+Test Suite 'PiMomContextStoreTests' passed at 2026-02-26 20:05:23.091.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'PiMomCoordinatorTests' started at 2026-02-26 20:05:23.091.
+Test Case '-[PiMomTests.PiMomCoordinatorTests testReceiveUserEventLogsMessageSyncsContextAndRunsCoordinatorFlow]' started.
+Test Case '-[PiMomTests.PiMomCoordinatorTests testReceiveUserEventLogsMessageSyncsContextAndRunsCoordinatorFlow]' passed (0.002 seconds).
+Test Case '-[PiMomTests.PiMomCoordinatorTests testScheduledEventQueuedDuringRunExecutesAfterCurrentRunFinishes]' started.
+Test Case '-[PiMomTests.PiMomCoordinatorTests testScheduledEventQueuedDuringRunExecutesAfterCurrentRunFinishes]' passed (0.001 seconds).
+Test Case '-[PiMomTests.PiMomCoordinatorTests testStopWhileRunningAbortsRunnerAndUpdatesStoppedMessageAfterAbortedRun]' started.
+Test Case '-[PiMomTests.PiMomCoordinatorTests testStopWhileRunningAbortsRunnerAndUpdatesStoppedMessageAfterAbortedRun]' passed (0.001 seconds).
+Test Suite 'PiMomCoordinatorTests' passed at 2026-02-26 20:05:23.095.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'PiMomSandboxTests' started at 2026-02-26 20:05:23.095.
+Test Case '-[PiMomTests.PiMomSandboxTests testDefaultProcessRunnerCapturesStderr]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testDefaultProcessRunnerCapturesStderr]' passed (0.069 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testDefaultProcessRunnerExecutesAndCapturesOutput]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testDefaultProcessRunnerExecutesAndCapturesOutput]' passed (0.069 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testDefaultProcessRunnerHandlesTimeout]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testDefaultProcessRunnerHandlesTimeout]' passed (0.181 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testDefaultProcessRunnerThrowsOnInvalidExecutable]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testDefaultProcessRunnerThrowsOnInvalidExecutable]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testDockerExecutorWrapsCommandWithDockerExecAndEscapesSingleQuotes]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testDockerExecutorWrapsCommandWithDockerExecAndEscapesSingleQuotes]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testExecutorFactoryMakeDocker]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testExecutorFactoryMakeDocker]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testExecutorFactoryMakeHost]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testExecutorFactoryMakeHost]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testHostExecutorUsesHostWorkspacePathAndDirectShellCommand]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testHostExecutorUsesHostWorkspacePathAndDirectShellCommand]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testParseErrorDescriptions]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testParseErrorDescriptions]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testParseRejectsEmptyDockerContainerName]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testParseRejectsEmptyDockerContainerName]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testParseRejectsInvalidSandboxType]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testParseRejectsInvalidSandboxType]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testParsesDockerSandboxWithContainerName]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testParsesDockerSandboxWithContainerName]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSandboxTests testParsesHostSandbox]' started.
+Test Case '-[PiMomTests.PiMomSandboxTests testParsesHostSandbox]' passed (0.000 seconds).
+Test Suite 'PiMomSandboxTests' passed at 2026-02-26 20:05:23.418.
+	 Executed 13 tests, with 0 failures (0 unexpected) in 0.322 (0.323) seconds
+Test Suite 'PiMomSlackDispatchTests' started at 2026-02-26 20:05:23.418.
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testBusyMentionAndDMBothPostCorrectMessages]' started.
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testBusyMentionAndDMBothPostCorrectMessages]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testIdleUserMessageQueuesThenDrainsToHandler]' started.
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testIdleUserMessageQueuesThenDrainsToHandler]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testScheduledEventsAlwaysQueueAndHonorMaxQueueSize]' started.
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testScheduledEventsAlwaysQueueAndHonorMaxQueueSize]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testStopCommandWhenIdlePostsNothingRunningMessage]' started.
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testStopCommandWhenIdlePostsNothingRunningMessage]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testStopCommandWhenRunningInvokesHandlerImmediatelyWithoutQueueing]' started.
+Test Case '-[PiMomTests.PiMomSlackDispatchTests testStopCommandWhenRunningInvokesHandlerImmediatelyWithoutQueueing]' passed (0.000 seconds).
+Test Suite 'PiMomSlackDispatchTests' passed at 2026-02-26 20:05:23.420.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiMomSmokeTests' started at 2026-02-26 20:05:23.420.
+Test Case '-[PiMomTests.PiMomSmokeTests testDependencyGraphIncludesCodingAgent]' started.
+Test Case '-[PiMomTests.PiMomSmokeTests testDependencyGraphIncludesCodingAgent]' passed (0.000 seconds).
+Test Suite 'PiMomSmokeTests' passed at 2026-02-26 20:05:23.420.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiMomToolBridgeTests' started at 2026-02-26 20:05:23.420.
+Test Case '-[PiMomTests.PiMomToolBridgeTests testCreateMomToolRegistryIncludesCoreToolsAndAttach]' started.
+Test Case '-[PiMomTests.PiMomToolBridgeTests testCreateMomToolRegistryIncludesCoreToolsAndAttach]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomToolBridgeTests testMomAttachToolRejectsPathsOutsideWorkspace]' started.
+Test Case '-[PiMomTests.PiMomToolBridgeTests testMomAttachToolRejectsPathsOutsideWorkspace]' passed (0.001 seconds).
+Test Case '-[PiMomTests.PiMomToolBridgeTests testMomAttachToolUploadsFileInsideWorkspace]' started.
+Test Case '-[PiMomTests.PiMomToolBridgeTests testMomAttachToolUploadsFileInsideWorkspace]' passed (0.000 seconds).
+Test Case '-[PiMomTests.PiMomToolBridgeTests testMomBashToolDelegatesToSandboxExecutor]' started.
+Test Case '-[PiMomTests.PiMomToolBridgeTests testMomBashToolDelegatesToSandboxExecutor]' passed (0.000 seconds).
+Test Suite 'PiMomToolBridgeTests' passed at 2026-02-26 20:05:23.422.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'PiPodsCLITests' started at 2026-02-26 20:05:23.422.
+Test Case '-[PiPodsTests.PiPodsCLITests testHelpAndVersion]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testHelpAndVersion]' passed (0.001 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testInvalidArgsReturnUsageError]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testInvalidArgsReturnUsageError]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testListModelsEmpty]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testListModelsEmpty]' passed (0.001 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testListModelsWithPodOverride]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testListModelsWithPodOverride]' passed (0.001 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testLogsForNonExistentModel]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testLogsForNonExistentModel]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testPodsListAndActivate]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testPodsListAndActivate]' passed (0.001 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testSSHActionCommandBuildingEdgeCases]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testSSHActionCommandBuildingEdgeCases]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testSSHCommandBuildsInvocationAndRoutesToRuntime]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testSSHCommandBuildsInvocationAndRoutesToRuntime]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testStartArgumentParsingEdgeCases]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testStartArgumentParsingEdgeCases]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testStartCommandPlansAndPersistsModelEntry]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testStartCommandPlansAndPersistsModelEntry]' passed (0.001 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testStartFailureDueToPlannerError]' started.
+/Users/anyuan/Development/pi-swift/Tests/PiPodsTests/PiPodsCLITests.swift:205: error: -[PiPodsTests.PiPodsCLITests testStartFailureDueToPlannerError] : XCTAssertTrue failed
+Test Case '-[PiPodsTests.PiPodsCLITests testStartFailureDueToPlannerError]' failed (0.090 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testStopAllModelsReturnsCorrectCommand]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testStopAllModelsReturnsCorrectCommand]' passed (0.002 seconds).
+Test Case '-[PiPodsTests.PiPodsCLITests testStopAndLogsCommandsRouteThroughRuntimeAndUpdateConfig]' started.
+Test Case '-[PiPodsTests.PiPodsCLITests testStopAndLogsCommandsRouteThroughRuntimeAndUpdateConfig]' passed (0.001 seconds).
+Test Suite 'PiPodsCLITests' failed at 2026-02-26 20:05:23.521.
+	 Executed 13 tests, with 1 failure (0 unexpected) in 0.099 (0.099) seconds
+Test Suite 'PiPodsCommandPlanningTests' started at 2026-02-26 20:05:23.521.
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testModelPlannerSelectsLeastUsedGPUsAndNextPort]' started.
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testModelPlannerSelectsLeastUsedGPUsAndNextPort]' passed (0.001 seconds).
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testPlanStartKnownModelAppliesMemoryAndContextOverrides]' started.
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testPlanStartKnownModelAppliesMemoryAndContextOverrides]' passed (0.001 seconds).
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testPlanStartUnknownModelRejectsGPUOverrideWithoutCustomArgs]' started.
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testPlanStartUnknownModelRejectsGPUOverrideWithoutCustomArgs]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testPlanStopBuildsKillCommandForOneOrAllModels]' started.
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testPlanStopBuildsKillCommandForOneOrAllModels]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testSSHParserBuildsExecAndScpInvocations]' started.
+Test Case '-[PiPodsTests.PiPodsCommandPlanningTests testSSHParserBuildsExecAndScpInvocations]' passed (0.000 seconds).
+Test Suite 'PiPodsCommandPlanningTests' passed at 2026-02-26 20:05:23.524.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'PiPodsConfigStoreTests' started at 2026-02-26 20:05:23.524.
+Test Case '-[PiPodsTests.PiPodsConfigStoreTests testAddPodPersistsAndFirstPodBecomesActive]' started.
+Test Case '-[PiPodsTests.PiPodsConfigStoreTests testAddPodPersistsAndFirstPodBecomesActive]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsConfigStoreTests testLoadMissingConfigReturnsEmptyConfig]' started.
+Test Case '-[PiPodsTests.PiPodsConfigStoreTests testLoadMissingConfigReturnsEmptyConfig]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsConfigStoreTests testRemoveActivePodClearsActiveSelection]' started.
+Test Case '-[PiPodsTests.PiPodsConfigStoreTests testRemoveActivePodClearsActiveSelection]' passed (0.001 seconds).
+Test Case '-[PiPodsTests.PiPodsConfigStoreTests testSetActivePodValidatesExistence]' started.
+Test Case '-[PiPodsTests.PiPodsConfigStoreTests testSetActivePodValidatesExistence]' passed (0.001 seconds).
+Test Suite 'PiPodsConfigStoreTests' passed at 2026-02-26 20:05:23.526.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'PiPodsModelRegistryTests' started at 2026-02-26 20:05:23.526.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testDisplayName]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testDisplayName]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testIsKnownModel]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testIsKnownModel]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testKnownModelIDs]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testKnownModelIDs]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigCarriesOverModelLevelNotes]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigCarriesOverModelLevelNotes]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigFallsBackToConfigWithoutGPUTypes]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigFallsBackToConfigWithoutGPUTypes]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigMatchesExactGPUType]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigMatchesExactGPUType]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigMatchesPartialGPUType]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigMatchesPartialGPUType]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigPrefersConfigLevelNotes]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigPrefersConfigLevelNotes]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigReturnsNilForUnknownModel]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigReturnsNilForUnknownModel]' passed (0.000 seconds).
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigReturnsNilIfNoMatchingGPUCount]' started.
+Test Case '-[PiPodsTests.PiPodsModelRegistryTests testResolveConfigReturnsNilIfNoMatchingGPUCount]' passed (0.000 seconds).
+Test Suite 'PiPodsModelRegistryTests' passed at 2026-02-26 20:05:23.527.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiPodsSmokeTests' started at 2026-02-26 20:05:23.527.
+Test Case '-[PiPodsTests.PiPodsSmokeTests testDependencyGraphMatchesPlan]' started.
+Test Case '-[PiPodsTests.PiPodsSmokeTests testDependencyGraphMatchesPlan]' passed (0.000 seconds).
+Test Suite 'PiPodsSmokeTests' passed at 2026-02-26 20:05:23.527.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiTUIANSITerminalTests' started at 2026-02-26 20:05:23.528.
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testClearLineMovesAndClearsOnlyTargetRow]' started.
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testClearLineMovesAndClearsOnlyTargetRow]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testCursorVisibilityAndClearScreenEmitExpectedSequences]' started.
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testCursorVisibilityAndClearScreenEmitExpectedSequences]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testOutOfBoundsRowsAreIgnored]' started.
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testOutOfBoundsRowsAreIgnored]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testStartStoresCallbacksAndTestHooksTriggerInputAndResize]' started.
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testStartStoresCallbacksAndTestHooksTriggerInputAndResize]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testSynchronizedOutputMarkersEmitExpectedSequences]' started.
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testSynchronizedOutputMarkersEmitExpectedSequences]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testWriteLineMovesToRowClearsLineAndTruncatesToColumns]' started.
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testWriteLineMovesToRowClearsLineAndTruncatesToColumns]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testWriteLineUsesANSIVisibleWidthTruncationAndAppendsReset]' started.
+Test Case '-[PiTUITests.PiTUIANSITerminalTests testWriteLineUsesANSIVisibleWidthTruncationAndAppendsReset]' passed (0.000 seconds).
+Test Suite 'PiTUIANSITerminalTests' passed at 2026-02-26 20:05:23.528.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUIANSITextTests' started at 2026-02-26 20:05:23.528.
+Test Case '-[PiTUITests.PiTUIANSITextTests testEnsureLineResetAppendsResetOnlyWhenANSIPresent]' started.
+Test Case '-[PiTUITests.PiTUIANSITextTests testEnsureLineResetAppendsResetOnlyWhenANSIPresent]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITextTests testTruncateToVisibleWidthHandlesWideCharactersWithoutSplitting]' started.
+Test Case '-[PiTUITests.PiTUIANSITextTests testTruncateToVisibleWidthHandlesWideCharactersWithoutSplitting]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITextTests testTruncateToVisibleWidthPreservesANSISequences]' started.
+Test Case '-[PiTUITests.PiTUIANSITextTests testTruncateToVisibleWidthPreservesANSISequences]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITextTests testVisibleWidthIgnoresCSIEscapeSequences]' started.
+Test Case '-[PiTUITests.PiTUIANSITextTests testVisibleWidthIgnoresCSIEscapeSequences]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITextTests testVisibleWidthIgnoresOSC8HyperlinkSequences]' started.
+Test Case '-[PiTUITests.PiTUIANSITextTests testVisibleWidthIgnoresOSC8HyperlinkSequences]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIANSITextTests testVisibleWidthTreatsWideAndCombiningScalarsCorrectly]' started.
+Test Case '-[PiTUITests.PiTUIANSITextTests testVisibleWidthTreatsWideAndCombiningScalarsCorrectly]' passed (0.000 seconds).
+Test Suite 'PiTUIANSITextTests' passed at 2026-02-26 20:05:23.529.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUIAutocompleteTests' started at 2026-02-26 20:05:23.529.
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testAppliesQuotedCompletionWithoutDuplicatingClosingQuote]' started.
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testAppliesQuotedCompletionWithoutDuplicatingClosingQuote]' passed (0.001 seconds).
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testAtPathDirectoryCompletionKeepsCursorInsideClosingQuoteForContinuation]' started.
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testAtPathDirectoryCompletionKeepsCursorInsideClosingQuoteForContinuation]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testAtPathSuggestionsAddTrailingSpaceForFilesWhenApplied]' started.
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testAtPathSuggestionsAddTrailingSpaceForFilesWhenApplied]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testContinuesCompletionInsideQuotedPath]' started.
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testContinuesCompletionInsideQuotedPath]' passed (0.001 seconds).
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testForceDoesNotTriggerForSlashCommandAtLineStart]' started.
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testForceDoesNotTriggerForSlashCommandAtLineStart]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testForceExtractsRootSlashFromTrailingSpace]' started.
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testForceExtractsRootSlashFromTrailingSpace]' passed (0.001 seconds).
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testQuotesPathsWithSpacesForDirectCompletion]' started.
+Test Case '-[PiTUITests.PiTUIAutocompleteTests testQuotesPathsWithSpacesForDirectCompletion]' passed (0.001 seconds).
+Test Suite 'PiTUIAutocompleteTests' passed at 2026-02-26 20:05:23.533.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'PiTUICursorTests' started at 2026-02-26 20:05:23.533.
+Test Case '-[PiTUITests.PiTUICursorTests testCursorColumnCountsWideCharactersUsingDisplayWidth]' started.
+Test Case '-[PiTUITests.PiTUICursorTests testCursorColumnCountsWideCharactersUsingDisplayWidth]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUICursorTests testCursorColumnUsesVisibleWidthBeforeMarkerIgnoringANSISequences]' started.
+Test Case '-[PiTUITests.PiTUICursorTests testCursorColumnUsesVisibleWidthBeforeMarkerIgnoringANSISequences]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUICursorTests testCursorMarkerIsRemovedFromRenderedLinesAndCursorIsPositioned]' started.
+Test Case '-[PiTUITests.PiTUICursorTests testCursorMarkerIsRemovedFromRenderedLinesAndCursorIsPositioned]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUICursorTests testCursorMarkerPositionProjectsIntoVisibleViewportForLongContent]' started.
+Test Case '-[PiTUITests.PiTUICursorTests testCursorMarkerPositionProjectsIntoVisibleViewportForLongContent]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUICursorTests testNoCursorMarkerKeepsCursorHidden]' started.
+Test Case '-[PiTUITests.PiTUICursorTests testNoCursorMarkerKeepsCursorHidden]' passed (0.000 seconds).
+Test Suite 'PiTUICursorTests' passed at 2026-02-26 20:05:23.533.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUIDifferentialRenderingTests' started at 2026-02-26 20:05:23.533.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testAppendingLineShiftsViewportToLatestRows]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testAppendingLineShiftsViewportToLatestRows]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testAppliesLineResetForANSIStyledRenderedLines]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testAppliesLineResetForANSIStyledRenderedLines]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testClearOnShrinkClearsStaleRows]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testClearOnShrinkClearsStaleRows]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testDifferentialRenderingUpdatesOnlyChangedMiddleLine]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testDifferentialRenderingUpdatesOnlyChangedMiddleLine]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testHandlesContentToEmptyAndBack]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testHandlesContentToEmptyAndBack]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testRendersBottomViewportWhenContentExceedsTerminalHeight]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testRendersBottomViewportWhenContentExceedsTerminalHeight]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testRendersCorrectlyWhenMultipleNonAdjacentLinesChange]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testRendersCorrectlyWhenMultipleNonAdjacentLinesChange]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testRendersCorrectlyWhenOnlyFirstLineChanges]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testRendersCorrectlyWhenOnlyFirstLineChanges]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testRendersCorrectlyWhenOnlyLastLineChanges]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testRendersCorrectlyWhenOnlyLastLineChanges]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testShrinkThenLaterLineChangeStillTargetsCorrectRow]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testShrinkThenLaterLineChangeStillTargetsCorrectRow]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testShrinkWithoutClearOnShrinkUsesDifferentialTailClearsWithoutFullRedraw]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testShrinkWithoutClearOnShrinkUsesDifferentialTailClearsWithoutFullRedraw]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testTruncatesRenderedANSILineByVisibleWidthBeforeDiffing]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testTruncatesRenderedANSILineByVisibleWidthBeforeDiffing]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testWidthChangeTriggersFullRedraw]' started.
+Test Case '-[PiTUITests.PiTUIDifferentialRenderingTests testWidthChangeTriggersFullRedraw]' passed (0.000 seconds).
+Test Suite 'PiTUIDifferentialRenderingTests' passed at 2026-02-26 20:05:23.535.
+	 Executed 13 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiTUIEditingPrimitivesTests' started at 2026-02-26 20:05:23.535.
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testKillRingAccumulateAppendAndPrepend]' started.
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testKillRingAccumulateAppendAndPrepend]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testKillRingPushPeekAndIgnoreEmptyText]' started.
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testKillRingPushPeekAndIgnoreEmptyText]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testKillRingRotateCyclesEntries]' started.
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testKillRingRotateCyclesEntries]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testKillRingRotateIsNoopForZeroOrOneEntry]' started.
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testKillRingRotateIsNoopForZeroOrOneEntry]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testUndoStackPushPopClearAndLength]' started.
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testUndoStackPushPopClearAndLength]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testUndoStackUsesCloneClosureOnPush]' started.
+Test Case '-[PiTUITests.PiTUIEditingPrimitivesTests testUndoStackUsesCloneClosureOnPush]' passed (0.000 seconds).
+Test Suite 'PiTUIEditingPrimitivesTests' passed at 2026-02-26 20:05:23.535.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUIEditorComponentTests' started at 2026-02-26 20:05:23.535.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testBackspaceAndUndoFlowThroughEditorComponent]' started.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testBackspaceAndUndoFlowThroughEditorComponent]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testHandleInputSupportsArrowNavigationAcrossLines]' started.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testHandleInputSupportsArrowNavigationAcrossLines]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testHandleInputSupportsTypingNewlineAndSubmit]' started.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testHandleInputSupportsTypingNewlineAndSubmit]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testHistoryNavigationUpDownRestoresEditorDraft]' started.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testHistoryNavigationUpDownRestoresEditorDraft]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testIntegratesWithTUIHardwareCursorProjectionOnSecondLine]' started.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testIntegratesWithTUIHardwareCursorProjectionOnSecondLine]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testOnChangeFiresOnlyWhenTextChanges]' started.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testOnChangeFiresOnlyWhenTextChanges]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testRenderPlacesPromptOnFirstLineAndCursorMarkerAtCursor]' started.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testRenderPlacesPromptOnFirstLineAndCursorMarkerAtCursor]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testTypingExitsEditorHistoryBrowsingMode]' started.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testTypingExitsEditorHistoryBrowsingMode]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testUpArrowUsesCursorMovementWhenNotOnFirstLine]' started.
+Test Case '-[PiTUITests.PiTUIEditorComponentTests testUpArrowUsesCursorMovementWhenNotOnFirstLine]' passed (0.000 seconds).
+Test Suite 'PiTUIEditorComponentTests' passed at 2026-02-26 20:05:23.537.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiTUIEditorHistoryTests' started at 2026-02-26 20:05:23.537.
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testAddToHistoryIgnoresEmptyAndConsecutiveDuplicates]' started.
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testAddToHistoryIgnoresEmptyAndConsecutiveDuplicates]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testHistoryIsLimitedTo100Entries]' started.
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testHistoryIsLimitedTo100Entries]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testNavigateUpAndDownRestoresCurrentDraft]' started.
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testNavigateUpAndDownRestoresCurrentDraft]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testNavigateUpDoesNothingWhenHistoryEmpty]' started.
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testNavigateUpDoesNothingWhenHistoryEmpty]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testUpdateCurrentDraftExitsHistoryBrowsing]' started.
+Test Case '-[PiTUITests.PiTUIEditorHistoryTests testUpdateCurrentDraftExitsHistoryBrowsing]' passed (0.000 seconds).
+Test Suite 'PiTUIEditorHistoryTests' passed at 2026-02-26 20:05:23.537.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUIEditorKeybindingsTests' started at 2026-02-26 20:05:23.537.
+Test Case '-[PiTUITests.PiTUIEditorKeybindingsTests testCustomConfigOverridesDefaults]' started.
+Test Case '-[PiTUITests.PiTUIEditorKeybindingsTests testCustomConfigOverridesDefaults]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorKeybindingsTests testDefaultBindingsMatchExpectedActions]' started.
+Test Case '-[PiTUITests.PiTUIEditorKeybindingsTests testDefaultBindingsMatchExpectedActions]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorKeybindingsTests testGlobalKeybindingsCanBeReplaced]' started.
+Test Case '-[PiTUITests.PiTUIEditorKeybindingsTests testGlobalKeybindingsCanBeReplaced]' passed (0.000 seconds).
+Test Suite 'PiTUIEditorKeybindingsTests' passed at 2026-02-26 20:05:23.538.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiTUIEditorModelTests' started at 2026-02-26 20:05:23.538.
+Test Case '-[PiTUITests.PiTUIEditorModelTests testBackspaceDeletesGraphemeAndMergesLines]' started.
+Test Case '-[PiTUITests.PiTUIEditorModelTests testBackspaceDeletesGraphemeAndMergesLines]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorModelTests testCursorLeftRightCrossLineBoundariesAndEmoji]' started.
+Test Case '-[PiTUITests.PiTUIEditorModelTests testCursorLeftRightCrossLineBoundariesAndEmoji]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorModelTests testDeleteForwardDeletesGraphemeAndMergesNextLineAtEol]' started.
+Test Case '-[PiTUITests.PiTUIEditorModelTests testDeleteForwardDeletesGraphemeAndMergesNextLineAtEol]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorModelTests testInitialStateIsSingleEmptyLine]' started.
+Test Case '-[PiTUITests.PiTUIEditorModelTests testInitialStateIsSingleEmptyLine]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorModelTests testInsertNewlineSplitsCurrentLine]' started.
+Test Case '-[PiTUITests.PiTUIEditorModelTests testInsertNewlineSplitsCurrentLine]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorModelTests testInsertTextAtCursorSupportsMultiLineInsert]' started.
+Test Case '-[PiTUITests.PiTUIEditorModelTests testInsertTextAtCursorSupportsMultiLineInsert]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorModelTests testSetTextNormalizesNewlinesAndMovesCursorToEnd]' started.
+Test Case '-[PiTUITests.PiTUIEditorModelTests testSetTextNormalizesNewlinesAndMovesCursorToEnd]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIEditorModelTests testUndoRestoresPreviousEditorSnapshots]' started.
+Test Case '-[PiTUITests.PiTUIEditorModelTests testUndoRestoresPreviousEditorSnapshots]' passed (0.000 seconds).
+Test Suite 'PiTUIEditorModelTests' passed at 2026-02-26 20:05:23.538.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUIImageTests' started at 2026-02-26 20:05:23.538.
+Test Case '-[PiTUITests.PiTUIImageTests testFallbackRendersWhenImageProtocolUnavailable]' started.
+Test Case '-[PiTUITests.PiTUIImageTests testFallbackRendersWhenImageProtocolUnavailable]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIImageTests testITerm2UsesWidthInCharacterUnits]' started.
+Test Case '-[PiTUITests.PiTUIImageTests testITerm2UsesWidthInCharacterUnits]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIImageTests testKittyRendersBlankRowsAndSequenceAndCachesImageId]' started.
+Test Case '-[PiTUITests.PiTUIImageTests testKittyRendersBlankRowsAndSequenceAndCachesImageId]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIImageTests testTerminalImageHelpersEncodeAndCalculateRows]' started.
+Test Case '-[PiTUITests.PiTUIImageTests testTerminalImageHelpersEncodeAndCalculateRows]' passed (0.000 seconds).
+Test Suite 'PiTUIImageTests' passed at 2026-02-26 20:05:23.539.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiTUIInputComponentTests' started at 2026-02-26 20:05:23.539.
+Test Case '-[PiTUITests.PiTUIInputComponentTests testEnterTriggersSubmitCallbackWithoutMutatingText]' started.
+Test Case '-[PiTUITests.PiTUIInputComponentTests testEnterTriggersSubmitCallbackWithoutMutatingText]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputComponentTests testEscapeTriggersEscapeCallback]' started.
+Test Case '-[PiTUITests.PiTUIInputComponentTests testEscapeTriggersEscapeCallback]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputComponentTests testHandleInputDelegatesToModelForEditingKeys]' started.
+Test Case '-[PiTUITests.PiTUIInputComponentTests testHandleInputDelegatesToModelForEditingKeys]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputComponentTests testHistoryNavigationUpDownRestoresDraft]' started.
+Test Case '-[PiTUITests.PiTUIInputComponentTests testHistoryNavigationUpDownRestoresDraft]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputComponentTests testIntegratesWithTUIHardwareCursorProjection]' started.
+Test Case '-[PiTUITests.PiTUIInputComponentTests testIntegratesWithTUIHardwareCursorProjection]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputComponentTests testRenderIncludesPromptAndCursorMarkerAtModelCursor]' started.
+Test Case '-[PiTUITests.PiTUIInputComponentTests testRenderIncludesPromptAndCursorMarkerAtModelCursor]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputComponentTests testTypingExitsHistoryBrowsingMode]' started.
+Test Case '-[PiTUITests.PiTUIInputComponentTests testTypingExitsHistoryBrowsingMode]' passed (0.000 seconds).
+Test Suite 'PiTUIInputComponentTests' passed at 2026-02-26 20:05:23.541.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiTUIInputModelTests' started at 2026-02-26 20:05:23.541.
+Test Case '-[PiTUITests.PiTUIInputModelTests testBackspaceAndDeleteForwardAreGraphemeAware]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testBackspaceAndDeleteForwardAreGraphemeAware]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testBracketedPasteIsBufferedAcrossChunksAndUndoesAtomically]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testBracketedPasteIsBufferedAcrossChunksAndUndoesAtomically]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testBracketedPasteStripsNewlinesLikeInputComponent]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testBracketedPasteStripsNewlinesLikeInputComponent]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testControlCharactersAreIgnoredAsTextInput]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testControlCharactersAreIgnoredAsTextInput]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testCursorMovesAcrossEmojiAsSingleStep]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testCursorMovesAcrossEmojiAsSingleStep]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testHandleInputSupportsCtrlAAndCtrlEAndDeleteSequence]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testHandleInputSupportsCtrlAAndCtrlEAndDeleteSequence]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testInsertAndCursorMovement]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testInsertAndCursorMovement]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testKillRingLineDeleteAndYankFlow]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testKillRingLineDeleteAndYankFlow]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testUndoRestoresPreviousSnapshots]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testUndoRestoresPreviousSnapshots]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testWordMovementAndDeletionCommands]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testWordMovementAndDeletionCommands]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIInputModelTests testYankPopCyclesBetweenMultipleKills]' started.
+Test Case '-[PiTUITests.PiTUIInputModelTests testYankPopCyclesBetweenMultipleKills]' passed (0.000 seconds).
+Test Suite 'PiTUIInputModelTests' passed at 2026-02-26 20:05:23.542.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
+Test Suite 'PiTUIKeysTests' started at 2026-02-26 20:05:23.542.
+Test Case '-[PiTUITests.PiTUIKeysTests testKittyModeDisablesMostLegacyAltPrefixedSequences]' started.
+Test Case '-[PiTUITests.PiTUIKeysTests testKittyModeDisablesMostLegacyAltPrefixedSequences]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIKeysTests testMatchesKeySupportsAliasesAndModifierOrdering]' started.
+Test Case '-[PiTUITests.PiTUIKeysTests testMatchesKeySupportsAliasesAndModifierOrdering]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIKeysTests testParsesLegacyAltSequencesWhenKittyInactive]' started.
+Test Case '-[PiTUITests.PiTUIKeysTests testParsesLegacyAltSequencesWhenKittyInactive]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIKeysTests testParsesLegacyAndSS3ArrowKeys]' started.
+Test Case '-[PiTUITests.PiTUIKeysTests testParsesLegacyAndSS3ArrowKeys]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIKeysTests testParsesLegacyCtrlKeysAndSymbols]' started.
+Test Case '-[PiTUITests.PiTUIKeysTests testParsesLegacyCtrlKeysAndSymbols]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIKeysTests testParsesPrintableAndCommonSpecialKeys]' started.
+Test Case '-[PiTUITests.PiTUIKeysTests testParsesPrintableAndCommonSpecialKeys]' passed (0.000 seconds).
+Test Suite 'PiTUIKeysTests' passed at 2026-02-26 20:05:23.543.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUIMarkdownTests' started at 2026-02-26 20:05:23.543.
+Test Case '-[PiTUITests.PiTUIMarkdownTests testCachesByWidthAndInvalidatesOnSourceChange]' started.
+Test Case '-[PiTUITests.PiTUIMarkdownTests testCachesByWidthAndInvalidatesOnSourceChange]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIMarkdownTests testRendersBasicHeadingBulletQuoteAndLinkInline]' started.
+Test Case '-[PiTUITests.PiTUIMarkdownTests testRendersBasicHeadingBulletQuoteAndLinkInline]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIMarkdownTests testSkipsWrappingForImageProtocolLine]' started.
+Test Case '-[PiTUITests.PiTUIMarkdownTests testSkipsWrappingForImageProtocolLine]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIMarkdownTests testWrapsParagraphTextToWidth]' started.
+Test Case '-[PiTUITests.PiTUIMarkdownTests testWrapsParagraphTextToWidth]' passed (0.000 seconds).
+Test Suite 'PiTUIMarkdownTests' passed at 2026-02-26 20:05:23.544.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiTUIOverlayCompositionTests' started at 2026-02-26 20:05:23.544.
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testLaterOverlayRendersOnTopAndHideRestoresPrevious]' started.
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testLaterOverlayRendersOnTopAndHideRestoresPrevious]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testOverlayCompositingOnStyledBaseAndWideCharsDoesNotCrashAndShowsOverlay]' started.
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testOverlayCompositingOnStyledBaseAndWideCharsDoesNotCrashAndShowsOverlay]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testOverlayMaxHeightTruncatesRenderedLines]' started.
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testOverlayMaxHeightTruncatesRenderedLines]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testOverlayRendersWithResolvedWidthPercentage]' started.
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testOverlayRendersWithResolvedWidthPercentage]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testOverlaysAtDifferentPositionsDoNotInterfere]' started.
+Test Case '-[PiTUITests.PiTUIOverlayCompositionTests testOverlaysAtDifferentPositionsDoNotInterfere]' passed (0.000 seconds).
+Test Suite 'PiTUIOverlayCompositionTests' passed at 2026-02-26 20:05:23.544.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiTUIOverlayLayoutTests' started at 2026-02-26 20:05:23.544.
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testAnchorAndOffsetsRespectMarginsAndClamping]' started.
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testAnchorAndOffsetsRespectMarginsAndClamping]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testDefaultCenteredLayoutUsesClampedWidth]' started.
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testDefaultCenteredLayoutUsesClampedWidth]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testMaxHeightPercentIsReturnedAndClamped]' started.
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testMaxHeightPercentIsReturnedAndClamped]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testNegativeMarginsAreClampedToZeroViaEdgesInput]' started.
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testNegativeMarginsAreClampedToZeroViaEdgesInput]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testPercentRowAndColUseRemainingSpaceAfterOverlaySize]' started.
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testPercentRowAndColUseRemainingSpaceAfterOverlaySize]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testWidthPercentAndMinWidthAreResolvedAndClamped]' started.
+Test Case '-[PiTUITests.PiTUIOverlayLayoutTests testWidthPercentAndMinWidthAreResolvedAndClamped]' passed (0.000 seconds).
+Test Suite 'PiTUIOverlayLayoutTests' passed at 2026-02-26 20:05:23.545.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUIProcessTerminalTests' started at 2026-02-26 20:05:23.545.
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testDelegatesANSIOutputThroughHostWriter]' started.
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testDelegatesANSIOutputThroughHostWriter]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testLateHostCallbacksAfterStopAreIgnored]' started.
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testLateHostCallbacksAfterStopAreIgnored]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testStandardIOHostWritesViaInjectedWriterAndClampsDimensions]' started.
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testStandardIOHostWritesViaInjectedWriterAndClampsDimensions]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testStartAndStopAreIdempotentForHostLifecycle]' started.
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testStartAndStopAreIdempotentForHostLifecycle]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testStartBridgesInputAndResizeCallbacksAndUpdatesDimensions]' started.
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testStartBridgesInputAndResizeCallbacksAndUpdatesDimensions]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testStopDelegatesToHostAfterStart]' started.
+Test Case '-[PiTUITests.PiTUIProcessTerminalTests testStopDelegatesToHostAfterStart]' passed (0.000 seconds).
+Test Suite 'PiTUIProcessTerminalTests' passed at 2026-02-26 20:05:23.545.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUIRenderSchedulingTests' started at 2026-02-26 20:05:23.545.
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testOldScheduledRenderIsIgnoredAfterStopAndRestart]' started.
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testOldScheduledRenderIsIgnoredAfterStopAndRestart]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testPendingScheduledRenderDoesNotRunAfterStop]' started.
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testPendingScheduledRenderDoesNotRunAfterStop]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testRequestRenderCoalescesUntilManualSchedulerFlush]' started.
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testRequestRenderCoalescesUntilManualSchedulerFlush]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testResizeCallbackCoalescesWithExplicitRequestBeforeFlush]' started.
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testResizeCallbackCoalescesWithExplicitRequestBeforeFlush]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testRestartForcesFreshRenderEvenWhenContentDidNotChange]' started.
+Test Case '-[PiTUITests.PiTUIRenderSchedulingTests testRestartForcesFreshRenderEvenWhenContentDidNotChange]' passed (0.000 seconds).
+Test Suite 'PiTUIRenderSchedulingTests' passed at 2026-02-26 20:05:23.546.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUISelectListTests' started at 2026-02-26 20:05:23.546.
+Test Case '-[PiTUITests.PiTUISelectListTests testConfirmAndCancelCallbacks]' started.
+Test Case '-[PiTUITests.PiTUISelectListTests testConfirmAndCancelCallbacks]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISelectListTests testFilterResetsSelectionAndNoMatchMessageRenders]' started.
+Test Case '-[PiTUITests.PiTUISelectListTests testFilterResetsSelectionAndNoMatchMessageRenders]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISelectListTests testNormalizesMultilineDescriptionsToSingleLine]' started.
+Test Case '-[PiTUITests.PiTUISelectListTests testNormalizesMultilineDescriptionsToSingleLine]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISelectListTests testRenderAddsScrollInfoWhenListExceedsMaxVisible]' started.
+Test Case '-[PiTUITests.PiTUISelectListTests testRenderAddsScrollInfoWhenListExceedsMaxVisible]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISelectListTests testUpDownNavigationWrapsAndSelectionChangeFires]' started.
+Test Case '-[PiTUITests.PiTUISelectListTests testUpDownNavigationWrapsAndSelectionChangeFires]' passed (0.000 seconds).
+Test Suite 'PiTUISelectListTests' passed at 2026-02-26 20:05:23.546.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'PiTUISettingsListTests' started at 2026-02-26 20:05:23.546.
+Test Case '-[PiTUITests.PiTUISettingsListTests testCancelInvokesCallback]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testCancelInvokesCallback]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISettingsListTests testEnterAndSpaceCycleValuesAndEmitOnChange]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testEnterAndSpaceCycleValuesAndEmitOnChange]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISettingsListTests testRenderAlignsLabelAndValueAndShowsHint]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testRenderAlignsLabelAndValueAndShowsHint]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISettingsListTests testRenderShowsNoMatchMessageWhenSearchFiltersEverything]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testRenderShowsNoMatchMessageWhenSearchFiltersEverything]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISettingsListTests testRenderShowsSelectedDescriptionWrapped]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testRenderShowsSelectedDescriptionWrapped]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISettingsListTests testScrollIndicatorRendersWhenClipped]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testScrollIndicatorRendersWhenClipped]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISettingsListTests testSearchFiltersItemsAndBackspaceRestoresMatches]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testSearchFiltersItemsAndBackspaceRestoresMatches]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISettingsListTests testSubmenuCancelClosesWithoutChangingValue]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testSubmenuCancelClosesWithoutChangingValue]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISettingsListTests testSubmenuRenderAndDoneUpdatesValueAndRestoresList]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testSubmenuRenderAndDoneUpdatesValueAndRestoresList]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISettingsListTests testUpDownNavigationWrapsAndSelectionMoves]' started.
+Test Case '-[PiTUITests.PiTUISettingsListTests testUpDownNavigationWrapsAndSelectionMoves]' passed (0.000 seconds).
+Test Suite 'PiTUISettingsListTests' passed at 2026-02-26 20:05:23.548.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiTUISmokeTests' started at 2026-02-26 20:05:23.548.
+Test Case '-[PiTUITests.PiTUISmokeTests testModuleExposesCoreDependencyMarker]' started.
+Test Case '-[PiTUITests.PiTUISmokeTests testModuleExposesCoreDependencyMarker]' passed (0.000 seconds).
+Test Suite 'PiTUISmokeTests' passed at 2026-02-26 20:05:23.548.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiTUIStdinBufferTests' started at 2026-02-26 20:05:23.548.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testBuffersIncompleteCsiSequenceAcrossChunks]' started.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testBuffersIncompleteCsiSequenceAcrossChunks]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testEmitsBracketedPasteAsPasteEvent]' started.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testEmitsBracketedPasteAsPasteEvent]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testEmptyInputWithEmptyBufferEmitsEmptyDataEventForCompatibility]' started.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testEmptyInputWithEmptyBufferEmitsEmptyDataEventForCompatibility]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testFlushReturnsIncompleteRemainder]' started.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testFlushReturnsIncompleteRemainder]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testHandlesBracketedPasteInChunksWithDataBeforeAndAfter]' started.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testHandlesBracketedPasteInChunksWithDataBeforeAndAfter]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testParsesOscSequenceAcrossChunks]' started.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testParsesOscSequenceAcrossChunks]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testParsesSgrMouseSequenceOnlyWhenComplete]' started.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testParsesSgrMouseSequenceOnlyWhenComplete]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testSingleHighByteBufferConvertsToEscPrefixedMetaSequence]' started.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testSingleHighByteBufferConvertsToEscPrefixedMetaSequence]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testSplitsPlainTextIntoSingleCharacterEvents]' started.
+Test Case '-[PiTUITests.PiTUIStdinBufferTests testSplitsPlainTextIntoSingleCharacterEvents]' passed (0.000 seconds).
+Test Suite 'PiTUIStdinBufferTests' passed at 2026-02-26 20:05:23.549.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'PiTUISynchronizedOutputTests' started at 2026-02-26 20:05:23.549.
+Test Case '-[PiTUITests.PiTUISynchronizedOutputTests testDifferentialRenderIsWrappedInSynchronizedOutput]' started.
+Test Case '-[PiTUITests.PiTUISynchronizedOutputTests testDifferentialRenderIsWrappedInSynchronizedOutput]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISynchronizedOutputTests testFirstRenderIsWrappedInSynchronizedOutput]' started.
+Test Case '-[PiTUITests.PiTUISynchronizedOutputTests testFirstRenderIsWrappedInSynchronizedOutput]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUISynchronizedOutputTests testNoopRenderDoesNotEmitSynchronizedOutput]' started.
+Test Case '-[PiTUITests.PiTUISynchronizedOutputTests testNoopRenderDoesNotEmitSynchronizedOutput]' passed (0.000 seconds).
+Test Suite 'PiTUISynchronizedOutputTests' passed at 2026-02-26 20:05:23.549.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PiTUITerminalImageTests' started at 2026-02-26 20:05:23.549.
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDetectsImageSequencesInVeryLongLine]' started.
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDetectsImageSequencesInVeryLongLine]' passed (0.003 seconds).
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDetectsITerm2ImageSequencesInDifferentPositions]' started.
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDetectsITerm2ImageSequencesInDifferentPositions]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDetectsKittyImageSequencesInDifferentPositions]' started.
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDetectsKittyImageSequencesInDifferentPositions]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDetectsMixedImageProtocolsWithANSIText]' started.
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDetectsMixedImageProtocolsWithANSIText]' passed (0.000 seconds).
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDoesNotDetectPlainTextOrNormalANSI]' started.
+Test Case '-[PiTUITests.PiTUITerminalImageTests testDoesNotDetectPlainTextOrNormalANSI]' passed (0.000 seconds).
+Test Suite 'PiTUITerminalImageTests' passed at 2026-02-26 20:05:23.552.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'PiWebUIBridgeSmokeTests' started at 2026-02-26 20:05:23.552.
+Test Case '-[PiWebUIBridgeTests.PiWebUIBridgeSmokeTests testDependencyGraphMatchesPlan]' started.
+Test Case '-[PiWebUIBridgeTests.PiWebUIBridgeSmokeTests testDependencyGraphMatchesPlan]' passed (0.000 seconds).
+Test Suite 'PiWebUIBridgeSmokeTests' passed at 2026-02-26 20:05:23.552.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'pi-swiftPackageTests.xctest' failed at 2026-02-26 20:05:23.552.
+	 Executed 391 tests, with 1 failure (0 unexpected) in 0.946 (0.964) seconds
+Test Suite 'All tests' failed at 2026-02-26 20:05:23.553.
+	 Executed 391 tests, with 1 failure (0 unexpected) in 0.946 (0.965) seconds
+◇ Test run started.
+↳ Testing Library Version: 1501
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

@@ -74,4 +74,16 @@ final class PiCodingAgentInteractiveSessionTests: XCTestCase {
         XCTAssertTrue(viewport.contains("Model Selector"))
         XCTAssertTrue(viewport.contains("openai/gpt-4o"))
     }
+
+    func testStopSession() {
+        let terminal = PiTUIVirtualTerminal(columns: 100, rows: 12)
+        let scheduler = PiTUIManualRenderScheduler()
+        let session = makeSession(terminal: terminal, scheduler: scheduler)
+        session.start()
+        scheduler.flush()
+        
+        XCTAssertFalse(terminal.operationLog.contains(.stop))
+        session.stop()
+        XCTAssertTrue(terminal.operationLog.contains(.stop))
+    }
 }
