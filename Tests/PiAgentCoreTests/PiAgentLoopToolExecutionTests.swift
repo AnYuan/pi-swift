@@ -158,4 +158,77 @@ final class PiAgentLoopToolExecutionTests: XCTestCase {
         }
         XCTAssertEqual(finalText.text, "done")
     }
+
+    func testParallelToolExecutionCompletesAndMaintainsOrder() async throws {
+        let model = PiAIModel(provider: "openai", id: "gpt-4o-mini")
+        let toolSchema = PiToolParameterSchema(
+            type: .object,
+            properties: ["id": .init(type: .string)],
+            required: ["id"],
+            additionalProperties: false
+        )
+
+        // Create 3 tools that each return their id
+        let tools = (0..<3).map { index in
+            PiAgentRuntimeTool(tool: .init(
+                name: "tool\(index)",
+                label: "Tool \(index)",
+                description: "test tool",
+                parameters: toolSchema
+            )) { toolCallID, args, _, _ in
+                // Small delay to allow concurrent execution to interleave
+                try await Task.sleep(nanoseconds: 10_000_000) // 10ms
+                let id = args["id"]
+                return PiAgentToolExecutionResult(
+                    content: [.text(.init(text: "result-\(id ?? .string("?"))"))],
+                    details: .object([:])
+                )
+            }
+        }
+
+        let context = PiAgentContext(systemPrompt: "test", messages: [], tools: tools.map(\.tool))
+        let config = PiAgentLoopConfig(model: model)
+
+        // Factory returns assistant with 3 tool calls, then "done"
+        let turnCounter = TestState()
+        let stream = PiAgentLoop.run(
+            prompts: [.user(.init(content: .text("go"), timestamp: 1))],
+            context: context,
+            config: config,
+            runtimeTools: tools
+        ) { _, _ in
+            let turn = await turnCounter.nextCallIndex()
+            let mockStream = PiAIAssistantMessageEventStream()
+            if turn == 0 {
+                let msg = PiAIAssistantMessage(
+                    content: (0..<3).map { i in
+                        .toolCall(.init(id: "tc\(i)", name: "tool\(i)", arguments: ["id": .string("\(i)")]))
+                    },
+                    api: "test", provider: "openai", model: "gpt-4o-mini",
+                    usage: .zero, stopReason: .toolUse, timestamp: 1
+                )
+                mockStream.push(.done(reason: .toolUse, message: msg))
+            } else {
+                let msg = PiAIAssistantMessage(
+                    content: [.text(.init(text: "all done"))],
+                    api: "test", provider: "openai", model: "gpt-4o-mini",
+                    usage: .zero, stopReason: .stop, timestamp: 2
+                )
+                mockStream.push(.done(reason: .stop, message: msg))
+            }
+            return mockStream
+        }
+
+        let result = await stream.result()
+
+        // Verify all 3 tool results are present in order
+        let toolResults = result.compactMap { msg -> PiAIToolResultMessage? in
+            guard case .toolResult(let tr) = msg else { return nil }
+            return tr
+        }
+        XCTAssertEqual(toolResults.count, 3)
+        XCTAssertEqual(toolResults[0].toolCallId, "tc0")
+        XCTAssertEqual(toolResults[1].toolCallId, "tc1")
+        XCTAssertEqual(toolResults[2].toolCallId, "tc2")
+    }
 }

@@ -700,12 +700,20 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/modules/pi-mom.md`, `docs/PLAN.md`
 
 ### P7-8: parallel-tool-execution
-- Status: TODO
+- Status: DONE
 - Depends On: P7-7
 - Scope:
-  - Use `TaskGroup` for concurrent tool execution when steering is not active
+  - Used `withThrowingTaskGroup` for concurrent tool execution when steering is not active
+  - When `getSteeringMessages` is non-nil or only 1 tool call, falls back to sequential
+  - Parallel mode buffers events per tool and emits in original order after all complete
+  - Progress update events suppressed in parallel mode to avoid interleaved ordering
 - Test Plan:
-  - Add parallel execution test with concurrent tools
+  - Added parallel execution test with 3 concurrent tools
+- Verification:
+  - Tests: `swift test` passed (366 tests total, including `testParallelToolExecutionCompletesAndMaintainsOrder`) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: All existing tool execution and steering tests pass (sequential path unchanged)
+  - Docs updated: `docs/modules/pi-agent-core.md`, `docs/PLAN.md`
 
 ### P7-9: coverage-reports-mom-pods
 - Status: DONE

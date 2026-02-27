@@ -276,6 +276,28 @@ Coverage snapshot (`Sources/PiAgentCore/*`):
 - `swift test --enable-code-coverage` passed; coverage report generated at `docs/reports/pi-agent-core-coverage.md`
 - `swift build` passed
 
+## P7-8: Parallel tool execution
+
+Files:
+
+- `Sources/PiAgentCore/AgentLoop.swift`
+- `Tests/PiAgentCoreTests/PiAgentLoopToolExecutionTests.swift`
+
+Implemented behavior:
+
+- When `getSteeringMessages` is nil and there are multiple tool calls, executes concurrently via `withThrowingTaskGroup`
+- Events buffered per tool and emitted in original tool call order after all complete
+- Sequential fallback when steering is active (preserves early-break behavior)
+- Progress update events suppressed in parallel mode to maintain ordered event stream
+
+Tests added:
+
+- `testParallelToolExecutionCompletesAndMaintainsOrder`: 3 concurrent tools with delays, verifies results in original order
+
+Verification:
+
+- `swift test --filter PiAgentLoopToolExecutionTests` passed (2 tests) on 2026-02-27
+
 ## Next Step
 
 - `P4-1`: `pi-tui` terminal abstraction + render buffer + differential rendering

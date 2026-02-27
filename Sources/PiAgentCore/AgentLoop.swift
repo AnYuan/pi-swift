@@ -577,62 +577,44 @@ public enum PiAgentLoop {
             return ([], nil)
         }
 
+        // When steering is active, execute sequentially to support early-break.
+        // When steering is not active and there are multiple tool calls, execute
+        // concurrently for performance.
+        if getSteeringMessages != nil || toolCalls.count == 1 {
+            return try await executeToolCallsSequentially(
+                toolCalls: toolCalls,
+                runtimeTools: runtimeTools,
+                stream: stream,
+                abortController: abortController,
+                getSteeringMessages: getSteeringMessages
+            )
+        } else {
+            return try await executeToolCallsInParallel(
+                toolCalls: toolCalls,
+                runtimeTools: runtimeTools,
+                stream: stream,
+                abortController: abortController
+            )
+        }
+    }
+
+    private static func executeToolCallsSequentially(
+        toolCalls: [PiAIToolCallContent],
+        runtimeTools: [PiAgentRuntimeTool],
+        stream: PiAgentEventStream,
+        abortController: PiAgentAbortController?,
+        getSteeringMessages: PiAgentLoopConfig.GetMessages?
+    ) async throws -> (toolResults: [PiAIToolResultMessage], steeringMessages: [PiAgentMessage]?) {
         var results: [PiAIToolResultMessage] = []
         var steeringMessages: [PiAgentMessage]?
 
         for (index, toolCall) in toolCalls.enumerated() {
             try throwIfAborted(abortController)
-            stream.push(.toolExecutionStart(
-                toolCallID: toolCall.id,
-                toolName: toolCall.name,
-                args: .object(toolCall.arguments)
-            ))
-
-            let executionResult: PiAgentToolExecutionResult
-            let isError: Bool
-
-            do {
-                guard let runtimeTool = runtimeTools.first(where: { $0.tool.name == toolCall.name }) else {
-                    throw PiAIValidationError("Tool \"\(toolCall.name)\" not found")
-                }
-                let validatedArgs = try PiAIValidation.validateToolArguments(tool: runtimeTool.tool.asAITool, toolCall: toolCall)
-                executionResult = try await runtimeTool.execute(toolCall.id, validatedArgs, abortController) { partialResult in
-                    stream.push(.toolExecutionUpdate(
-                        toolCallID: toolCall.id,
-                        toolName: toolCall.name,
-                        args: .object(toolCall.arguments),
-                        partialResult: partialResult
-                    ))
-                }
-                isError = false
-            } catch {
-                executionResult = PiAgentToolExecutionResult(
-                    content: [.text(.init(text: String(describing: error)))],
-                    details: .object([:])
-                )
-                isError = true
-            }
-
-            stream.push(.toolExecutionEnd(
-                toolCallID: toolCall.id,
-                toolName: toolCall.name,
-                result: executionResult,
-                isError: isError
-            ))
-
-            let toolResultMessage = PiAIToolResultMessage(
-                toolCallId: toolCall.id,
-                toolName: toolCall.name,
-                content: executionResult.content,
-                details: executionResult.details,
-                isError: isError,
-                timestamp: currentTimestampMillis()
+            let (toolResultMessage, _) = try await executeSingleToolCall(
+                toolCall: toolCall, runtimeTools: runtimeTools,
+                stream: stream, abortController: abortController
             )
             results.append(toolResultMessage)
-
-            let agentMessage = PiAgentMessage.toolResult(toolResultMessage)
-            stream.push(.messageStart(message: agentMessage))
-            stream.push(.messageEnd(message: agentMessage))
 
             if let getSteeringMessages {
                 let steering = await getSteeringMessages()
@@ -650,6 +632,166 @@ public enum PiAgentLoop {
         }
 
         return (results, steeringMessages)
+    }
+
+    private static func executeToolCallsInParallel(
+        toolCalls: [PiAIToolCallContent],
+        runtimeTools: [PiAgentRuntimeTool],
+        stream: PiAgentEventStream,
+        abortController: PiAgentAbortController?
+    ) async throws -> (toolResults: [PiAIToolResultMessage], steeringMessages: [PiAgentMessage]?) {
+        // Execute all tool calls concurrently, collecting results indexed by position
+        let indexedResults: [(Int, PiAIToolResultMessage, [PiAgentEvent])] = try await withThrowingTaskGroup(
+            of: (Int, PiAIToolResultMessage, [PiAgentEvent]).self
+        ) { group in
+            for (index, toolCall) in toolCalls.enumerated() {
+                group.addTask {
+                    try throwIfAborted(abortController)
+                    let (result, events) = try await executeSingleToolCallBuffered(
+                        toolCall: toolCall, runtimeTools: runtimeTools,
+                        abortController: abortController
+                    )
+                    return (index, result, events)
+                }
+            }
+
+            var collected: [(Int, PiAIToolResultMessage, [PiAgentEvent])] = []
+            for try await item in group {
+                collected.append(item)
+            }
+            return collected.sorted { $0.0 < $1.0 }
+        }
+
+        // Emit events in original tool call order after all complete
+        var results: [PiAIToolResultMessage] = []
+        for (_, toolResultMessage, events) in indexedResults {
+            for event in events {
+                stream.push(event)
+            }
+            results.append(toolResultMessage)
+        }
+
+        return (results, nil)
+    }
+
+    /// Executes a single tool call, pushing events directly to the stream.
+    private static func executeSingleToolCall(
+        toolCall: PiAIToolCallContent,
+        runtimeTools: [PiAgentRuntimeTool],
+        stream: PiAgentEventStream,
+        abortController: PiAgentAbortController?
+    ) async throws -> (PiAIToolResultMessage, [PiAgentEvent]) {
+        stream.push(.toolExecutionStart(
+            toolCallID: toolCall.id,
+            toolName: toolCall.name,
+            args: .object(toolCall.arguments)
+        ))
+
+        let executionResult: PiAgentToolExecutionResult
+        let isError: Bool
+
+        do {
+            guard let runtimeTool = runtimeTools.first(where: { $0.tool.name == toolCall.name }) else {
+                throw PiAIValidationError("Tool \"\(toolCall.name)\" not found")
+            }
+            let validatedArgs = try PiAIValidation.validateToolArguments(tool: runtimeTool.tool.asAITool, toolCall: toolCall)
+            executionResult = try await runtimeTool.execute(toolCall.id, validatedArgs, abortController) { partialResult in
+                stream.push(.toolExecutionUpdate(
+                    toolCallID: toolCall.id,
+                    toolName: toolCall.name,
+                    args: .object(toolCall.arguments),
+                    partialResult: partialResult
+                ))
+            }
+            isError = false
+        } catch {
+            executionResult = PiAgentToolExecutionResult(
+                content: [.text(.init(text: String(describing: error)))],
+                details: .object([:])
+            )
+            isError = true
+        }
+
+        stream.push(.toolExecutionEnd(
+            toolCallID: toolCall.id,
+            toolName: toolCall.name,
+            result: executionResult,
+            isError: isError
+        ))
+
+        let toolResultMessage = PiAIToolResultMessage(
+            toolCallId: toolCall.id,
+            toolName: toolCall.name,
+            content: executionResult.content,
+            details: executionResult.details,
+            isError: isError,
+            timestamp: currentTimestampMillis()
+        )
+
+        let agentMessage = PiAgentMessage.toolResult(toolResultMessage)
+        stream.push(.messageStart(message: agentMessage))
+        stream.push(.messageEnd(message: agentMessage))
+
+        return (toolResultMessage, [])
+    }
+
+    /// Executes a single tool call for parallel mode — returns buffered events
+    /// instead of pushing to stream, so they can be emitted in order later.
+    private static func executeSingleToolCallBuffered(
+        toolCall: PiAIToolCallContent,
+        runtimeTools: [PiAgentRuntimeTool],
+        abortController: PiAgentAbortController?
+    ) async throws -> (PiAIToolResultMessage, [PiAgentEvent]) {
+        var events: [PiAgentEvent] = []
+
+        events.append(.toolExecutionStart(
+            toolCallID: toolCall.id,
+            toolName: toolCall.name,
+            args: .object(toolCall.arguments)
+        ))
+
+        let executionResult: PiAgentToolExecutionResult
+        let isError: Bool
+
+        do {
+            guard let runtimeTool = runtimeTools.first(where: { $0.tool.name == toolCall.name }) else {
+                throw PiAIValidationError("Tool \"\(toolCall.name)\" not found")
+            }
+            let validatedArgs = try PiAIValidation.validateToolArguments(tool: runtimeTool.tool.asAITool, toolCall: toolCall)
+            executionResult = try await runtimeTool.execute(toolCall.id, validatedArgs, abortController) { _ in
+                // Progress updates are not emitted in parallel mode to avoid
+                // interleaved event ordering across concurrent tool calls
+            }
+            isError = false
+        } catch {
+            executionResult = PiAgentToolExecutionResult(
+                content: [.text(.init(text: String(describing: error)))],
+                details: .object([:])
+            )
+            isError = true
+        }
+
+        events.append(.toolExecutionEnd(
+            toolCallID: toolCall.id,
+            toolName: toolCall.name,
+            result: executionResult,
+            isError: isError
+        ))
+
+        let toolResultMessage = PiAIToolResultMessage(
+            toolCallId: toolCall.id,
+            toolName: toolCall.name,
+            content: executionResult.content,
+            details: executionResult.details,
+            isError: isError,
+            timestamp: currentTimestampMillis()
+        )
+
+        let agentMessage = PiAgentMessage.toolResult(toolResultMessage)
+        events.append(.messageStart(message: agentMessage))
+        events.append(.messageEnd(message: agentMessage))
+
+        return (toolResultMessage, events)
     }
 
     private static func throwIfAborted(_ abortController: PiAgentAbortController?) throws {
