@@ -589,6 +589,100 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Scope completion: `PiPods` now includes typed config store (`pods.json`), SSH invocation parser/builders, known-model registry + lifecycle planner, and a mock-runtime `PiPodsCLIApp` for `pods/ssh/start/stop/list/logs`
   - Docs updated: `docs/modules/pi-pods.md`, `docs/PLAN.md`, `README.md`
 
+## P7 Code Quality and Modernization
+
+### P7-1: bash-pipe-deadlock-fix
+- Status: DONE
+- Depends On: none
+- Scope:
+  - Fix pipe deadlock in `PiBashTool.execute()` where `readDataToEndOfFile()` was called after `sema.wait()`
+  - If process output exceeded the OS pipe buffer (~64KB on macOS), the child blocked on `write()` while the parent blocked on `sema.wait()` — classic pipe deadlock
+  - Fixed by dispatching `readDataToEndOfFile()` on a background queue before waiting for termination, using `DispatchGroup` to sync read completion
+- Test Plan:
+  - Add test running `seq 1 100000` (~588KB output) verifying no timeout/deadlock
+  - All existing bash tool tests continue to pass
+- Verification:
+  - Tests: `swift test` passed (361 tests total, including new `testBashToolHandlesLargeOutputWithoutDeadlock`) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: All 15 existing tool tests pass; new test verifies >64KB output completes correctly
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PRD.md`, `docs/PLAN.md`
+
+### P7-2: overflow-detection-divergence-fix
+- Status: TODO
+- Depends On: none
+- Scope:
+  - Replace weak 3-pattern overflow detection in `PiCodingAgentCompactionEngine.isContextOverflowSignal()` with delegation to `PiAIOverflow.patterns()` (15 regex patterns)
+  - Add 400/413 status code check for full parity
+- Test Plan:
+  - Add test verifying `shouldCompact` triggers `.overflow` for all 15 patterns
+  - Existing compaction tests continue to pass
+
+### P7-3: kill-ring-undo-stack-bounds
+- Status: TODO
+- Depends On: none
+- Scope:
+  - Add `maxSize` parameter to `PiKillRing` (default 64) and `PiUndoStack` (default 200)
+  - Drop oldest entries on overflow via `removeFirst()`
+- Test Plan:
+  - Add bounded-size tests for both types
+
+### P7-4: deduplicate-path-resolution
+- Status: TODO
+- Depends On: none
+- Scope:
+  - Extract shared `resolvePath(_:relativeTo:)` function from duplicated tool implementations
+- Test Plan:
+  - Existing tests pass (pure refactor)
+
+### P7-5: improve-compaction-token-estimation
+- Status: TODO
+- Depends On: none
+- Scope:
+  - Change token estimation divisor from `4.0` to `3.3` for more accurate code-heavy content estimation
+- Test Plan:
+  - Add code-heavy estimation test; update existing threshold assertions
+
+### P7-6: precompile-overflow-regex
+- Status: TODO
+- Depends On: none
+- Scope:
+  - Pre-compile 15 overflow regex patterns as static `NSRegularExpression` instances
+- Test Plan:
+  - Existing overflow tests pass (pure optimization)
+
+### P7-7: async-tool-protocol
+- Status: TODO
+- Depends On: P7-1
+- Scope:
+  - Change `PiCodingAgentTool.execute()` to `async throws`
+  - Update all conformances and callers
+- Test Plan:
+  - Update existing tool/modes/mom tests to async
+
+### P7-8: parallel-tool-execution
+- Status: TODO
+- Depends On: P7-7
+- Scope:
+  - Use `TaskGroup` for concurrent tool execution when steering is not active
+- Test Plan:
+  - Add parallel execution test with concurrent tools
+
+### P7-9: coverage-reports-mom-pods
+- Status: TODO
+- Depends On: none
+- Scope:
+  - Generate coverage reports for `PiMom` and `PiPods` modules
+- Test Plan:
+  - Documentation only; no new tests
+
+### P7-10: actor-migration-event-streams
+- Status: TODO
+- Depends On: P7-7, P7-8
+- Scope:
+  - Convert `PiAgentAbortController`, `PiAgentEventStream`, `PiAIAssistantMessageEventStream` to actors
+- Test Plan:
+  - Update all affected tests; add concurrency safety tests
+
 ## 6. Documentation Sync Tasks (Continuous)
 
 After any task is completed, append/update the corresponding module doc (recommended):
@@ -610,4 +704,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: None. All tasks in the current plan are marked `DONE`. Continue by opening a new plan task (for example: `pi-mom` Slack Socket Mode runtime adapter, `pi-pods` `pods setup` remote bootstrap parity, or coverage/report pushes for `PiMom` / `PiPods`).
+Next recommended task: P7-2 (overflow-detection-divergence-fix). See P7 phase above for full task list.

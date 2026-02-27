@@ -226,6 +226,27 @@ final class PiCodingAgentToolsTests: XCTestCase {
         }
     }
 
+    func testBashToolHandlesLargeOutputWithoutDeadlock() throws {
+        // seq 1 100000 produces ~588KB of output, well over the 64KB pipe buffer.
+        // Without concurrent pipe reading, this would deadlock: the child blocks on
+        // write() while the parent blocks waiting for termination.
+        let tool = PiBashTool(configuration: .init(
+            workingDirectory: tempDir.path,
+            shellPath: "/bin/zsh",
+            defaultTimeoutSeconds: 30,
+            maxOutputBytes: 1_048_576
+        ))
+        let result = try tool.execute(
+            toolCallID: "1",
+            arguments: .object(["command": .string("seq 1 100000")])
+        )
+        let text = try XCTUnwrap(extractText(result))
+        // Verify output contains the last line
+        XCTAssertTrue(text.contains("100000"))
+        // Verify output is substantial (>64KB)
+        XCTAssertGreaterThan(text.utf8.count, 65_536)
+    }
+
     private func extractText(_ result: PiCodingAgentToolResult) -> String? {
         guard result.content.count == 1 else { return nil }
         guard case .text(let content) = result.content[0] else { return nil }

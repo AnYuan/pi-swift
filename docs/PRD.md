@@ -64,6 +64,7 @@ Target functionality:
 - OAuth helpers (OpenAI Codex / Copilot / Gemini CLI / Antigravity, etc.)
 - Provider adapters and message-format transformation
 - Utility functions (event-stream parsing, JSON parsing, overflow handling, validation, Unicode sanitization, etc.)
+- Performance: pre-compiled regex patterns for overflow detection
 
 Visible baseline evidence:
 
@@ -82,6 +83,7 @@ Target functionality:
 - Custom stream function / transport / retry strategy
 - Provider integration settings such as thinking budgets and sessionId
 - Tool-call state management (pending tool calls)
+- Concurrency modernization: async tool execution protocol, parallel independent tool execution via TaskGroup, actor-based event streams
 
 Visible baseline evidence:
 
@@ -102,6 +104,7 @@ Target functionality:
 - Autocomplete (paths / commands)
 - Image rendering (Kitty/iTerm terminal image protocols, etc.)
 - Editing helpers (`undo`, kill-ring)
+- Resource bounds: kill ring and undo stack size limits to prevent unbounded memory growth
 
 Visible baseline evidence:
 
@@ -134,6 +137,7 @@ Target functionality (highest-priority product surface):
 - File processing and attachments (including images and clipboard image handling)
 - Export (for example, HTML export)
 - Settings management, config selection, slash commands
+- Correctness: pipe-safe bash tool (prevents deadlock on large output), unified overflow detection reusing PiAI patterns, improved token estimation for code content, shared path resolution for tools
 
 Visible baseline evidence:
 
@@ -213,13 +217,24 @@ Visible baseline evidence:
   - Interface changes must update PRD/PLAN/module docs
   - Newly discovered `pi-mono` feature scope must be added to PRD before scheduling in PLAN
 
-## 8. Risks and Notes
+## 8. Internal Quality Improvements (P7)
+
+P7 addresses internal code quality, correctness, and modernization concerns discovered during codebase audit. These changes do not add new user-visible features but improve reliability, resource safety, and codebase maintainability.
+
+Priority order:
+
+1. Bug fixes (pipe deadlock, overflow pattern divergence)
+2. Resource safety (bounded collections)
+3. Code hygiene (deduplication, estimation accuracy, regex compilation)
+4. Modernization (async protocols, parallel execution, actor migration)
+
+## 9. Risks and Notes
 
 - `pi-mono` is a monorepo with strong cross-package dependencies; migration order must follow the dependency chain
 - Some functionality depends on Node.js / Browser / Slack / SSH ecosystems and requires Swift platform-equivalent abstractions
 - OAuth / provider API behavior changes frequently; adapter isolation plus regression tests are required
 
-## 9. PRD Maintenance Rules
+## 10. PRD Maintenance Rules
 
 - PRD defines what should be implemented; it does not track task completion status
 - Task breakdown and status tracking live in `docs/PLAN.md`

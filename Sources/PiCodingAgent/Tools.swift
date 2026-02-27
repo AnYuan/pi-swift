@@ -342,17 +342,33 @@ public struct PiBashTool: PiCodingAgentTool, @unchecked Sendable {
             throw PiCodingAgentToolError.io("Failed to spawn shell: \(configuration.shellPath)")
         }
 
+        // Read pipe output on a background queue BEFORE waiting for termination.
+        // This prevents deadlock when process output exceeds the OS pipe buffer
+        // (~64KB on macOS): without concurrent reading, the child blocks on write()
+        // while the parent blocks on sema.wait().
+        var outputData = Data()
+        let readGroup = DispatchGroup()
+        readGroup.enter()
+        DispatchQueue.global(qos: .userInitiated).async {
+            outputData = pipe.fileHandleForReading.readDataToEndOfFile()
+            readGroup.leave()
+        }
+
         let sema = DispatchSemaphore(value: 0)
         process.terminationHandler = { _ in sema.signal() }
         let waitResult = sema.wait(timeout: .now() + max(0.1, timeout))
         if waitResult == .timedOut {
             process.terminate()
             _ = sema.wait(timeout: .now() + 1)
+            // Wait for read to finish after termination
+            readGroup.wait()
             throw PiCodingAgentToolError.io("Command timed out after \(Int(timeout))s")
         }
 
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        var output = String(data: data, encoding: .utf8) ?? String(decoding: data, as: UTF8.self)
+        // Wait for pipe read to complete after process exits
+        readGroup.wait()
+
+        var output = String(data: outputData, encoding: .utf8) ?? String(decoding: outputData, as: UTF8.self)
         var details: [String: JSONValue] = [
             "exitCode": .number(Double(process.terminationStatus))
         ]

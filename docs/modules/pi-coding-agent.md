@@ -755,3 +755,25 @@ Tests added:
 Verification (slice):
 
 - `swift test --filter PiCodingAgentModesTests` passed on 2026-02-24
+
+### P7-1: Bash tool pipe deadlock fix
+
+Files:
+
+- `Sources/PiCodingAgent/Tools.swift`
+- `Tests/PiCodingAgentTests/PiCodingAgentToolsTests.swift`
+
+Implemented behavior:
+
+- Fixed pipe deadlock in `PiBashTool.execute()` where `readDataToEndOfFile()` was called after waiting for process termination
+- If process output exceeded the OS pipe buffer (~64KB on macOS), the child blocked on `write()` while the parent blocked on `sema.wait()`
+- Now dispatches `readDataToEndOfFile()` on a background queue before waiting for termination, using `DispatchGroup` to sync read completion
+- Timeout and error handling paths also wait for the read to finish before returning
+
+Tests added:
+
+- `testBashToolHandlesLargeOutputWithoutDeadlock`: runs `seq 1 100000` (~588KB output), verifies completion and content correctness
+
+Verification:
+
+- `swift test --filter PiCodingAgentToolsTests` passed (15 tests) on 2026-02-27
