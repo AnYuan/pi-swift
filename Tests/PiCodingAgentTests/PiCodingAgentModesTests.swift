@@ -43,9 +43,9 @@ final class PiCodingAgentModesTests: XCTestCase {
         XCTAssertEqual(third["status"] as? String, "ok")
     }
 
-    func testRPCPingReturnsOKResult() throws {
+    func testRPCPingReturnsOKResult() async throws {
         let runner = PiCodingAgentModeRunner(version: "pi-swift test")
-        let response = try runner.handleRPC(#"{"id":"1","method":"ping"}"#)
+        let response = try await runner.handleRPC(#"{"id":"1","method":"ping"}"#)
         let object = try parseObject(response)
 
         XCTAssertEqual(object["id"] as? String, "1")
@@ -54,9 +54,9 @@ final class PiCodingAgentModesTests: XCTestCase {
         XCTAssertEqual(result["version"] as? String, "pi-swift test")
     }
 
-    func testRPCRunPrintDelegatesToPrintMode() throws {
+    func testRPCRunPrintDelegatesToPrintMode() async throws {
         let runner = PiCodingAgentModeRunner(version: "pi-swift test")
-        let response = try runner.handleRPC(#"{"id":"2","method":"run.print","params":{"prompt":"ship it"}} "#)
+        let response = try await runner.handleRPC(#"{"id":"2","method":"run.print","params":{"prompt":"ship it"}} "#)
         let object = try parseObject(response)
 
         let result = try XCTUnwrap(object["result"] as? [String: Any])
@@ -65,9 +65,9 @@ final class PiCodingAgentModesTests: XCTestCase {
         XCTAssertTrue(output.contains("prompt: ship it"))
     }
 
-    func testRPCUnknownMethodReturnsErrorEnvelope() throws {
+    func testRPCUnknownMethodReturnsErrorEnvelope() async throws {
         let runner = PiCodingAgentModeRunner(version: "pi-swift test")
-        let response = try runner.handleRPC(#"{"id":"3","method":"missing.method"}"#)
+        let response = try await runner.handleRPC(#"{"id":"3","method":"missing.method"}"#)
         let object = try parseObject(response)
 
         XCTAssertEqual(object["id"] as? String, "3")
@@ -85,13 +85,13 @@ final class PiCodingAgentModesTests: XCTestCase {
         XCTAssertTrue(json.contains("\"type\":\"mode.start\""))
     }
 
-    func testRPCToolsListReturnsToolDefinitions() throws {
+    func testRPCToolsListReturnsToolDefinitions() async throws {
         let registry = PiCodingAgentToolRegistry(tools: [
             PiFileReadTool(baseDirectory: tempDir.path),
             PiFileWriteTool(baseDirectory: tempDir.path)
         ])
         let runner = PiCodingAgentModeRunner(version: "pi-swift test", toolRegistry: registry)
-        let response = try runner.handleRPC(#"{"id":"4","method":"tools.list"}"#)
+        let response = try await runner.handleRPC(#"{"id":"4","method":"tools.list"}"#)
         let object = try parseObject(response)
 
         let result = try XCTUnwrap(object["result"] as? [String: Any])
@@ -100,12 +100,12 @@ final class PiCodingAgentModesTests: XCTestCase {
         XCTAssertEqual(names, ["read", "write"])
     }
 
-    func testRPCToolsExecuteRunsToolAndReturnsStructuredResult() throws {
+    func testRPCToolsExecuteRunsToolAndReturnsStructuredResult() async throws {
         let registry = PiCodingAgentToolRegistry(tools: [
             PiFileWriteTool(baseDirectory: tempDir.path)
         ])
         let runner = PiCodingAgentModeRunner(version: "pi-swift test", toolRegistry: registry)
-        let response = try runner.handleRPC(#"{"id":"5","method":"tools.execute","params":{"id":"tc1","name":"write","arguments":{"path":"out.txt","content":"hello"}}}"#)
+        let response = try await runner.handleRPC(#"{"id":"5","method":"tools.execute","params":{"id":"tc1","name":"write","arguments":{"path":"out.txt","content":"hello"}}}"#)
         let object = try parseObject(response)
         let result = try XCTUnwrap(object["result"] as? [String: Any])
         let text = try XCTUnwrap(result["text"] as? String)
@@ -113,14 +113,14 @@ final class PiCodingAgentModesTests: XCTestCase {
         XCTAssertEqual(try String(contentsOf: tempDir.appendingPathComponent("out.txt"), encoding: .utf8), "hello")
     }
 
-    func testSDKFacadeCanListAndExecuteTools() throws {
+    func testSDKFacadeCanListAndExecuteTools() async throws {
         let registry = PiCodingAgentToolRegistry(tools: [PiFileWriteTool(baseDirectory: tempDir.path)])
         let sdk = PiCodingAgentSDK(runner: .init(version: "pi-swift test", toolRegistry: registry))
 
         let tools = sdk.listTools()
         XCTAssertEqual(tools.map(\.name), ["write"])
 
-        let result = try sdk.executeTool(.init(
+        let result = try await sdk.executeTool(.init(
             id: "1",
             name: "write",
             arguments: .object(["path": .string("sdk.txt"), "content": .string("abc")])

@@ -17,7 +17,7 @@ let env = PiCodingAgentCLIEnvironment(
     pipedStdin: pipedStdin
 )
 
-let result = PiCodingAgentCLIExecutor.execute(argv: Array(CommandLine.arguments.dropFirst()), env: env)
+let result = await PiCodingAgentCLIExecutor.execute(argv: Array(CommandLine.arguments.dropFirst()), env: env)
 if !result.stdout.isEmpty {
     FileHandle.standardOutput.write(Data(result.stdout.utf8))
 }

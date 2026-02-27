@@ -6,7 +6,7 @@ public enum PiCodingAgentCLIExecutor {
         argv: [String],
         env: PiCodingAgentCLIEnvironment = .init(),
         modeRunner: PiCodingAgentModeRunner = .init()
-    ) -> PiCodingAgentCLIResult {
+    ) async -> PiCodingAgentCLIResult {
         var result = PiCodingAgentCLIApp.run(argv: argv, env: env)
         guard result.exitCode == 0 else { return result }
 
@@ -26,7 +26,7 @@ public enum PiCodingAgentCLIExecutor {
         case .startRPC:
             if let request = env.pipedStdin?.trimmingCharacters(in: .whitespacesAndNewlines), !request.isEmpty {
                 do {
-                    result.stdout += try modeRunner.handleRPC(request) + "\n"
+                    result.stdout += try await modeRunner.handleRPC(request) + "\n"
                 } catch {
                     result.stdout += rpcInvalidRequestResponse(error: error) + "\n"
                 }

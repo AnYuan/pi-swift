@@ -683,13 +683,21 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P7-7: async-tool-protocol
-- Status: TODO
+- Status: DONE
 - Depends On: P7-1
 - Scope:
-  - Change `PiCodingAgentTool.execute()` to `async throws`
-  - Update all conformances and callers
+  - Changed `PiCodingAgentTool.execute()` protocol to `async throws`
+  - Updated all 6 tool conformances (`PiFileReadTool`, `PiFileWriteTool`, `PiFileEditTool`, `PiBashTool`, `PiMomBashTool`, `PiMomAttachTool`)
+  - Updated `PiCodingAgentToolRegistry.execute()`, `PiCodingAgentModeRunner.handleRPC()`, `PiCodingAgentSDK.executeTool()`, `PiCodingAgentCLIExecutor.execute()` to `async`
+  - Converted `PiBashTool` from `DispatchSemaphore` to structured concurrency (`withCheckedThrowingContinuation`)
+  - Updated `main.swift` to use `await`
 - Test Plan:
-  - Update existing tool/modes/mom tests to async
+  - Updated 3 test files to async: `PiCodingAgentToolsTests`, `PiCodingAgentModesTests`, `PiMomToolBridgeTests`, `PiCodingAgentCLIExecutionTests`
+- Verification:
+  - Tests: `swift test` passed (365 tests, all pass) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: All existing tests updated to async and passing
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/modules/pi-mom.md`, `docs/PLAN.md`
 
 ### P7-8: parallel-tool-execution
 - Status: TODO

@@ -15,14 +15,14 @@ final class PiCodingAgentToolsTests: XCTestCase {
         if let tempDir { try? FileManager.default.removeItem(at: tempDir) }
     }
 
-    func testRegistryListsDefinitionsAndDispatchesReadTool() throws {
+    func testRegistryListsDefinitionsAndDispatchesReadTool() async throws {
         let fileURL = tempDir.appendingPathComponent("notes.txt")
         try "line1\nline2\nline3".write(to: fileURL, atomically: true, encoding: .utf8)
 
         let registry = PiCodingAgentToolRegistry(tools: [PiFileReadTool(baseDirectory: tempDir.path)])
         XCTAssertEqual(registry.listDefinitions().map(\.name), ["read"])
 
-        let result = try registry.execute(.init(
+        let result = try await registry.execute(.init(
             id: "1",
             name: "read",
             arguments: .object(["path": .string("notes.txt")])
@@ -30,11 +30,11 @@ final class PiCodingAgentToolsTests: XCTestCase {
         XCTAssertEqual(result.content, [.text(.init(text: "line1\nline2\nline3"))])
     }
 
-    func testReadToolSupportsOffsetAndLimitWithTruncationDetails() throws {
+    func testReadToolSupportsOffsetAndLimitWithTruncationDetails() async throws {
         try "a\nb\nc\nd".write(to: tempDir.appendingPathComponent("f.txt"), atomically: true, encoding: .utf8)
         let tool = PiFileReadTool(baseDirectory: tempDir.path)
 
-        let result = try tool.execute(
+        let result = try await tool.execute(
             toolCallID: "1",
             arguments: .object([
                 "path": .string("f.txt"),
@@ -55,24 +55,21 @@ final class PiCodingAgentToolsTests: XCTestCase {
         }
     }
 
-    func testReadToolErrorsWhenOffsetBeyondEOF() throws {
+    func testReadToolErrorsWhenOffsetBeyondEOF() async throws {
         try "x".write(to: tempDir.appendingPathComponent("f.txt"), atomically: true, encoding: .utf8)
         let tool = PiFileReadTool(baseDirectory: tempDir.path)
 
-        XCTAssertThrowsError(try tool.execute(
-            toolCallID: "1",
-            arguments: .object([
-                "path": .string("f.txt"),
-                "offset": .number(5)
-            ])
-        )) { error in
+        do {
+            _ = try await tool.execute(toolCallID: "1", arguments: .object(["path": .string("f.txt"), "offset": .number(5)]))
+            XCTFail("Expected error")
+        } catch {
             XCTAssertEqual(error as? PiCodingAgentToolError, .io("offset 5 is beyond end of file"))
         }
     }
 
-    func testWriteToolCreatesParentDirectoriesAndWritesFile() throws {
+    func testWriteToolCreatesParentDirectoriesAndWritesFile() async throws {
         let tool = PiFileWriteTool(baseDirectory: tempDir.path)
-        let result = try tool.execute(
+        let result = try await tool.execute(
             toolCallID: "1",
             arguments: .object([
                 "path": .string("nested/dir/out.txt"),
@@ -85,16 +82,19 @@ final class PiCodingAgentToolsTests: XCTestCase {
         XCTAssertEqual(extractText(result), "Wrote 5 bytes to nested/dir/out.txt")
     }
 
-    func testRegistryErrorsForUnknownTool() {
+    func testRegistryErrorsForUnknownTool() async {
         let registry = PiCodingAgentToolRegistry()
-        XCTAssertThrowsError(try registry.execute(.init(id: "1", name: "missing", arguments: .object([:])))) { error in
+        do {
+            _ = try await registry.execute(.init(id: "1", name: "missing", arguments: .object([:])))
+            XCTFail("Expected error")
+        } catch {
             XCTAssertEqual(error as? PiCodingAgentToolError, .unknownTool("missing"))
         }
     }
 
-    func testBashToolRunsCommandAndReturnsOutput() throws {
+    func testBashToolRunsCommandAndReturnsOutput() async throws {
         let tool = PiBashTool(configuration: .init(workingDirectory: tempDir.path, shellPath: "/bin/zsh"))
-        let result = try tool.execute(
+        let result = try await tool.execute(
             toolCallID: "1",
             arguments: .object(["command": .string("printf 'hello'")])
         )
@@ -106,70 +106,67 @@ final class PiCodingAgentToolsTests: XCTestCase {
         }
     }
 
-    func testBashToolCommandPrefixIsPrepended() throws {
+    func testBashToolCommandPrefixIsPrepended() async throws {
         let tool = PiBashTool(configuration: .init(
             workingDirectory: tempDir.path,
             shellPath: "/bin/zsh",
             commandPrefix: "export FOO=bar"
         ))
-        let result = try tool.execute(
+        let result = try await tool.execute(
             toolCallID: "1",
             arguments: .object(["command": .string("printf \"$FOO\"")])
         )
         XCTAssertEqual(extractText(result), "bar")
     }
 
-    func testBashToolErrorsOnNonZeroExit() {
+    func testBashToolErrorsOnNonZeroExit() async {
         let tool = PiBashTool(configuration: .init(workingDirectory: tempDir.path, shellPath: "/bin/zsh"))
-        XCTAssertThrowsError(try tool.execute(
-            toolCallID: "1",
-            arguments: .object(["command": .string("printf err && exit 7")])
-        )) { error in
+        do {
+            _ = try await tool.execute(toolCallID: "1", arguments: .object(["command": .string("printf err && exit 7")]))
+            XCTFail("Expected error")
+        } catch {
             let message = (error as? PiCodingAgentToolError)?.description ?? ""
             XCTAssertTrue(message.contains("exit code 7"))
         }
     }
 
-    func testBashToolErrorsOnTimeout() {
+    func testBashToolErrorsOnTimeout() async {
         let tool = PiBashTool(configuration: .init(workingDirectory: tempDir.path, shellPath: "/bin/zsh"))
-        XCTAssertThrowsError(try tool.execute(
-            toolCallID: "1",
-            arguments: .object([
-                "command": .string("sleep 2"),
-                "timeout": .number(0.2)
-            ])
-        )) { error in
+        do {
+            _ = try await tool.execute(toolCallID: "1", arguments: .object(["command": .string("sleep 2"), "timeout": .number(0.2)]))
+            XCTFail("Expected error")
+        } catch {
             XCTAssertEqual(error as? PiCodingAgentToolError, .io("Command timed out after 0s"))
         }
     }
 
-    func testBashToolErrorsWhenWorkingDirectoryMissing() {
+    func testBashToolErrorsWhenWorkingDirectoryMissing() async {
         let missing = tempDir.appendingPathComponent("missing").path
         let tool = PiBashTool(configuration: .init(workingDirectory: missing, shellPath: "/bin/zsh"))
-        XCTAssertThrowsError(try tool.execute(
-            toolCallID: "1",
-            arguments: .object(["command": .string("pwd")])
-        )) { error in
+        do {
+            _ = try await tool.execute(toolCallID: "1", arguments: .object(["command": .string("pwd")]))
+            XCTFail("Expected error")
+        } catch {
             XCTAssertEqual(error as? PiCodingAgentToolError, .io("Working directory not found: \(missing)"))
         }
     }
 
-    func testBashToolErrorsWhenShellInvalid() {
+    func testBashToolErrorsWhenShellInvalid() async {
         let tool = PiBashTool(configuration: .init(workingDirectory: tempDir.path, shellPath: "/path/does/not/exist"))
-        XCTAssertThrowsError(try tool.execute(
-            toolCallID: "1",
-            arguments: .object(["command": .string("pwd")])
-        )) { error in
+        do {
+            _ = try await tool.execute(toolCallID: "1", arguments: .object(["command": .string("pwd")]))
+            XCTFail("Expected error")
+        } catch {
             XCTAssertEqual(error as? PiCodingAgentToolError, .io("Failed to spawn shell: /path/does/not/exist"))
         }
     }
 
-    func testEditToolReplacesUniqueMatchAndReturnsDiffDetails() throws {
+    func testEditToolReplacesUniqueMatchAndReturnsDiffDetails() async throws {
         let url = tempDir.appendingPathComponent("edit.txt")
         try "hello\nworld\n".write(to: url, atomically: true, encoding: .utf8)
         let tool = PiFileEditTool(baseDirectory: tempDir.path)
 
-        let result = try tool.execute(
+        let result = try await tool.execute(
             toolCallID: "1",
             arguments: .object([
                 "path": .string("edit.txt"),
@@ -194,56 +191,43 @@ final class PiCodingAgentToolsTests: XCTestCase {
         }
     }
 
-    func testEditToolErrorsWhenOldTextMissing() throws {
+    func testEditToolErrorsWhenOldTextMissing() async throws {
         try "abc".write(to: tempDir.appendingPathComponent("f.txt"), atomically: true, encoding: .utf8)
         let tool = PiFileEditTool(baseDirectory: tempDir.path)
 
-        XCTAssertThrowsError(try tool.execute(
-            toolCallID: "1",
-            arguments: .object([
-                "path": .string("f.txt"),
-                "oldText": .string("zzz"),
-                "newText": .string("x"),
-            ])
-        )) { error in
+        do {
+            _ = try await tool.execute(toolCallID: "1", arguments: .object(["path": .string("f.txt"), "oldText": .string("zzz"), "newText": .string("x")]))
+            XCTFail("Expected error")
+        } catch {
             XCTAssertEqual(error as? PiCodingAgentToolError, .io("oldText not found in f.txt"))
         }
     }
 
-    func testEditToolErrorsWhenOldTextMatchesMultipleLocations() throws {
+    func testEditToolErrorsWhenOldTextMatchesMultipleLocations() async throws {
         try "x x x".write(to: tempDir.appendingPathComponent("f.txt"), atomically: true, encoding: .utf8)
         let tool = PiFileEditTool(baseDirectory: tempDir.path)
 
-        XCTAssertThrowsError(try tool.execute(
-            toolCallID: "1",
-            arguments: .object([
-                "path": .string("f.txt"),
-                "oldText": .string("x"),
-                "newText": .string("y"),
-            ])
-        )) { error in
+        do {
+            _ = try await tool.execute(toolCallID: "1", arguments: .object(["path": .string("f.txt"), "oldText": .string("x"), "newText": .string("y")]))
+            XCTFail("Expected error")
+        } catch {
             XCTAssertEqual(error as? PiCodingAgentToolError, .io("oldText matched multiple locations in f.txt"))
         }
     }
 
-    func testBashToolHandlesLargeOutputWithoutDeadlock() throws {
-        // seq 1 100000 produces ~588KB of output, well over the 64KB pipe buffer.
-        // Without concurrent pipe reading, this would deadlock: the child blocks on
-        // write() while the parent blocks waiting for termination.
+    func testBashToolHandlesLargeOutputWithoutDeadlock() async throws {
         let tool = PiBashTool(configuration: .init(
             workingDirectory: tempDir.path,
             shellPath: "/bin/zsh",
             defaultTimeoutSeconds: 30,
             maxOutputBytes: 1_048_576
         ))
-        let result = try tool.execute(
+        let result = try await tool.execute(
             toolCallID: "1",
             arguments: .object(["command": .string("seq 1 100000")])
         )
         let text = try XCTUnwrap(extractText(result))
-        // Verify output contains the last line
         XCTAssertTrue(text.contains("100000"))
-        // Verify output is substantial (>64KB)
         XCTAssertGreaterThan(text.utf8.count, 65_536)
     }
 

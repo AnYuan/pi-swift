@@ -28,7 +28,7 @@ public enum PiCodingAgentToolError: Error, Equatable, CustomStringConvertible {
 
 public protocol PiCodingAgentTool: Sendable {
     var definition: PiToolDefinition { get }
-    func execute(toolCallID: String, arguments: JSONValue) throws -> PiCodingAgentToolResult
+    func execute(toolCallID: String, arguments: JSONValue) async throws -> PiCodingAgentToolResult
 }
 
 public struct PiCodingAgentToolRegistry: Sendable {
@@ -45,11 +45,11 @@ public struct PiCodingAgentToolRegistry: Sendable {
         toolsByName.values.map(\.definition).sorted { $0.name < $1.name }
     }
 
-    public func execute(_ call: PiToolCall) throws -> PiCodingAgentToolResult {
+    public func execute(_ call: PiToolCall) async throws -> PiCodingAgentToolResult {
         guard let tool = toolsByName[call.name] else {
             throw PiCodingAgentToolError.unknownTool(call.name)
         }
-        return try tool.execute(toolCallID: call.id, arguments: call.arguments)
+        return try await tool.execute(toolCallID: call.id, arguments: call.arguments)
     }
 }
 
@@ -79,7 +79,7 @@ public struct PiFileReadTool: PiCodingAgentTool, @unchecked Sendable {
         )
     }
 
-    public func execute(toolCallID: String, arguments: JSONValue) throws -> PiCodingAgentToolResult {
+    public func execute(toolCallID: String, arguments: JSONValue) async throws -> PiCodingAgentToolResult {
         let object = try requireObject(arguments)
         let path = try requireString(object, key: "path")
         let offset = intValue(object["offset"]) ?? 0
@@ -161,7 +161,7 @@ public struct PiFileWriteTool: PiCodingAgentTool, @unchecked Sendable {
         )
     }
 
-    public func execute(toolCallID: String, arguments: JSONValue) throws -> PiCodingAgentToolResult {
+    public func execute(toolCallID: String, arguments: JSONValue) async throws -> PiCodingAgentToolResult {
         let object = try requireObject(arguments)
         let path = try requireString(object, key: "path")
         let content = try requireString(object, key: "content")
@@ -205,7 +205,7 @@ public struct PiFileEditTool: PiCodingAgentTool, @unchecked Sendable {
         )
     }
 
-    public func execute(toolCallID: String, arguments: JSONValue) throws -> PiCodingAgentToolResult {
+    public func execute(toolCallID: String, arguments: JSONValue) async throws -> PiCodingAgentToolResult {
         let object = try requireObject(arguments)
         let path = try requireString(object, key: "path")
         let oldText = try requireString(object, key: "oldText")
@@ -306,7 +306,7 @@ public struct PiBashTool: PiCodingAgentTool, @unchecked Sendable {
         )
     }
 
-    public func execute(toolCallID: String, arguments: JSONValue) throws -> PiCodingAgentToolResult {
+    public func execute(toolCallID: String, arguments: JSONValue) async throws -> PiCodingAgentToolResult {
         let object = try requireObject(arguments)
         let command = try requireString(object, key: "command")
         let timeout = doubleValue(object["timeout"]) ?? configuration.defaultTimeoutSeconds
@@ -338,31 +338,29 @@ public struct PiBashTool: PiCodingAgentTool, @unchecked Sendable {
             throw PiCodingAgentToolError.io("Failed to spawn shell: \(configuration.shellPath)")
         }
 
-        // Read pipe output on a background queue BEFORE waiting for termination.
-        // This prevents deadlock when process output exceeds the OS pipe buffer
-        // (~64KB on macOS): without concurrent reading, the child blocks on write()
-        // while the parent blocks on sema.wait().
-        var outputData = Data()
-        let readGroup = DispatchGroup()
-        readGroup.enter()
-        DispatchQueue.global(qos: .userInitiated).async {
-            outputData = pipe.fileHandleForReading.readDataToEndOfFile()
-            readGroup.leave()
+        // Run process execution and pipe reading concurrently using structured
+        // concurrency. The pipe read must happen concurrently with the process
+        // to avoid deadlock when output exceeds the ~64KB OS pipe buffer.
+        let outputData: Data = try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                // Read all pipe output (blocks until process closes its end)
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                // Wait for process to fully terminate
+                process.waitUntilExit()
+                continuation.resume(returning: data)
+            }
+
+            // Set up timeout: terminate process if it takes too long
+            DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + max(0.1, timeout)) {
+                if process.isRunning {
+                    process.terminate()
+                }
+            }
         }
 
-        let sema = DispatchSemaphore(value: 0)
-        process.terminationHandler = { _ in sema.signal() }
-        let waitResult = sema.wait(timeout: .now() + max(0.1, timeout))
-        if waitResult == .timedOut {
-            process.terminate()
-            _ = sema.wait(timeout: .now() + 1)
-            // Wait for read to finish after termination
-            readGroup.wait()
+        if !process.isRunning && process.terminationStatus == 15 /* SIGTERM */ {
             throw PiCodingAgentToolError.io("Command timed out after \(Int(timeout))s")
         }
-
-        // Wait for pipe read to complete after process exits
-        readGroup.wait()
 
         var output = String(data: outputData, encoding: .utf8) ?? String(decoding: outputData, as: UTF8.self)
         var details: [String: JSONValue] = [

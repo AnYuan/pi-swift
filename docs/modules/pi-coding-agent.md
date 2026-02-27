@@ -835,3 +835,24 @@ Tests added:
 Verification:
 
 - `swift test --filter PiCodingAgentCompactionTests` passed (7 tests) on 2026-02-27
+
+### P7-7: Async tool protocol migration
+
+Files:
+
+- `Sources/PiCodingAgent/Tools.swift` (protocol + all 4 built-in tools)
+- `Sources/PiCodingAgent/Modes.swift` (handleRPC, executeTool)
+- `Sources/PiCodingAgent/CLIExecutor.swift` (execute)
+- `Sources/PiMom/Tools.swift` (PiMomBashTool, PiMomAttachTool)
+- `Sources/PiSwiftCLI/main.swift` (await)
+- 4 test files updated to async
+
+Implemented behavior:
+
+- Changed `PiCodingAgentTool` protocol to `async throws`
+- Converted `PiBashTool` from `DispatchSemaphore` to `withCheckedThrowingContinuation`
+- All callers cascade async through RPC, CLI executor, and main entry point
+
+Verification:
+
+- `swift test` passed (365 tests) on 2026-02-27

@@ -224,6 +224,11 @@ Coverage report: `docs/reports/pi-mom-coverage.md`
 
 Summary: Regions 71.80%, Functions 83.93%, Lines 77.30% (25 tests)
 
+## P7-7: Async tool protocol migration
+
+- `PiMomBashTool` and `PiMomAttachTool` updated to `async throws` conformance
+- Tests updated to async in `PiMomToolBridgeTests`
+
 ## Notes / Parity Gaps (Known Differences / Future Work)
 
 - real Slack Socket Mode / Web API runtime adapter (current implementation provides mockable integration contracts + coordinator only)

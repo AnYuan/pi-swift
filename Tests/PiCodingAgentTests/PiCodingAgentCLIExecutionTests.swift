@@ -5,8 +5,8 @@ import PiAgentCore
 @testable import PiCodingAgent
 
 final class PiCodingAgentCLIExecutionTests: XCTestCase {
-    func testExecutePrintModeReturnsRenderedPrintOutput() {
-        let result = PiCodingAgentCLIExecutor.execute(
+    func testExecutePrintModeReturnsRenderedPrintOutput() async {
+        let result = await PiCodingAgentCLIExecutor.execute(
             argv: ["--print", "ship"],
             env: .init(),
             modeRunner: .init(version: "pi-swift test")
@@ -18,8 +18,8 @@ final class PiCodingAgentCLIExecutionTests: XCTestCase {
         XCTAssertTrue(result.stdout.contains("prompt: ship"))
     }
 
-    func testExecuteJSONModeReturnsStructuredJSONOutput() {
-        let result = PiCodingAgentCLIExecutor.execute(
+    func testExecuteJSONModeReturnsStructuredJSONOutput() async {
+        let result = await PiCodingAgentCLIExecutor.execute(
             argv: ["--mode", "json", "hello"],
             env: .init(),
             modeRunner: .init(version: "pi-swift test")
@@ -31,8 +31,8 @@ final class PiCodingAgentCLIExecutionTests: XCTestCase {
         XCTAssertTrue(result.stdout.contains("\"mode\":\"json\""))
     }
 
-    func testExecuteRPCModeHandlesSingleRequestFromPipedStdin() {
-        let result = PiCodingAgentCLIExecutor.execute(
+    func testExecuteRPCModeHandlesSingleRequestFromPipedStdin() async {
+        let result = await PiCodingAgentCLIExecutor.execute(
             argv: ["--mode", "rpc"],
             env: .init(stdinIsTTY: false, pipedStdin: #"{"id":"1","method":"ping"}"#),
             modeRunner: .init(version: "pi-swift test")
@@ -45,8 +45,8 @@ final class PiCodingAgentCLIExecutionTests: XCTestCase {
         XCTAssertTrue(result.stdout.contains("\"version\":\"pi-swift test\""))
     }
 
-    func testExecuteRPCModeReturnsProtocolErrorForInvalidJSONRequest() {
-        let result = PiCodingAgentCLIExecutor.execute(
+    func testExecuteRPCModeReturnsProtocolErrorForInvalidJSONRequest() async {
+        let result = await PiCodingAgentCLIExecutor.execute(
             argv: ["--mode", "rpc"],
             env: .init(stdinIsTTY: false, pipedStdin: "{ invalid"),
             modeRunner: .init(version: "pi-swift test")
@@ -58,7 +58,7 @@ final class PiCodingAgentCLIExecutionTests: XCTestCase {
         XCTAssertTrue(result.stdout.contains("invalid_request"))
     }
 
-    func testExecuteExportModeWritesHTMLAndPrintsOutputPath() throws {
+    func testExecuteExportModeWritesHTMLAndPrintsOutputPath() async throws {
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: tempDir) }
@@ -67,7 +67,7 @@ final class PiCodingAgentCLIExecutionTests: XCTestCase {
         let outputURL = tempDir.appendingPathComponent("session-export.html")
         try writeSessionFixture(to: sessionURL)
 
-        let result = PiCodingAgentCLIExecutor.execute(
+        let result = await PiCodingAgentCLIExecutor.execute(
             argv: ["--export", sessionURL.path, outputURL.path],
             env: .init(),
             modeRunner: .init(version: "pi-swift test")

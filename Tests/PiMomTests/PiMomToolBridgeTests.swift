@@ -16,11 +16,11 @@ final class PiMomToolBridgeTests: XCTestCase {
         XCTAssertEqual(registry.listDefinitions().map(\.name), ["attach", "bash", "edit", "read", "write"])
     }
 
-    func testMomBashToolDelegatesToSandboxExecutor() throws {
+    func testMomBashToolDelegatesToSandboxExecutor() async throws {
         let executor = RecordingMomExecutor(result: .init(stdout: "ok", stderr: "", code: 0))
         let tool = PiMomBashTool(executor: executor)
 
-        let result = try tool.execute(
+        let result = try await tool.execute(
             toolCallID: "1",
             arguments: .object([
                 "command": .string("echo hi"),
@@ -34,7 +34,7 @@ final class PiMomToolBridgeTests: XCTestCase {
         XCTAssertEqual(extractText(result), "ok")
     }
 
-    func testMomAttachToolUploadsFileInsideWorkspace() throws {
+    func testMomAttachToolUploadsFileInsideWorkspace() async throws {
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: tempDir) }
@@ -43,7 +43,7 @@ final class PiMomToolBridgeTests: XCTestCase {
 
         let uploads = UploadRecorder()
         let tool = PiMomAttachTool(workspaceDirectory: tempDir.path, uploader: uploads)
-        let result = try tool.execute(
+        let result = try await tool.execute(
             toolCallID: "a1",
             arguments: .object(["path": .string(fileURL.path)])
         )
@@ -52,7 +52,7 @@ final class PiMomToolBridgeTests: XCTestCase {
         XCTAssertEqual(extractText(result), "Attached file: report.txt")
     }
 
-    func testMomAttachToolRejectsPathsOutsideWorkspace() throws {
+    func testMomAttachToolRejectsPathsOutsideWorkspace() async throws {
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: tempDir) }
@@ -61,7 +61,10 @@ final class PiMomToolBridgeTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: outsideURL) }
 
         let tool = PiMomAttachTool(workspaceDirectory: tempDir.path, uploader: UploadRecorder())
-        XCTAssertThrowsError(try tool.execute(toolCallID: "a1", arguments: .object(["path": .string(outsideURL.path)]))) { error in
+        do {
+            _ = try await tool.execute(toolCallID: "a1", arguments: .object(["path": .string(outsideURL.path)]))
+            XCTFail("Expected error")
+        } catch {
             XCTAssertEqual(error as? PiCodingAgentToolError, .io("Attach path must be inside workspace: \(outsideURL.path)"))
         }
     }

@@ -81,7 +81,7 @@ public final class PiCodingAgentModeRunner {
         }.joined(separator: "\n")
     }
 
-    public func handleRPC(_ requestJSON: String) throws -> String {
+    public func handleRPC(_ requestJSON: String) async throws -> String {
         let request = try JSONDecoder().decode(PiCodingAgentRPCRequestEnvelope.self, from: Data(requestJSON.utf8))
 
         let response: PiCodingAgentRPCResponseEnvelope
@@ -124,7 +124,7 @@ public final class PiCodingAgentModeRunner {
             let toolCallID = request.params?["id"]?.stringValue ?? UUID().uuidString
             let arguments = request.params?["arguments"] ?? .object([:])
             do {
-                let result = try toolRegistry.execute(.init(id: toolCallID, name: name, arguments: arguments))
+                let result = try await toolRegistry.execute(.init(id: toolCallID, name: name, arguments: arguments))
                 response = .init(id: request.id, result: [
                     "toolCallID": .string(toolCallID),
                     "text": .string(extractToolText(result)),
@@ -165,16 +165,16 @@ public struct PiCodingAgentSDK {
         runner.runJSON(.init(prompt: prompt, pipedInput: pipedInput))
     }
 
-    public func handleRPC(_ requestJSON: String) throws -> String {
-        try runner.handleRPC(requestJSON)
+    public func handleRPC(_ requestJSON: String) async throws -> String {
+        try await runner.handleRPC(requestJSON)
     }
 
     public func listTools() -> [PiToolDefinition] {
         runner.listTools()
     }
 
-    public func executeTool(_ call: PiToolCall) throws -> PiCodingAgentToolResult {
-        try runner.executeTool(call)
+    public func executeTool(_ call: PiToolCall) async throws -> PiCodingAgentToolResult {
+        try await runner.executeTool(call)
     }
 }
 
@@ -183,11 +183,11 @@ extension PiCodingAgentModeRunner {
         toolRegistry?.listDefinitions() ?? []
     }
 
-    public func executeTool(_ call: PiToolCall) throws -> PiCodingAgentToolResult {
+    public func executeTool(_ call: PiToolCall) async throws -> PiCodingAgentToolResult {
         guard let toolRegistry else {
             throw PiCodingAgentToolError.io("No tool registry configured")
         }
-        return try toolRegistry.execute(call)
+        return try await toolRegistry.execute(call)
     }
 }
 

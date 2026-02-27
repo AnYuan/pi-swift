@@ -30,7 +30,7 @@ public struct PiMomBashTool: PiCodingAgentTool, Sendable {
         )
     }
 
-    public func execute(toolCallID: String, arguments: JSONValue) throws -> PiCodingAgentToolResult {
+    public func execute(toolCallID: String, arguments: JSONValue) async throws -> PiCodingAgentToolResult {
         _ = toolCallID
         let object = try momRequireObject(arguments)
         let command = try momRequireString(object, key: "command")
@@ -77,7 +77,7 @@ public struct PiMomAttachTool: PiCodingAgentTool, Sendable {
         )
     }
 
-    public func execute(toolCallID: String, arguments: JSONValue) throws -> PiCodingAgentToolResult {
+    public func execute(toolCallID: String, arguments: JSONValue) async throws -> PiCodingAgentToolResult {
         _ = toolCallID
         let object = try momRequireObject(arguments)
         let rawPath = try momRequireString(object, key: "path")
