@@ -19,12 +19,25 @@ public enum PiAIOverflow {
         "token limit exceeded",
     ]
 
+    // Pre-compiled regex patterns — compiled once at first access instead of
+    // re-compiling on every isContextOverflow call.
+    private static let compiledPatterns: [NSRegularExpression] = {
+        overflowPatterns.compactMap { pattern in
+            try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        }
+    }()
+
+    private static let compiledStatusPattern: NSRegularExpression? = {
+        try? NSRegularExpression(pattern: #"^4(00|13)\s*(status code)?\s*\(no body\)"#, options: .caseInsensitive)
+    }()
+
     public static func isContextOverflow(_ message: PiAIAssistantMessage, contextWindow: Int? = nil) -> Bool {
         if message.stopReason == .error, let errorMessage = message.errorMessage {
-            if overflowPatterns.contains(where: { errorMessage.range(of: $0, options: [.regularExpression, .caseInsensitive]) != nil }) {
+            let range = NSRange(errorMessage.startIndex..., in: errorMessage)
+            if compiledPatterns.contains(where: { $0.firstMatch(in: errorMessage, range: range) != nil }) {
                 return true
             }
-            if errorMessage.range(of: #"^4(00|13)\s*(status code)?\s*\(no body\)"#, options: [.regularExpression, .caseInsensitive]) != nil {
+            if compiledStatusPattern?.firstMatch(in: errorMessage, range: range) != nil {
                 return true
             }
         }
@@ -43,4 +56,3 @@ public enum PiAIOverflow {
         overflowPatterns
     }
 }
-

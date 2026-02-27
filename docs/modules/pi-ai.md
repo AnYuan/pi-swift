@@ -346,6 +346,23 @@ Coverage snapshot (`Sources/PiAI/*`, 2026-02-23):
 - `swift test --enable-code-coverage` passed (`docs/reports/pi-ai-coverage.md`)
 - `swift build` passed
 
+## P7-6: Pre-compiled overflow regex patterns
+
+Files:
+
+- `Sources/PiAI/Utils/Overflow.swift`
+
+Implemented behavior:
+
+- Pre-compiled 15 overflow regex patterns as `[NSRegularExpression]` static let (compiled once at first access)
+- Pre-compiled HTTP 400/413 status code pattern separately
+- Uses `firstMatch(in:range:)` instead of per-call `String.range(of:options:.regularExpression)` compilation
+- Pure performance optimization, no behavioral change
+
+Verification:
+
+- `swift test --filter PiAIRegressionCoverageTests` passed on 2026-02-27
+
 ## Next Step
 
 - `P3-1`: `pi-agent-core` AgentState / AgentMessage / AgentEvent types

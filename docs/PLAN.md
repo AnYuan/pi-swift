@@ -668,12 +668,19 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`
 
 ### P7-6: precompile-overflow-regex
-- Status: TODO
+- Status: DONE
 - Depends On: none
 - Scope:
-  - Pre-compile 15 overflow regex patterns as static `NSRegularExpression` instances
+  - Pre-compiled 15 overflow regex patterns as static `NSRegularExpression` array (compiled once at first access)
+  - Also pre-compiled HTTP 400/413 status code pattern
+  - Uses `firstMatch(in:range:)` instead of `String.range(of:options:.regularExpression)` per call
 - Test Plan:
   - Existing overflow tests pass (pure optimization)
+- Verification:
+  - Tests: `swift test` passed (365 tests, all PiAI regression tests pass) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: Pure optimization, no behavioral change
+  - Docs updated: `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P7-7: async-tool-protocol
 - Status: TODO
