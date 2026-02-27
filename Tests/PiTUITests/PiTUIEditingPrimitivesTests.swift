@@ -77,6 +77,41 @@ final class PiTUIEditingPrimitivesTests: XCTestCase {
         XCTAssertEqual(ring.peek(), "three")
     }
 
+    func testKillRingDropsOldestWhenMaxSizeExceeded() {
+        let ring = PiKillRing(maxSize: 3)
+        ring.push("a", options: .init(prepend: false))
+        ring.push("b", options: .init(prepend: false))
+        ring.push("c", options: .init(prepend: false))
+        ring.push("d", options: .init(prepend: false))
+        ring.push("e", options: .init(prepend: false))
+
+        XCTAssertEqual(ring.length, 3)
+        XCTAssertEqual(ring.peek(), "e")
+        // Rotate through to verify oldest were dropped
+        ring.rotate()
+        XCTAssertEqual(ring.peek(), "d")
+        ring.rotate()
+        XCTAssertEqual(ring.peek(), "c")
+        ring.rotate()
+        XCTAssertEqual(ring.peek(), "e") // back to newest
+    }
+
+    func testUndoStackDropsOldestWhenMaxSizeExceeded() {
+        let stack = PiUndoStack<String>(maxSize: 3)
+        stack.push("a")
+        stack.push("b")
+        stack.push("c")
+        stack.push("d")
+        stack.push("e")
+
+        XCTAssertEqual(stack.length, 3)
+        // Pop should return most recent first (LIFO)
+        XCTAssertEqual(stack.pop(), "e")
+        XCTAssertEqual(stack.pop(), "d")
+        XCTAssertEqual(stack.pop(), "c")
+        XCTAssertNil(stack.pop()) // a and b were dropped
+    }
+
     func testKillRingRotateIsNoopForZeroOrOneEntry() {
         let empty = PiKillRing()
         empty.rotate()

@@ -10,8 +10,11 @@ public final class PiKillRing {
     }
 
     private var ring: [String] = []
+    private let maxSize: Int
 
-    public init() {}
+    public init(maxSize: Int = 64) {
+        self.maxSize = max(1, maxSize)
+    }
 
     public var length: Int {
         ring.count
@@ -24,6 +27,9 @@ public final class PiKillRing {
             ring.append(options.prepend ? text + last : last + text)
         } else {
             ring.append(text)
+        }
+        if ring.count > maxSize {
+            ring.removeFirst(ring.count - maxSize)
         }
     }
 

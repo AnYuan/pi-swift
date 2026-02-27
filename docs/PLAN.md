@@ -623,13 +623,19 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`
 
 ### P7-3: kill-ring-undo-stack-bounds
-- Status: TODO
+- Status: DONE
 - Depends On: none
 - Scope:
-  - Add `maxSize` parameter to `PiKillRing` (default 64) and `PiUndoStack` (default 200)
+  - Added `maxSize` parameter to `PiKillRing` (default 64) and `PiUndoStack` (default 200)
   - Drop oldest entries on overflow via `removeFirst()`
+  - Default values preserve existing API (no breaking change)
 - Test Plan:
   - Add bounded-size tests for both types
+- Verification:
+  - Tests: `swift test` passed (364 tests total, including `testKillRingDropsOldestWhenMaxSizeExceeded` and `testUndoStackDropsOldestWhenMaxSizeExceeded`) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: All 8 editing primitives tests pass; existing tests unaffected by default maxSize values
+  - Docs updated: `docs/modules/pi-tui.md`, `docs/PLAN.md`
 
 ### P7-4: deduplicate-path-resolution
 - Status: TODO

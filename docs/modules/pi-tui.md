@@ -394,3 +394,27 @@ These are tracked as follow-on work and do not block `P4-1` completion.
 - `swift build` passed on 2026-02-24
 - Coverage report added: `/Users/anyuan/Development/pi-swift/docs/reports/pi-tui-coverage.md`
 - `P4` (`pi-tui`) is now complete in `/Users/anyuan/Development/pi-swift/docs/PLAN.md`
+
+## P7-3: Kill ring and undo stack size bounds
+
+Files:
+
+- `Sources/PiTUI/PiKillRing.swift`
+- `Sources/PiTUI/PiUndoStack.swift`
+- `Tests/PiTUITests/PiTUIEditingPrimitivesTests.swift`
+
+Implemented behavior:
+
+- Added `maxSize` parameter to `PiKillRing` (default 64) — drops oldest entries when exceeded
+- Added `maxSize` parameter to `PiUndoStack` (default 200) — drops oldest entries when exceeded
+- Prevents unbounded memory growth in long editing sessions
+- Default values are backward-compatible (no breaking change to existing callers)
+
+Tests added:
+
+- `testKillRingDropsOldestWhenMaxSizeExceeded`
+- `testUndoStackDropsOldestWhenMaxSizeExceeded`
+
+Verification:
+
+- `swift test --filter PiTUIEditingPrimitivesTests` passed (8 tests) on 2026-02-27
