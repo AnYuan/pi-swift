@@ -165,6 +165,56 @@ final class PiCodingAgentCompactionTests: XCTestCase {
         XCTAssertEqual(flushed, ["queued"])
     }
 
+    func testOverflowDetectionCoversAllPiAIOverflowPatterns() {
+        let config = PiCodingAgentCompactionConfig(
+            contextWindow: 999_999,
+            reserveTokens: 0,
+            keepRecentMessages: 4,
+            minimumMessagesBeforeCompaction: 5
+        )
+        let state = sampleState(messageCount: 20, textSize: 10)
+
+        // All 15 PiAIOverflow patterns should trigger overflow mode
+        let patternExamples = [
+            "prompt is too long",
+            "input is too long for requested model",
+            "This request exceeds the context window",
+            "input token count of 200000 exceeds the maximum",
+            "maximum prompt length is 4096",
+            "Please reduce the length of the messages",
+            "maximum context length is 128000 tokens",
+            "exceeds the limit of 128000",
+            "exceeds the available context size",
+            "greater than the context length",
+            "context window exceeds limit",
+            "exceeded model token limit",
+            "context_length_exceeded",
+            "too many tokens",
+            "token limit exceeded",
+        ]
+
+        for example in patternExamples {
+            let decision = PiCodingAgentCompactionEngine.shouldCompact(
+                state: state, config: config, errorMessage: example
+            )
+            XCTAssertEqual(
+                decision.mode, .overflow,
+                "Expected overflow for pattern: \"\(example)\""
+            )
+        }
+
+        // HTTP status code patterns should also trigger
+        for statusExample in ["400 (no body)", "413 status code (no body)"] {
+            let decision = PiCodingAgentCompactionEngine.shouldCompact(
+                state: state, config: config, errorMessage: statusExample
+            )
+            XCTAssertEqual(
+                decision.mode, .overflow,
+                "Expected overflow for status: \"\(statusExample)\""
+            )
+        }
+    }
+
     private func sampleState(messageCount: Int, textSize: Int) -> PiAgentState {
         var state = PiAgentState.empty(model: .init(provider: "openai", id: "gpt-5"), systemPrompt: "system prompt")
         let chunk = String(repeating: "x", count: textSize)

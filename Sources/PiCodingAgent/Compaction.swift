@@ -205,10 +205,18 @@ public enum PiCodingAgentCompactionEngine {
     }
 
     private static func isContextOverflowSignal(_ message: String) -> Bool {
-        let lowered = message.lowercased()
-        return (lowered.contains("context") && lowered.contains("overflow")) ||
-            lowered.contains("maximum context length") ||
-            lowered.contains("too many tokens")
+        // Delegate to PiAIOverflow's comprehensive pattern library (15 regex patterns)
+        // instead of maintaining a separate, weaker set of checks
+        for pattern in PiAIOverflow.patterns() {
+            if message.range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil {
+                return true
+            }
+        }
+        // Also check for HTTP 400/413 status codes with no body (matches PiAIOverflow behavior)
+        if message.range(of: #"^4(00|13)\s*(status code)?\s*\(no body\)"#, options: [.regularExpression, .caseInsensitive]) != nil {
+            return true
+        }
+        return false
     }
 
     private static func stringify(_ value: JSONValue) -> String {

@@ -777,3 +777,24 @@ Tests added:
 Verification:
 
 - `swift test --filter PiCodingAgentToolsTests` passed (15 tests) on 2026-02-27
+
+### P7-2: Overflow detection divergence fix
+
+Files:
+
+- `Sources/PiCodingAgent/Compaction.swift`
+- `Tests/PiCodingAgentTests/PiCodingAgentCompactionTests.swift`
+
+Implemented behavior:
+
+- Replaced weak 3-pattern overflow detection in `isContextOverflowSignal()` with delegation to `PiAIOverflow.patterns()` (15 regex patterns)
+- Added HTTP 400/413 status code check for full parity with `PiAIOverflow.isContextOverflow`
+- Compaction now detects all overflow signals that the AI layer detects
+
+Tests added:
+
+- `testOverflowDetectionCoversAllPiAIOverflowPatterns`: verifies all 15 patterns + HTTP status codes trigger overflow compaction
+
+Verification:
+
+- `swift test --filter PiCodingAgentCompactionTests` passed (6 tests) on 2026-02-27

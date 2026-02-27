@@ -608,14 +608,19 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PRD.md`, `docs/PLAN.md`
 
 ### P7-2: overflow-detection-divergence-fix
-- Status: TODO
+- Status: DONE
 - Depends On: none
 - Scope:
-  - Replace weak 3-pattern overflow detection in `PiCodingAgentCompactionEngine.isContextOverflowSignal()` with delegation to `PiAIOverflow.patterns()` (15 regex patterns)
-  - Add 400/413 status code check for full parity
+  - Replaced weak 3-pattern overflow detection in `PiCodingAgentCompactionEngine.isContextOverflowSignal()` with delegation to `PiAIOverflow.patterns()` (15 regex patterns)
+  - Added 400/413 status code check for full parity with `PiAIOverflow.isContextOverflow`
 - Test Plan:
-  - Add test verifying `shouldCompact` triggers `.overflow` for all 15 patterns
+  - Add test verifying `shouldCompact` triggers `.overflow` for all 15 patterns plus HTTP status codes
   - Existing compaction tests continue to pass
+- Verification:
+  - Tests: `swift test` passed (362 tests total, including new `testOverflowDetectionCoversAllPiAIOverflowPatterns`) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: All 6 compaction tests pass; new test verifies all 15 PiAIOverflow patterns + HTTP 400/413 trigger overflow compaction
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`
 
 ### P7-3: kill-ring-undo-stack-bounds
 - Status: TODO
