@@ -798,3 +798,19 @@ Tests added:
 Verification:
 
 - `swift test --filter PiCodingAgentCompactionTests` passed (6 tests) on 2026-02-27
+
+### P7-4: Deduplicate path resolution
+
+Files:
+
+- `Sources/PiCodingAgent/Tools.swift`
+
+Implemented behavior:
+
+- Extracted shared `resolvePath(_:relativeTo:)` file-private function
+- Removed duplicated path resolution from `PiFileReadTool`, `PiFileWriteTool`, `PiFileEditTool`
+- Pure refactor with zero behavioral change
+
+Verification:
+
+- `swift test --filter PiCodingAgentToolsTests` passed (15 tests) on 2026-02-27

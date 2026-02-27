@@ -638,12 +638,19 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-tui.md`, `docs/PLAN.md`
 
 ### P7-4: deduplicate-path-resolution
-- Status: TODO
+- Status: DONE
 - Depends On: none
 - Scope:
-  - Extract shared `resolvePath(_:relativeTo:)` function from duplicated tool implementations
+  - Extracted shared `resolvePath(_:relativeTo:)` file-private function from duplicated tool implementations
+  - Removed `PiFileReadTool.resolvePath(_:)` private method
+  - Updated `PiFileReadTool`, `PiFileWriteTool`, `PiFileEditTool` to use shared function
 - Test Plan:
   - Existing tests pass (pure refactor)
+- Verification:
+  - Tests: `swift test` passed (364 tests, all 15 tool tests pass) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: Pure refactor, no behavioral change
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`
 
 ### P7-5: improve-compaction-token-estimation
 - Status: TODO

@@ -85,7 +85,7 @@ public struct PiFileReadTool: PiCodingAgentTool, @unchecked Sendable {
         let offset = intValue(object["offset"]) ?? 0
         let limit = intValue(object["limit"])
 
-        let resolved = resolvePath(path)
+        let resolved = resolvePath(path, relativeTo: baseDirectory)
         guard fileManager.fileExists(atPath: resolved) else {
             throw PiCodingAgentToolError.io("File not found: \(path)")
         }
@@ -134,10 +134,6 @@ public struct PiFileReadTool: PiCodingAgentTool, @unchecked Sendable {
         return .init(content: [.text(.init(text: output))])
     }
 
-    private func resolvePath(_ path: String) -> String {
-        if path.hasPrefix("/") { return path }
-        return (baseDirectory as NSString).appendingPathComponent(path)
-    }
 }
 
 public struct PiFileWriteTool: PiCodingAgentTool, @unchecked Sendable {
@@ -169,7 +165,7 @@ public struct PiFileWriteTool: PiCodingAgentTool, @unchecked Sendable {
         let object = try requireObject(arguments)
         let path = try requireString(object, key: "path")
         let content = try requireString(object, key: "content")
-        let resolved = path.hasPrefix("/") ? path : (baseDirectory as NSString).appendingPathComponent(path)
+        let resolved = resolvePath(path, relativeTo: baseDirectory)
 
         let dir = (resolved as NSString).deletingLastPathComponent
         do {
@@ -218,7 +214,7 @@ public struct PiFileEditTool: PiCodingAgentTool, @unchecked Sendable {
             throw PiCodingAgentToolError.invalidArguments("oldText and newText are identical")
         }
 
-        let resolved = path.hasPrefix("/") ? path : (baseDirectory as NSString).appendingPathComponent(path)
+        let resolved = resolvePath(path, relativeTo: baseDirectory)
         guard fileManager.fileExists(atPath: resolved) else {
             throw PiCodingAgentToolError.io("File not found: \(path)")
         }
@@ -385,6 +381,11 @@ public struct PiBashTool: PiCodingAgentTool, @unchecked Sendable {
 
         return .init(content: [.text(.init(text: output))], details: .object(details))
     }
+}
+
+private func resolvePath(_ path: String, relativeTo baseDirectory: String) -> String {
+    if path.hasPrefix("/") { return path }
+    return (baseDirectory as NSString).appendingPathComponent(path)
 }
 
 private func requireObject(_ value: JSONValue) throws -> [String: JSONValue] {
