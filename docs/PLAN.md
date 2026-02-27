@@ -700,12 +700,18 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Add parallel execution test with concurrent tools
 
 ### P7-9: coverage-reports-mom-pods
-- Status: TODO
+- Status: DONE
 - Depends On: none
 - Scope:
-  - Generate coverage reports for `PiMom` and `PiPods` modules
+  - Generated coverage reports for `PiMom` and `PiPods` modules
+  - PiMom: Regions 71.80%, Functions 83.93%, Lines 77.30%
+  - PiPods: Regions 68.18%, Functions 80.95%, Lines 80.14%
 - Test Plan:
   - Documentation only; no new tests
+- Verification:
+  - Coverage: `swift test --enable-code-coverage` passed on 2026-02-27
+  - Reports: `docs/reports/pi-mom-coverage.md`, `docs/reports/pi-pods-coverage.md`
+  - Docs updated: `docs/modules/pi-mom.md`, `docs/modules/pi-pods.md`, `docs/PLAN.md`
 
 ### P7-10: actor-migration-event-streams
 - Status: TODO

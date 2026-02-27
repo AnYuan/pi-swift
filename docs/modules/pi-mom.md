@@ -218,6 +218,12 @@ Verification (slice):
 - `swift test --filter PiMomTests` passed (25 `PiMom` tests) on 2026-02-25
 - `swift build` passed on 2026-02-25
 
+## Coverage Report (P7-9)
+
+Coverage report: `docs/reports/pi-mom-coverage.md`
+
+Summary: Regions 71.80%, Functions 83.93%, Lines 77.30% (25 tests)
+
 ## Notes / Parity Gaps (Known Differences / Future Work)
 
 - real Slack Socket Mode / Web API runtime adapter (current implementation provides mockable integration contracts + coordinator only)

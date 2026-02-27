@@ -114,6 +114,12 @@ Verification (slice):
 - `swift test --filter PiPodsTests` passed (16 `PiPods` tests) on 2026-02-25
 - `swift build` passed on 2026-02-25
 
+## Coverage Report (P7-9)
+
+Coverage report: `docs/reports/pi-pods-coverage.md`
+
+Summary: Regions 68.18%, Functions 80.95%, Lines 80.14% (16 tests)
+
 ## Notes / Parity Gaps (Known Differences / Future Work)
 
 - real process-backed SSH/SCP execution runtime is still mock/runtime-abstracted in Swift (`PiPodsCLIRuntime`)
