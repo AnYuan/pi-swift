@@ -166,7 +166,10 @@ public enum PiCodingAgentCompactionEngine {
     }
 
     private static func tokenEstimate(for text: String) -> Int {
-        max(1, Int(ceil(Double(text.utf8.count) / 4.0)))
+        // ~3.3 bytes/token is more accurate for code-heavy content (common in
+        // coding agent context) than the previous 4.0 bytes/token heuristic.
+        // More conservative: triggers compaction earlier, avoiding overflow.
+        max(1, Int(ceil(Double(text.utf8.count) / 3.3)))
     }
 
     private static func flatten(_ message: PiAgentMessage) -> String {

@@ -653,12 +653,19 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`
 
 ### P7-5: improve-compaction-token-estimation
-- Status: TODO
+- Status: DONE
 - Depends On: none
 - Scope:
-  - Change token estimation divisor from `4.0` to `3.3` for more accurate code-heavy content estimation
+  - Changed token estimation divisor from `4.0` to `3.3` for more accurate code-heavy content estimation
+  - More conservative: triggers compaction earlier, avoiding overflow
 - Test Plan:
-  - Add code-heavy estimation test; update existing threshold assertions
+  - Added code-heavy estimation test comparing old vs new divisor output
+  - Existing threshold/overflow tests still pass (higher estimates make threshold easier to trigger)
+- Verification:
+  - Tests: `swift test` passed (365 tests total, including new `testTokenEstimationUsesAccurateCodeDivisor`) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: All 7 compaction tests pass
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`
 
 ### P7-6: precompile-overflow-regex
 - Status: TODO

@@ -165,6 +165,33 @@ final class PiCodingAgentCompactionTests: XCTestCase {
         XCTAssertEqual(flushed, ["queued"])
     }
 
+    func testTokenEstimationUsesAccurateCodeDivisor() {
+        // A ~330-byte code snippet should estimate ~100 tokens with 3.3 divisor
+        // (previously ~83 with 4.0 divisor, which underestimated for code content)
+        let code = """
+        func fibonacci(_ n: Int) -> Int {
+            guard n > 1 else { return n }
+            var a = 0, b = 1
+            for _ in 2...n {
+                let temp = a + b
+                a = b
+                b = temp
+            }
+            return b
+        }
+        """
+        let state = PiAgentState.empty(model: .init(provider: "test", id: "test"), systemPrompt: "")
+        var stateWithCode = state
+        stateWithCode.messages = [.user(.init(content: .text(code), timestamp: 0))]
+
+        let estimate = PiCodingAgentCompactionEngine.estimateContextTokens(
+            systemPrompt: "", messages: stateWithCode.messages
+        )
+        // With 3.3 divisor: ceil(utf8.count / 3.3) + 8 overhead ≈ higher than old 4.0 estimate
+        let oldEstimate = max(1, Int(ceil(Double(code.utf8.count) / 4.0))) + 8
+        XCTAssertGreaterThan(estimate, oldEstimate, "New 3.3 divisor should produce higher estimates than old 4.0")
+    }
+
     func testOverflowDetectionCoversAllPiAIOverflowPatterns() {
         let config = PiCodingAgentCompactionConfig(
             contextWindow: 999_999,

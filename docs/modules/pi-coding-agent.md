@@ -814,3 +814,24 @@ Implemented behavior:
 Verification:
 
 - `swift test --filter PiCodingAgentToolsTests` passed (15 tests) on 2026-02-27
+
+### P7-5: Improved compaction token estimation
+
+Files:
+
+- `Sources/PiCodingAgent/Compaction.swift`
+- `Tests/PiCodingAgentTests/PiCodingAgentCompactionTests.swift`
+
+Implemented behavior:
+
+- Changed token estimation divisor from `4.0` to `3.3` bytes/token
+- More accurate for code-heavy content common in coding agent context
+- More conservative: triggers compaction earlier, reducing risk of hitting overflow
+
+Tests added:
+
+- `testTokenEstimationUsesAccurateCodeDivisor`: verifies new divisor produces higher (more accurate) estimates than old divisor
+
+Verification:
+
+- `swift test --filter PiCodingAgentCompactionTests` passed (7 tests) on 2026-02-27
