@@ -1,93 +1,73 @@
 import Foundation
 
-public final class PiAIAssistantMessageEventStream: AsyncSequence, @unchecked Sendable {
+public actor PiAIAssistantMessageEventStream: AsyncSequence {
     public typealias Element = PiAIAssistantMessageEvent
 
-    private final class ContinuationBox {
-        var continuation: AsyncStream<Element>.Continuation?
-    }
+    // The AsyncStream and its continuation are Sendable and thread-safe.
+    // They are set once during init and never mutated.
+    private let _continuation: AsyncStream<Element>.Continuation
+    nonisolated public let _stream: AsyncStream<Element>
 
-    private let lock = NSLock()
-    private let continuationBox: ContinuationBox
-    private let stream: AsyncStream<Element>
     private var finalResultContinuation: CheckedContinuation<PiAIAssistantMessage, Never>?
     private var finalResult: PiAIAssistantMessage?
     private var isFinished = false
 
     public init() {
-        let box = ContinuationBox()
-        self.continuationBox = box
-        self.stream = AsyncStream<Element> { continuation in
-            box.continuation = continuation
+        var cont: AsyncStream<Element>.Continuation!
+        self._stream = AsyncStream<Element> { continuation in
+            cont = continuation
         }
+        self._continuation = cont
     }
 
-    public func makeAsyncIterator() -> AsyncStream<Element>.Iterator {
-        stream.makeAsyncIterator()
+    nonisolated public func makeAsyncIterator() -> AsyncStream<Element>.Iterator {
+        _stream.makeAsyncIterator()
     }
 
     public func push(_ event: PiAIAssistantMessageEvent) {
-        lock.lock()
-        guard !isFinished else {
-            lock.unlock()
-            return
-        }
-        continuationBox.continuation?.yield(event)
+        guard !isFinished else { return }
+        _continuation.yield(event)
 
         switch event {
         case .done(_, let message):
             isFinished = true
             finalResult = message
-            let finalResultContinuation = self.finalResultContinuation
-            self.finalResultContinuation = nil
-            continuationBox.continuation?.finish()
-            lock.unlock()
-            finalResultContinuation?.resume(returning: message)
-            return
+            let waiting = finalResultContinuation
+            finalResultContinuation = nil
+            _continuation.finish()
+            waiting?.resume(returning: message)
         case .error(_, let error):
             isFinished = true
             finalResult = error
-            let finalResultContinuation = self.finalResultContinuation
-            self.finalResultContinuation = nil
-            continuationBox.continuation?.finish()
-            lock.unlock()
-            finalResultContinuation?.resume(returning: error)
-            return
+            let waiting = finalResultContinuation
+            finalResultContinuation = nil
+            _continuation.finish()
+            waiting?.resume(returning: error)
         default:
-            lock.unlock()
+            break
         }
     }
 
     public func end(with result: PiAIAssistantMessage? = nil) {
-        lock.lock()
-        guard !isFinished else {
-            lock.unlock()
-            return
-        }
+        guard !isFinished else { return }
         isFinished = true
         if let result {
             finalResult = result
         }
-        let finalResultContinuation = self.finalResultContinuation
-        self.finalResultContinuation = nil
-        continuationBox.continuation?.finish()
-        let final = finalResult
-        lock.unlock()
-        if let final {
-            finalResultContinuation?.resume(returning: final)
+        let waiting = finalResultContinuation
+        finalResultContinuation = nil
+        _continuation.finish()
+        if let finalResult {
+            waiting?.resume(returning: finalResult)
         }
     }
 
     public func result() async -> PiAIAssistantMessage {
+        if let finalResult {
+            return finalResult
+        }
         return await withCheckedContinuation { continuation in
-            lock.lock()
-            if let finalResult {
-                lock.unlock()
-                continuation.resume(returning: finalResult)
-                return
-            }
             finalResultContinuation = continuation
-            lock.unlock()
         }
     }
 }

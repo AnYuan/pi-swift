@@ -363,6 +363,24 @@ Verification:
 
 - `swift test --filter PiAIRegressionCoverageTests` passed on 2026-02-27
 
+## P7-10: Actor migration for PiAIAssistantMessageEventStream
+
+Files:
+
+- `Sources/PiAI/Utils/AssistantMessageEventStream.swift`
+- `Sources/PiAI/Providers/AnthropicMessagesAdapter.swift`
+- `Sources/PiAI/Providers/GoogleFamilyAdapter.swift`
+- `Sources/PiAI/Providers/OpenAIResponsesAdapter.swift`
+
+Implemented behavior:
+
+- `PiAIAssistantMessageEventStream`: converted from `@unchecked Sendable` class with `NSLock` to `actor` with `nonisolated _stream` for `AsyncSequence` conformance
+- All 3 provider adapter EventProcessor methods made `async` to support `await stream.push()`
+
+Verification:
+
+- `swift test` passed (366 tests) on 2026-02-27
+
 ## Next Step
 
 - `P3-1`: `pi-agent-core` AgentState / AgentMessage / AgentEvent types

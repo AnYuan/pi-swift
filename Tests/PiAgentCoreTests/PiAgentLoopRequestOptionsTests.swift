@@ -24,7 +24,7 @@ final class PiAgentLoopRequestOptionsTests: XCTestCase {
 
             let s = PiAIAssistantMessageEventStream()
             Task {
-                s.push(.done(reason: .stop, message: .init(
+                await s.push(.done(reason: .stop, message: .init(
                     content: [.text(.init(text: "ok"))],
                     api: "openai-responses",
                     provider: "openai",
@@ -63,7 +63,7 @@ final class PiAgentLoopRequestOptionsTests: XCTestCase {
 
             let s = PiAIAssistantMessageEventStream()
             Task {
-                s.push(.done(reason: .stop, message: .init(
+                await s.push(.done(reason: .stop, message: .init(
                     content: [.text(.init(text: "ok"))],
                     api: "openai-responses",
                     provider: "openai",

@@ -108,15 +108,15 @@ public struct PiAIAnthropicMessagesProvider: Sendable {
                     context: context,
                     oauthToolNaming: oauthToolNaming
                 )
-                stream.push(.start(partial: processor.output))
+                await stream.push(.start(partial: processor.output))
 
                 let events = try await source()
                 for event in events {
-                    try processor.apply(event)
+                    try await processor.apply(event)
                 }
 
                 // Safety net when the mock source omits a terminal event.
-                stream.end(with: processor.output)
+                await stream.end(with: processor.output)
             } catch {
                 let message = errorMessage(error)
                 let errorOutput = PiAIAssistantMessage(
@@ -129,7 +129,7 @@ public struct PiAIAnthropicMessagesProvider: Sendable {
                     errorMessage: message,
                     timestamp: currentTimestamp()
                 )
-                stream.push(.error(reason: .error, error: errorOutput))
+                await stream.push(.error(reason: .error, error: errorOutput))
             }
         }
 
@@ -212,23 +212,23 @@ private struct PiAIAnthropicMessagesEventProcessor {
         self.oauthToolNaming = oauthToolNaming
     }
 
-    mutating func apply(_ event: PiAIAnthropicMessagesRawEvent) throws {
+    mutating func apply(_ event: PiAIAnthropicMessagesRawEvent) async throws {
         switch event {
         case .messageStart(let usage):
             applyUsageUpdate(usage)
         case .contentBlockStart(let index, let block):
-            try handleContentBlockStart(index: index, block: block)
+            try await handleContentBlockStart(index: index, block: block)
         case .contentBlockDelta(let index, let delta):
-            try handleContentBlockDelta(index: index, delta: delta)
+            try await handleContentBlockDelta(index: index, delta: delta)
         case .contentBlockStop(let index):
-            try handleContentBlockStop(index: index)
+            try await handleContentBlockStop(index: index)
         case .messageDelta(let delta, let usage):
             try handleMessageDelta(delta: delta, usage: usage)
         case .messageStop:
             if output.stopReason == .error || output.stopReason == .aborted {
                 throw PiAIAnthropicMessagesProcessorError.unhandledStopReason(output.stopReason.rawValue)
             }
-            stream.push(.done(reason: output.stopReason, message: output))
+            await stream.push(.done(reason: output.stopReason, message: output))
         }
     }
 
@@ -248,19 +248,19 @@ private struct PiAIAnthropicMessagesEventProcessor {
         output.usage.totalTokens = output.usage.input + output.usage.output + output.usage.cacheRead + output.usage.cacheWrite
     }
 
-    private mutating func handleContentBlockStart(index: Int, block: PiAIAnthropicMessagesContentBlockStart) throws {
+    private mutating func handleContentBlockStart(index: Int, block: PiAIAnthropicMessagesContentBlockStart) async throws {
         switch block {
         case .text:
             output.content.append(.text(.init(text: "")))
             let contentIndex = output.content.count - 1
             anthropicIndexToContentIndex[index] = contentIndex
-            stream.push(.textStart(contentIndex: contentIndex, partial: output))
+            await stream.push(.textStart(contentIndex: contentIndex, partial: output))
 
         case .thinking:
             output.content.append(.thinking(.init(thinking: "", thinkingSignature: nil)))
             let contentIndex = output.content.count - 1
             anthropicIndexToContentIndex[index] = contentIndex
-            stream.push(.thinkingStart(contentIndex: contentIndex, partial: output))
+            await stream.push(.thinkingStart(contentIndex: contentIndex, partial: output))
 
         case .toolUse(let id, let name, let input):
             let normalizedName: String
@@ -274,11 +274,11 @@ private struct PiAIAnthropicMessagesEventProcessor {
             let contentIndex = output.content.count - 1
             anthropicIndexToContentIndex[index] = contentIndex
             toolCallPartialJSONByContentIndex[contentIndex] = ""
-            stream.push(.toolCallStart(contentIndex: contentIndex, partial: output))
+            await stream.push(.toolCallStart(contentIndex: contentIndex, partial: output))
         }
     }
 
-    private mutating func handleContentBlockDelta(index: Int, delta: PiAIAnthropicMessagesContentBlockDelta) throws {
+    private mutating func handleContentBlockDelta(index: Int, delta: PiAIAnthropicMessagesContentBlockDelta) async throws {
         guard let contentIndex = anthropicIndexToContentIndex[index] else { return }
         guard output.content.indices.contains(contentIndex) else { return }
 
@@ -287,13 +287,13 @@ private struct PiAIAnthropicMessagesEventProcessor {
             guard case .text(var textBlock) = output.content[contentIndex] else { return }
             textBlock.text += chunk
             output.content[contentIndex] = .text(textBlock)
-            stream.push(.textDelta(contentIndex: contentIndex, delta: chunk, partial: output))
+            await stream.push(.textDelta(contentIndex: contentIndex, delta: chunk, partial: output))
 
         case .thinkingDelta(let chunk):
             guard case .thinking(var thinkingBlock) = output.content[contentIndex] else { return }
             thinkingBlock.thinking += chunk
             output.content[contentIndex] = .thinking(thinkingBlock)
-            stream.push(.thinkingDelta(contentIndex: contentIndex, delta: chunk, partial: output))
+            await stream.push(.thinkingDelta(contentIndex: contentIndex, delta: chunk, partial: output))
 
         case .signatureDelta(let signature):
             guard case .thinking(var thinkingBlock) = output.content[contentIndex] else { return }
@@ -306,27 +306,27 @@ private struct PiAIAnthropicMessagesEventProcessor {
             toolCallPartialJSONByContentIndex[contentIndex] = updated
             toolCall.arguments = extractJSONObject(PiAIJSON.parseStreamingJSON(updated))
             output.content[contentIndex] = .toolCall(toolCall)
-            stream.push(.toolCallDelta(contentIndex: contentIndex, delta: partialJSON, partial: output))
+            await stream.push(.toolCallDelta(contentIndex: contentIndex, delta: partialJSON, partial: output))
         }
     }
 
-    private mutating func handleContentBlockStop(index: Int) throws {
+    private mutating func handleContentBlockStop(index: Int) async throws {
         guard let contentIndex = anthropicIndexToContentIndex.removeValue(forKey: index) else { return }
         guard output.content.indices.contains(contentIndex) else { return }
 
         switch output.content[contentIndex] {
         case .text(let text):
-            stream.push(.textEnd(contentIndex: contentIndex, content: text.text, partial: output))
+            await stream.push(.textEnd(contentIndex: contentIndex, content: text.text, partial: output))
 
         case .thinking(let thinking):
-            stream.push(.thinkingEnd(contentIndex: contentIndex, content: thinking.thinking, partial: output))
+            await stream.push(.thinkingEnd(contentIndex: contentIndex, content: thinking.thinking, partial: output))
 
         case .toolCall(var toolCall):
             if let partial = toolCallPartialJSONByContentIndex.removeValue(forKey: contentIndex), !partial.isEmpty {
                 toolCall.arguments = extractJSONObject(PiAIJSON.parseStreamingJSON(partial))
                 output.content[contentIndex] = .toolCall(toolCall)
             }
-            stream.push(.toolCallEnd(contentIndex: contentIndex, toolCall: toolCall, partial: output))
+            await stream.push(.toolCallEnd(contentIndex: contentIndex, toolCall: toolCall, partial: output))
         }
     }
 

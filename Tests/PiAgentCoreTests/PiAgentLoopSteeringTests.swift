@@ -88,7 +88,7 @@ final class PiAgentLoopSteeringTests: XCTestCase {
                 if callIndex == 0 {
                     let first = PiAIToolCallContent(id: "tool-1", name: "echo", arguments: ["value": .string("first")])
                     let second = PiAIToolCallContent(id: "tool-2", name: "echo", arguments: ["value": .string("second")])
-                    s.push(.done(reason: .toolUse, message: .init(
+                    await s.push(.done(reason: .toolUse, message: .init(
                         content: [.toolCall(first), .toolCall(second)],
                         api: "openai-responses",
                         provider: "openai",
@@ -98,7 +98,7 @@ final class PiAgentLoopSteeringTests: XCTestCase {
                         timestamp: 3
                     )))
                 } else {
-                    s.push(.done(reason: .stop, message: .init(
+                    await s.push(.done(reason: .stop, message: .init(
                         content: [.text(.init(text: "done"))],
                         api: "openai-responses",
                         provider: "openai",
@@ -200,7 +200,7 @@ final class PiAgentLoopSteeringTests: XCTestCase {
             let s = PiAIAssistantMessageEventStream()
             Task {
                 if callIndex == 0 {
-                    s.push(.done(reason: .stop, message: .init(
+                    await s.push(.done(reason: .stop, message: .init(
                         content: [.text(.init(text: "first answer"))],
                         api: "openai-responses",
                         provider: "openai",
@@ -210,7 +210,7 @@ final class PiAgentLoopSteeringTests: XCTestCase {
                         timestamp: 3
                     )))
                 } else {
-                    s.push(.done(reason: .stop, message: .init(
+                    await s.push(.done(reason: .stop, message: .init(
                         content: [.text(.init(text: "second answer"))],
                         api: "openai-responses",
                         provider: "openai",

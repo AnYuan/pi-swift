@@ -62,7 +62,7 @@ final class PiAgentLoopContinueTests: XCTestCase {
             XCTAssertEqual(aiContext.messages.count, 1)
             let s = PiAIAssistantMessageEventStream()
             Task {
-                s.push(.done(reason: .stop, message: .init(
+                await s.push(.done(reason: .stop, message: .init(
                     content: [.text(.init(text: "Response"))],
                     api: "openai-responses",
                     provider: "openai",
@@ -124,7 +124,7 @@ final class PiAgentLoopContinueTests: XCTestCase {
         ) { _, _ in
             let s = PiAIAssistantMessageEventStream()
             Task {
-                s.push(.done(reason: .stop, message: .init(
+                await s.push(.done(reason: .stop, message: .init(
                     content: [.text(.init(text: "Response to custom message"))],
                     api: "openai-responses",
                     provider: "openai",

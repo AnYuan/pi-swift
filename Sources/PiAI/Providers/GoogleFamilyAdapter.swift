@@ -107,7 +107,7 @@ public struct PiAIGoogleFamilyProvider: Sendable {
         Task {
             do {
                 let attempts = try await source()
-                let final = try processAttempts(
+                let final = try await processAttempts(
                     attempts,
                     model: model,
                     context: context,
@@ -127,7 +127,7 @@ public struct PiAIGoogleFamilyProvider: Sendable {
                     errorMessage: message,
                     timestamp: currentTimestamp()
                 )
-                stream.push(.error(reason: .error, error: errorOutput))
+                await stream.push(.error(reason: .error, error: errorOutput))
             }
         }
 
@@ -140,7 +140,7 @@ public struct PiAIGoogleFamilyProvider: Sendable {
         context: PiAIContext,
         maxAttempts: Int,
         stream: PiAIAssistantMessageEventStream
-    ) throws -> PiAIAssistantMessage {
+    ) async throws -> PiAIAssistantMessage {
         let cappedMaxAttempts = max(1, maxAttempts)
         var processor = PiAIGoogleFamilyEventProcessor(
             output: PiAIAssistantMessage(
@@ -155,7 +155,7 @@ public struct PiAIGoogleFamilyProvider: Sendable {
             stream: stream
         )
 
-        stream.push(.start(partial: processor.output))
+        await stream.push(.start(partial: processor.output))
         _ = context // Reserved for future request payload conversion.
 
         var sawAnyChunk = false
@@ -168,7 +168,7 @@ public struct PiAIGoogleFamilyProvider: Sendable {
             }
             sawAnyChunk = true
             for chunk in chunks {
-                try processor.apply(chunk)
+                try await processor.apply(chunk)
             }
             break
         }
@@ -177,7 +177,7 @@ public struct PiAIGoogleFamilyProvider: Sendable {
             throw PiAIGoogleFamilySourceError.emptyStreamAfterRetries(cappedMaxAttempts)
         }
 
-        try processor.finish()
+        try await processor.finish()
         return processor.output
     }
 
@@ -221,9 +221,9 @@ private struct PiAIGoogleFamilyEventProcessor {
         self.stream = stream
     }
 
-    mutating func apply(_ chunk: PiAIGoogleRawChunk) throws {
+    mutating func apply(_ chunk: PiAIGoogleRawChunk) async throws {
         for part in chunk.parts {
-            try apply(part)
+            try await apply(part)
         }
 
         if let finishReason = chunk.finishReason {
@@ -245,24 +245,24 @@ private struct PiAIGoogleFamilyEventProcessor {
         }
     }
 
-    mutating func finish() throws {
-        closeCurrentBlockIfNeeded()
+    mutating func finish() async throws {
+        await closeCurrentBlockIfNeeded()
 
         if output.stopReason == .error || output.stopReason == .aborted {
             throw PiAIGoogleFamilyProcessorError.unhandledFinishReason(output.stopReason.rawValue)
         }
 
-        stream.push(.done(reason: output.stopReason, message: output))
+        await stream.push(.done(reason: output.stopReason, message: output))
     }
 
-    private mutating func apply(_ part: PiAIGooglePart) throws {
+    private mutating func apply(_ part: PiAIGooglePart) async throws {
         switch part {
         case .text(let text, let thought, let thoughtSignature):
             let isThinking = PiAIGoogleStreamingSemantics.isThinkingPart(thought: thought, thoughtSignature: thoughtSignature)
-            try appendTextPart(text, isThinking: isThinking, thoughtSignature: thoughtSignature)
+            try await appendTextPart(text, isThinking: isThinking, thoughtSignature: thoughtSignature)
 
         case .functionCall(let name, let id, let args, let thoughtSignature):
-            closeCurrentBlockIfNeeded()
+            await closeCurrentBlockIfNeeded()
             let toolCallID = uniqueToolCallID(name: name, preferredID: id)
             let arguments = args ?? [:]
             let toolCall = PiAIToolCallContent(
@@ -273,22 +273,22 @@ private struct PiAIGoogleFamilyEventProcessor {
             )
             output.content.append(.toolCall(toolCall))
             let contentIndex = output.content.count - 1
-            stream.push(.toolCallStart(contentIndex: contentIndex, partial: output))
-            stream.push(.toolCallDelta(contentIndex: contentIndex, delta: jsonObjectString(arguments), partial: output))
-            stream.push(.toolCallEnd(contentIndex: contentIndex, toolCall: toolCall, partial: output))
+            await stream.push(.toolCallStart(contentIndex: contentIndex, partial: output))
+            await stream.push(.toolCallDelta(contentIndex: contentIndex, delta: jsonObjectString(arguments), partial: output))
+            await stream.push(.toolCallEnd(contentIndex: contentIndex, toolCall: toolCall, partial: output))
         }
     }
 
-    private mutating func appendTextPart(_ text: String, isThinking: Bool, thoughtSignature: String?) throws {
+    private mutating func appendTextPart(_ text: String, isThinking: Bool, thoughtSignature: String?) async throws {
         if isThinking {
             if case .thinking = currentBlock {
                 // continue
             } else {
-                closeCurrentBlockIfNeeded()
+                await closeCurrentBlockIfNeeded()
                 output.content.append(.thinking(.init(thinking: "", thinkingSignature: nil)))
                 let contentIndex = output.content.count - 1
                 currentBlock = .thinking(contentIndex: contentIndex)
-                stream.push(.thinkingStart(contentIndex: contentIndex, partial: output))
+                await stream.push(.thinkingStart(contentIndex: contentIndex, partial: output))
             }
 
             guard case .thinking(let contentIndex)? = currentBlock else { return }
@@ -299,16 +299,16 @@ private struct PiAIGoogleFamilyEventProcessor {
                 incoming: thoughtSignature
             )
             output.content[contentIndex] = .thinking(block)
-            stream.push(.thinkingDelta(contentIndex: contentIndex, delta: text, partial: output))
+            await stream.push(.thinkingDelta(contentIndex: contentIndex, delta: text, partial: output))
         } else {
             if case .text = currentBlock {
                 // continue
             } else {
-                closeCurrentBlockIfNeeded()
+                await closeCurrentBlockIfNeeded()
                 output.content.append(.text(.init(text: "", textSignature: nil)))
                 let contentIndex = output.content.count - 1
                 currentBlock = .text(contentIndex: contentIndex)
-                stream.push(.textStart(contentIndex: contentIndex, partial: output))
+                await stream.push(.textStart(contentIndex: contentIndex, partial: output))
             }
 
             guard case .text(let contentIndex)? = currentBlock else { return }
@@ -319,11 +319,11 @@ private struct PiAIGoogleFamilyEventProcessor {
                 incoming: thoughtSignature
             )
             output.content[contentIndex] = .text(block)
-            stream.push(.textDelta(contentIndex: contentIndex, delta: text, partial: output))
+            await stream.push(.textDelta(contentIndex: contentIndex, delta: text, partial: output))
         }
     }
 
-    private mutating func closeCurrentBlockIfNeeded() {
+    private mutating func closeCurrentBlockIfNeeded() async {
         guard let currentBlock else { return }
         let contentIndex = currentBlock.contentIndex
         guard output.content.indices.contains(contentIndex) else {
@@ -333,9 +333,9 @@ private struct PiAIGoogleFamilyEventProcessor {
 
         switch output.content[contentIndex] {
         case .text(let block):
-            stream.push(.textEnd(contentIndex: contentIndex, content: block.text, partial: output))
+            await stream.push(.textEnd(contentIndex: contentIndex, content: block.text, partial: output))
         case .thinking(let block):
-            stream.push(.thinkingEnd(contentIndex: contentIndex, content: block.thinking, partial: output))
+            await stream.push(.thinkingEnd(contentIndex: contentIndex, content: block.thinking, partial: output))
         case .toolCall:
             break
         }

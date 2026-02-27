@@ -298,6 +298,25 @@ Verification:
 
 - `swift test --filter PiAgentLoopToolExecutionTests` passed (2 tests) on 2026-02-27
 
+## P7-10: Actor migration
+
+Files:
+
+- `Sources/PiAgentCore/AgentLoop.swift` (PiAgentAbortController, PiAgentEventStream converted to actors)
+
+Implemented behavior:
+
+- `PiAgentAbortController`: converted from `@unchecked Sendable` class with `NSLock` to `actor`
+- `PiAgentEventStream`: converted from `@unchecked Sendable` class with `NSLock/ContinuationBox` to `actor` with `nonisolated _stream` for `AsyncSequence` conformance
+- All `push()`, `end()`, `abort()`, `isAborted` call sites updated with `await`
+- `throwIfAborted` made `async throws`
+- `skipToolCall` made `async`
+- Progress callback wrapped in `Task { }` for fire-and-forget actor access
+
+Verification:
+
+- `swift test` passed (366 tests) on 2026-02-27
+
 ## Next Step
 
 - `P4-1`: `pi-tui` terminal abstraction + render buffer + differential rendering

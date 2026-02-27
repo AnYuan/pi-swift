@@ -9,7 +9,7 @@ final class PiAgentLoopAbortTests: XCTestCase {
         let user = PiAgentMessage.user(.init(content: .text("Hello"), timestamp: 1))
         let context = PiAgentContext(systemPrompt: "", messages: [user], tools: [])
         let abort = PiAgentAbortController()
-        abort.abort()
+        await abort.abort()
 
         let stream = try PiAgentLoop.runContinue(
             context: context,
@@ -74,7 +74,7 @@ final class PiAgentLoopAbortTests: XCTestCase {
         let runtimeTool = PiAgentRuntimeTool(tool: tool) { _, args, passedAbortController, _ in
             XCTAssertTrue(passedAbortController === abort)
             XCTAssertEqual(args["value"], .string("hello"))
-            passedAbortController?.abort()
+            await passedAbortController?.abort()
             return .init(
                 content: [.text(.init(text: "ok"))],
                 details: .object([:])
@@ -93,7 +93,7 @@ final class PiAgentLoopAbortTests: XCTestCase {
             Task {
                 if callIndex == 0 {
                     let toolCall = PiAIToolCallContent(id: "tool-1", name: "echo", arguments: ["value": .string("hello")])
-                    s.push(.done(reason: .toolUse, message: .init(
+                    await s.push(.done(reason: .toolUse, message: .init(
                         content: [.toolCall(toolCall)],
                         api: "openai-responses",
                         provider: "openai",
@@ -104,7 +104,7 @@ final class PiAgentLoopAbortTests: XCTestCase {
                     )))
                 } else {
                     XCTFail("Abort should prevent second assistant call")
-                    s.push(.done(reason: .stop, message: .init(
+                    await s.push(.done(reason: .stop, message: .init(
                         content: [],
                         api: "openai-responses",
                         provider: "openai",

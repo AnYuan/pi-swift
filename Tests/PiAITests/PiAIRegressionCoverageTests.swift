@@ -128,8 +128,8 @@ final class PiAIRegressionCoverageTests: XCTestCase {
         let stream = PiAIAssistantMessageEventStream()
         let resultMessage = makeAssistantMessage(stopReason: .stop)
 
-        stream.end(with: resultMessage)
-        stream.push(.done(reason: .error, message: makeAssistantMessage(stopReason: .error)))
+        await stream.end(with: resultMessage)
+        await stream.push(.done(reason: .error, message: makeAssistantMessage(stopReason: .error)))
 
         var seenEvents = 0
         for await _ in stream {
@@ -146,7 +146,7 @@ final class PiAIRegressionCoverageTests: XCTestCase {
         let errorMessage = makeAssistantMessage(stopReason: .error, errorMessage: "boom")
 
         let task = Task { await stream.result() }
-        stream.push(.error(reason: .error, error: errorMessage))
+        await stream.push(.error(reason: .error, error: errorMessage))
         let result = await task.value
 
         XCTAssertEqual(result.stopReason, .error)

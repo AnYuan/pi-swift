@@ -2,102 +2,77 @@ import Foundation
 import PiAI
 import PiCoreTypes
 
-public final class PiAgentAbortController: @unchecked Sendable {
-    private let lock = NSLock()
+public actor PiAgentAbortController {
     private var aborted = false
 
     public init() {}
 
     public func abort() {
-        lock.lock()
         aborted = true
-        lock.unlock()
     }
 
     public var isAborted: Bool {
-        lock.lock()
-        let value = aborted
-        lock.unlock()
-        return value
+        aborted
     }
 }
 
-public final class PiAgentEventStream: AsyncSequence, @unchecked Sendable {
+public actor PiAgentEventStream: AsyncSequence {
     public typealias Element = PiAgentEvent
 
-    private final class ContinuationBox {
-        var continuation: AsyncStream<Element>.Continuation?
-    }
+    // The AsyncStream and its continuation are Sendable and thread-safe.
+    // They are set once during init and never mutated.
+    private let _continuation: AsyncStream<Element>.Continuation
+    nonisolated public let _stream: AsyncStream<Element>
 
-    private let lock = NSLock()
-    private let continuationBox: ContinuationBox
-    private let stream: AsyncStream<Element>
     private var finalResultContinuation: CheckedContinuation<[PiAgentMessage], Never>?
     private var finalResult: [PiAgentMessage]?
     private var isFinished = false
 
     public init() {
-        let box = ContinuationBox()
-        self.continuationBox = box
-        self.stream = AsyncStream<Element> { continuation in
-            box.continuation = continuation
+        var cont: AsyncStream<Element>.Continuation!
+        self._stream = AsyncStream<Element> { continuation in
+            cont = continuation
         }
+        self._continuation = cont
     }
 
-    public func makeAsyncIterator() -> AsyncStream<Element>.Iterator {
-        stream.makeAsyncIterator()
+    nonisolated public func makeAsyncIterator() -> AsyncStream<Element>.Iterator {
+        _stream.makeAsyncIterator()
     }
 
     public func push(_ event: PiAgentEvent) {
-        lock.lock()
-        guard !isFinished else {
-            lock.unlock()
-            return
-        }
-        continuationBox.continuation?.yield(event)
+        guard !isFinished else { return }
+        _continuation.yield(event)
         if case .agentEnd(let messages) = event {
             isFinished = true
             finalResult = messages
             let waiting = finalResultContinuation
             finalResultContinuation = nil
-            continuationBox.continuation?.finish()
-            lock.unlock()
+            _continuation.finish()
             waiting?.resume(returning: messages)
-            return
         }
-        lock.unlock()
     }
 
     public func end(with result: [PiAgentMessage]? = nil) {
-        lock.lock()
-        guard !isFinished else {
-            lock.unlock()
-            return
-        }
+        guard !isFinished else { return }
         isFinished = true
         if let result {
             finalResult = result
         }
         let waiting = finalResultContinuation
         finalResultContinuation = nil
-        continuationBox.continuation?.finish()
-        let final = finalResult
-        lock.unlock()
-        if let final {
-            waiting?.resume(returning: final)
+        _continuation.finish()
+        if let finalResult {
+            waiting?.resume(returning: finalResult)
         }
     }
 
     public func result() async -> [PiAgentMessage] {
-        await withCheckedContinuation { continuation in
-            lock.lock()
-            if let finalResult {
-                lock.unlock()
-                continuation.resume(returning: finalResult)
-                return
-            }
+        if let finalResult {
+            return finalResult
+        }
+        return await withCheckedContinuation { continuation in
             finalResultContinuation = continuation
-            lock.unlock()
         }
     }
 }
@@ -242,23 +217,23 @@ public enum PiAgentLoop {
             var currentMessages = context.messages
             var pendingMessages: [PiAgentMessage] = []
 
-            stream.push(.agentStart)
-            stream.push(.turnStart)
+            await stream.push(.agentStart)
+            await stream.push(.turnStart)
 
             for prompt in prompts {
                 currentMessages.append(prompt)
                 emittedMessages.append(prompt)
-                stream.push(.messageStart(message: prompt))
-                stream.push(.messageEnd(message: prompt))
+                await stream.push(.messageStart(message: prompt))
+                await stream.push(.messageEnd(message: prompt))
             }
 
             do {
                 var isFirstTurn = true
 
                 while true {
-                    try throwIfAborted(abortController)
+                    try await throwIfAborted(abortController)
                     if !isFirstTurn {
-                        stream.push(.turnStart)
+                        await stream.push(.turnStart)
                     }
                     isFirstTurn = false
 
@@ -266,8 +241,8 @@ public enum PiAgentLoop {
                         for message in pendingMessages {
                             currentMessages.append(message)
                             emittedMessages.append(message)
-                            stream.push(.messageStart(message: message))
-                            stream.push(.messageEnd(message: message))
+                            await stream.push(.messageStart(message: message))
+                            await stream.push(.messageEnd(message: message))
                         }
                         pendingMessages.removeAll(keepingCapacity: true)
                     }
@@ -300,7 +275,7 @@ public enum PiAgentLoop {
                         emittedMessages.append(toolResultAgentMessage)
                     }
 
-                    stream.push(.turnEnd(message: assistantAgentMessage, toolResults: toolResults))
+                    await stream.push(.turnEnd(message: assistantAgentMessage, toolResults: toolResults))
 
                     if assistant.stopReason == .error || assistant.stopReason == .aborted {
                         break
@@ -320,15 +295,15 @@ public enum PiAgentLoop {
                     }
                 }
 
-                stream.push(.agentEnd(messages: emittedMessages))
+                await stream.push(.agentEnd(messages: emittedMessages))
             } catch {
                 let errorAssistant = makeFailureAssistantMessage(model: config.model, error: error)
                 let errorMessage = PiAgentMessage.assistant(errorAssistant)
                 emittedMessages.append(errorMessage)
-                stream.push(.messageStart(message: errorMessage))
-                stream.push(.messageEnd(message: errorMessage))
-                stream.push(.turnEnd(message: errorMessage, toolResults: []))
-                stream.push(.agentEnd(messages: emittedMessages))
+                await stream.push(.messageStart(message: errorMessage))
+                await stream.push(.messageEnd(message: errorMessage))
+                await stream.push(.turnEnd(message: errorMessage, toolResults: []))
+                await stream.push(.agentEnd(messages: emittedMessages))
             }
         }
 
@@ -406,18 +381,18 @@ public enum PiAgentLoop {
             var emittedMessages: [PiAgentMessage] = []
             var currentMessages = context.messages
 
-            stream.push(.agentStart)
-            stream.push(.turnStart)
+            await stream.push(.agentStart)
+            await stream.push(.turnStart)
 
             for prompt in prompts {
                 currentMessages.append(prompt)
                 emittedMessages.append(prompt)
-                stream.push(.messageStart(message: prompt))
-                stream.push(.messageEnd(message: prompt))
+                await stream.push(.messageStart(message: prompt))
+                await stream.push(.messageEnd(message: prompt))
             }
 
             do {
-                try throwIfAborted(abortController)
+                try await throwIfAborted(abortController)
                 let assistant = try await streamAssistantResponse(
                     systemPrompt: context.systemPrompt,
                     tools: context.tools,
@@ -430,16 +405,16 @@ public enum PiAgentLoop {
 
                 let assistantMessage = PiAgentMessage.assistant(assistant)
                 emittedMessages.append(assistantMessage)
-                stream.push(.turnEnd(message: assistantMessage, toolResults: []))
-                stream.push(.agentEnd(messages: emittedMessages))
+                await stream.push(.turnEnd(message: assistantMessage, toolResults: []))
+                await stream.push(.agentEnd(messages: emittedMessages))
             } catch {
                 let errorAssistant = makeFailureAssistantMessage(model: config.model, error: error)
                 let errorMessage = PiAgentMessage.assistant(errorAssistant)
                 emittedMessages.append(errorMessage)
-                stream.push(.messageStart(message: errorMessage))
-                stream.push(.messageEnd(message: errorMessage))
-                stream.push(.turnEnd(message: errorMessage, toolResults: []))
-                stream.push(.agentEnd(messages: emittedMessages))
+                await stream.push(.messageStart(message: errorMessage))
+                await stream.push(.messageEnd(message: errorMessage))
+                await stream.push(.turnEnd(message: errorMessage, toolResults: []))
+                await stream.push(.agentEnd(messages: emittedMessages))
             }
         }
 
@@ -455,14 +430,14 @@ public enum PiAgentLoop {
         abortController: PiAgentAbortController?,
         assistantStreamFactory: AssistantStreamFactoryWithOptions
     ) async throws -> PiAIAssistantMessage {
-        try throwIfAborted(abortController)
+        try await throwIfAborted(abortController)
         let transformedMessages: [PiAgentMessage]
         if let transformContext = config.transformContext {
             transformedMessages = try await transformContext(messages, abortController)
         } else {
             transformedMessages = messages
         }
-        try throwIfAborted(abortController)
+        try await throwIfAborted(abortController)
         let llmMessages = try await config.convertToLLM(transformedMessages)
         let aiContext = PiAIContext(
             systemPrompt: systemPrompt.isEmpty ? nil : systemPrompt,
@@ -470,18 +445,18 @@ public enum PiAgentLoop {
             tools: tools?.map(\.asAITool)
         )
 
-        try throwIfAborted(abortController)
+        try await throwIfAborted(abortController)
         let assistantStream = try await assistantStreamFactory(config.model, aiContext, makeLLMRequestOptions(config: config))
         var addedPartial = false
 
         for await event in assistantStream {
-            try throwIfAborted(abortController)
+            try await throwIfAborted(abortController)
             switch event {
             case .start(let partial):
                 let partialMessage = PiAgentMessage.assistant(partial)
                 messages.append(partialMessage)
                 addedPartial = true
-                stream.push(.messageStart(message: partialMessage))
+                await stream.push(.messageStart(message: partialMessage))
 
             case .textStart, .textDelta, .textEnd, .thinkingStart, .thinkingDelta, .thinkingEnd, .toolCallStart, .toolCallDelta, .toolCallEnd:
                 let partial = partialMessage(from: event)
@@ -491,9 +466,9 @@ public enum PiAgentLoop {
                 } else {
                     messages.append(partialAgentMessage)
                     addedPartial = true
-                    stream.push(.messageStart(message: partialAgentMessage))
+                    await stream.push(.messageStart(message: partialAgentMessage))
                 }
-                stream.push(.messageUpdate(message: partialAgentMessage, assistantMessageEvent: event))
+                await stream.push(.messageUpdate(message: partialAgentMessage, assistantMessageEvent: event))
 
             case .done, .error:
                 let finalMessage = await assistantStream.result()
@@ -502,9 +477,9 @@ public enum PiAgentLoop {
                     messages[messages.count - 1] = finalAgentMessage
                 } else {
                     messages.append(finalAgentMessage)
-                    stream.push(.messageStart(message: finalAgentMessage))
+                    await stream.push(.messageStart(message: finalAgentMessage))
                 }
-                stream.push(.messageEnd(message: finalAgentMessage))
+                await stream.push(.messageEnd(message: finalAgentMessage))
                 return finalMessage
             }
         }
@@ -515,9 +490,9 @@ public enum PiAgentLoop {
             messages[messages.count - 1] = finalAgentMessage
         } else {
             messages.append(finalAgentMessage)
-            stream.push(.messageStart(message: finalAgentMessage))
+            await stream.push(.messageStart(message: finalAgentMessage))
         }
-        stream.push(.messageEnd(message: finalAgentMessage))
+        await stream.push(.messageEnd(message: finalAgentMessage))
         return finalMessage
     }
 
@@ -609,7 +584,7 @@ public enum PiAgentLoop {
         var steeringMessages: [PiAgentMessage]?
 
         for (index, toolCall) in toolCalls.enumerated() {
-            try throwIfAborted(abortController)
+            try await throwIfAborted(abortController)
             let (toolResultMessage, _) = try await executeSingleToolCall(
                 toolCall: toolCall, runtimeTools: runtimeTools,
                 stream: stream, abortController: abortController
@@ -622,7 +597,7 @@ public enum PiAgentLoop {
                     steeringMessages = steering
                     if index < toolCalls.count - 1 {
                         for skippedCall in toolCalls[(index + 1)...] {
-                            let skipped = skipToolCall(skippedCall, stream: stream)
+                            let skipped = await skipToolCall(skippedCall, stream: stream)
                             results.append(skipped)
                         }
                     }
@@ -646,7 +621,7 @@ public enum PiAgentLoop {
         ) { group in
             for (index, toolCall) in toolCalls.enumerated() {
                 group.addTask {
-                    try throwIfAborted(abortController)
+                    try await throwIfAborted(abortController)
                     let (result, events) = try await executeSingleToolCallBuffered(
                         toolCall: toolCall, runtimeTools: runtimeTools,
                         abortController: abortController
@@ -666,7 +641,7 @@ public enum PiAgentLoop {
         var results: [PiAIToolResultMessage] = []
         for (_, toolResultMessage, events) in indexedResults {
             for event in events {
-                stream.push(event)
+                await stream.push(event)
             }
             results.append(toolResultMessage)
         }
@@ -681,7 +656,7 @@ public enum PiAgentLoop {
         stream: PiAgentEventStream,
         abortController: PiAgentAbortController?
     ) async throws -> (PiAIToolResultMessage, [PiAgentEvent]) {
-        stream.push(.toolExecutionStart(
+        await stream.push(.toolExecutionStart(
             toolCallID: toolCall.id,
             toolName: toolCall.name,
             args: .object(toolCall.arguments)
@@ -696,12 +671,14 @@ public enum PiAgentLoop {
             }
             let validatedArgs = try PiAIValidation.validateToolArguments(tool: runtimeTool.tool.asAITool, toolCall: toolCall)
             executionResult = try await runtimeTool.execute(toolCall.id, validatedArgs, abortController) { partialResult in
-                stream.push(.toolExecutionUpdate(
-                    toolCallID: toolCall.id,
-                    toolName: toolCall.name,
-                    args: .object(toolCall.arguments),
-                    partialResult: partialResult
-                ))
+                Task {
+                    await stream.push(.toolExecutionUpdate(
+                        toolCallID: toolCall.id,
+                        toolName: toolCall.name,
+                        args: .object(toolCall.arguments),
+                        partialResult: partialResult
+                    ))
+                }
             }
             isError = false
         } catch {
@@ -712,7 +689,7 @@ public enum PiAgentLoop {
             isError = true
         }
 
-        stream.push(.toolExecutionEnd(
+        await stream.push(.toolExecutionEnd(
             toolCallID: toolCall.id,
             toolName: toolCall.name,
             result: executionResult,
@@ -729,8 +706,8 @@ public enum PiAgentLoop {
         )
 
         let agentMessage = PiAgentMessage.toolResult(toolResultMessage)
-        stream.push(.messageStart(message: agentMessage))
-        stream.push(.messageEnd(message: agentMessage))
+        await stream.push(.messageStart(message: agentMessage))
+        await stream.push(.messageEnd(message: agentMessage))
 
         return (toolResultMessage, [])
     }
@@ -794,8 +771,8 @@ public enum PiAgentLoop {
         return (toolResultMessage, events)
     }
 
-    private static func throwIfAborted(_ abortController: PiAgentAbortController?) throws {
-        if abortController?.isAborted == true {
+    private static func throwIfAborted(_ abortController: PiAgentAbortController?) async throws {
+        if let abortController, await abortController.isAborted {
             throw PiAgentLoopError.aborted
         }
     }
@@ -816,18 +793,18 @@ public enum PiAgentLoop {
     private static func skipToolCall(
         _ toolCall: PiAIToolCallContent,
         stream: PiAgentEventStream
-    ) -> PiAIToolResultMessage {
+    ) async -> PiAIToolResultMessage {
         let result = PiAgentToolExecutionResult(
             content: [.text(.init(text: "Skipped due to queued user message."))],
             details: .object([:])
         )
 
-        stream.push(.toolExecutionStart(
+        await stream.push(.toolExecutionStart(
             toolCallID: toolCall.id,
             toolName: toolCall.name,
             args: .object(toolCall.arguments)
         ))
-        stream.push(.toolExecutionEnd(
+        await stream.push(.toolExecutionEnd(
             toolCallID: toolCall.id,
             toolName: toolCall.name,
             result: result,
@@ -843,8 +820,8 @@ public enum PiAgentLoop {
             timestamp: currentTimestampMillis()
         )
         let agentMessage = PiAgentMessage.toolResult(toolResultMessage)
-        stream.push(.messageStart(message: agentMessage))
-        stream.push(.messageEnd(message: agentMessage))
+        await stream.push(.messageStart(message: agentMessage))
+        await stream.push(.messageEnd(message: agentMessage))
         return toolResultMessage
     }
 }

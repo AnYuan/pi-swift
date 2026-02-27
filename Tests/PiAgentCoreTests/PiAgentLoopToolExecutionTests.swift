@@ -89,7 +89,7 @@ final class PiAgentLoopToolExecutionTests: XCTestCase {
                         stopReason: .toolUse,
                         timestamp: 2
                     )
-                    s.push(.done(reason: .toolUse, message: message))
+                    await s.push(.done(reason: .toolUse, message: message))
                 } else {
                     let message = PiAIAssistantMessage(
                         content: [.text(.init(text: "done"))],
@@ -100,7 +100,7 @@ final class PiAgentLoopToolExecutionTests: XCTestCase {
                         stopReason: .stop,
                         timestamp: 3
                     )
-                    s.push(.done(reason: .stop, message: message))
+                    await s.push(.done(reason: .stop, message: message))
                 }
             }
             return s
@@ -207,14 +207,14 @@ final class PiAgentLoopToolExecutionTests: XCTestCase {
                     api: "test", provider: "openai", model: "gpt-4o-mini",
                     usage: .zero, stopReason: .toolUse, timestamp: 1
                 )
-                mockStream.push(.done(reason: .toolUse, message: msg))
+                await mockStream.push(.done(reason: .toolUse, message: msg))
             } else {
                 let msg = PiAIAssistantMessage(
                     content: [.text(.init(text: "all done"))],
                     api: "test", provider: "openai", model: "gpt-4o-mini",
                     usage: .zero, stopReason: .stop, timestamp: 2
                 )
-                mockStream.push(.done(reason: .stop, message: msg))
+                await mockStream.push(.done(reason: .stop, message: msg))
             }
             return mockStream
         }

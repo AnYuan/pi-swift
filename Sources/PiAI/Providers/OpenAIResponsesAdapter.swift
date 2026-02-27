@@ -55,13 +55,13 @@ public struct PiAIOpenAIResponsesProvider: Sendable {
 
             do {
                 var processor = PiAIOpenAIResponsesEventProcessor(output: output, stream: stream)
-                stream.push(.start(partial: processor.output))
+                await stream.push(.start(partial: processor.output))
                 let events = try await source()
                 for event in events {
-                    try processor.apply(event)
+                    try await processor.apply(event)
                 }
                 // Ensure stream is closed if the event list forgot to include completion.
-                stream.end(with: processor.output)
+                await stream.end(with: processor.output)
             } catch {
                 let message = errorMessage(error)
                 let errorOutput = PiAIAssistantMessage(
@@ -74,7 +74,7 @@ public struct PiAIOpenAIResponsesProvider: Sendable {
                     errorMessage: message,
                     timestamp: currentTimestamp()
                 )
-                stream.push(.error(reason: .error, error: errorOutput))
+                await stream.push(.error(reason: .error, error: errorOutput))
             }
 
             _ = context // Reserved for future conversion into provider request payload.
@@ -108,31 +108,31 @@ private struct PiAIOpenAIResponsesEventProcessor {
         self.stream = stream
     }
 
-    mutating func apply(_ event: PiAIOpenAIResponsesRawEvent) throws {
+    mutating func apply(_ event: PiAIOpenAIResponsesRawEvent) async throws {
         switch event {
         case .responseOutputItemAdded(let item):
-            try handleOutputItemAdded(item)
+            try await handleOutputItemAdded(item)
         case .responseOutputTextDelta(let delta):
-            try handleOutputTextDelta(delta)
+            try await handleOutputTextDelta(delta)
         case .responseFunctionCallArgumentsDelta(let delta):
-            try handleFunctionCallArgumentsDelta(delta)
+            try await handleFunctionCallArgumentsDelta(delta)
         case .responseFunctionCallArgumentsDone:
-            try handleFunctionCallArgumentsDone()
+            try await handleFunctionCallArgumentsDone()
         case .responseCompleted(let stopReason, let usage):
             output.stopReason = stopReason
             output.usage = usage
-            stream.push(.done(reason: stopReason, message: output))
+            await stream.push(.done(reason: stopReason, message: output))
         }
     }
 
-    private mutating func handleOutputItemAdded(_ item: PiAIOpenAIResponsesOutputItem) throws {
+    private mutating func handleOutputItemAdded(_ item: PiAIOpenAIResponsesOutputItem) async throws {
         switch item {
         case .message:
             output.content.append(.text(.init(text: "")))
             currentTextBlockIndex = output.content.count - 1
             currentToolCallBlockIndex = nil
             currentToolCallPartialJSON = ""
-            stream.push(.textStart(contentIndex: currentTextBlockIndex!, partial: output))
+            await stream.push(.textStart(contentIndex: currentTextBlockIndex!, partial: output))
 
         case .functionCall(let id, let name, let arguments):
             currentToolCallPartialJSON = arguments
@@ -140,19 +140,19 @@ private struct PiAIOpenAIResponsesEventProcessor {
             output.content.append(.toolCall(.init(id: id, name: name, arguments: initialArgs)))
             currentToolCallBlockIndex = output.content.count - 1
             currentTextBlockIndex = nil
-            stream.push(.toolCallStart(contentIndex: currentToolCallBlockIndex!, partial: output))
+            await stream.push(.toolCallStart(contentIndex: currentToolCallBlockIndex!, partial: output))
         }
     }
 
-    private mutating func handleOutputTextDelta(_ delta: String) throws {
+    private mutating func handleOutputTextDelta(_ delta: String) async throws {
         guard let index = currentTextBlockIndex else { return }
         guard case .text(var textBlock) = output.content[index] else { return }
         textBlock.text += delta
         output.content[index] = .text(textBlock)
-        stream.push(.textDelta(contentIndex: index, delta: delta, partial: output))
+        await stream.push(.textDelta(contentIndex: index, delta: delta, partial: output))
     }
 
-    private mutating func handleFunctionCallArgumentsDelta(_ delta: String) throws {
+    private mutating func handleFunctionCallArgumentsDelta(_ delta: String) async throws {
         guard let index = currentToolCallBlockIndex else { return }
         guard case .toolCall(var toolCall) = output.content[index] else { return }
 
@@ -160,16 +160,16 @@ private struct PiAIOpenAIResponsesEventProcessor {
         toolCall.arguments = extractJSONObject(PiAIJSON.parseStreamingJSON(currentToolCallPartialJSON))
         output.content[index] = .toolCall(toolCall)
 
-        stream.push(.toolCallDelta(contentIndex: index, delta: delta, partial: output))
+        await stream.push(.toolCallDelta(contentIndex: index, delta: delta, partial: output))
     }
 
-    private mutating func handleFunctionCallArgumentsDone() throws {
+    private mutating func handleFunctionCallArgumentsDone() async throws {
         guard let index = currentToolCallBlockIndex else { return }
         guard case .toolCall(var toolCall) = output.content[index] else { return }
 
         toolCall.arguments = extractJSONObject(PiAIJSON.parseStreamingJSON(currentToolCallPartialJSON))
         output.content[index] = .toolCall(toolCall)
-        stream.push(.toolCallEnd(contentIndex: index, toolCall: toolCall, partial: output))
+        await stream.push(.toolCallEnd(contentIndex: index, toolCall: toolCall, partial: output))
     }
 
     private func extractJSONObject(_ value: JSONValue) -> [String: JSONValue] {

@@ -36,8 +36,8 @@ final class PiAgentLoopSingleTurnTests: XCTestCase {
                 timestamp: 2
             )
             Task {
-                s.push(.start(partial: partial))
-                s.push(.textStart(contentIndex: 0, partial: partial))
+                await s.push(.start(partial: partial))
+                await s.push(.textStart(contentIndex: 0, partial: partial))
                 let partial1 = PiAIAssistantMessage(
                     content: [.text(.init(text: "Hi "))],
                     api: partial.api,
@@ -47,10 +47,10 @@ final class PiAgentLoopSingleTurnTests: XCTestCase {
                     stopReason: partial.stopReason,
                     timestamp: partial.timestamp
                 )
-                s.push(.textDelta(contentIndex: 0, delta: "Hi ", partial: partial1))
-                s.push(.textDelta(contentIndex: 0, delta: "there", partial: final))
-                s.push(.textEnd(contentIndex: 0, content: "Hi there", partial: final))
-                s.push(.done(reason: .stop, message: final))
+                await s.push(.textDelta(contentIndex: 0, delta: "Hi ", partial: partial1))
+                await s.push(.textDelta(contentIndex: 0, delta: "there", partial: final))
+                await s.push(.textEnd(contentIndex: 0, content: "Hi there", partial: final))
+                await s.push(.done(reason: .stop, message: final))
             }
             return s
         }
@@ -106,7 +106,7 @@ final class PiAgentLoopSingleTurnTests: XCTestCase {
                 timestamp: 2
             )
             Task {
-                s.push(.done(reason: .stop, message: final))
+                await s.push(.done(reason: .stop, message: final))
             }
             return s
         }
