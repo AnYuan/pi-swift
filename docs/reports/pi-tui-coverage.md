@@ -1,6 +1,6 @@
 # PiTUI Coverage Report
 
-Date: 2026-02-24
+Date: 2026-02-27
 
 Command:
 
@@ -13,40 +13,47 @@ xcrun llvm-cov report .build/arm64-apple-macosx/debug/pi-swiftPackageTests.xctes
 
 Scope: `Sources/PiTUI/*`
 
-Summary (TOTAL row for `Sources/PiTUI/*`):
+## Summary
 
-- Regions coverage: `80.62%`
-- Functions executed: `85.63%`
-- Lines coverage: `89.09%`
+| Metric | Covered | Total | Percentage |
+|--------|---------|-------|------------|
+| Regions | 1485 | 1821 | 81.55% |
+| Functions | 399 | 463 | 86.11% |
+| Lines | 3084 | 3434 | 89.81% |
 
-Snapshot:
+## Per-File Breakdown
 
-```text
-Filename                         Regions    Missed Regions     Cover   Functions  Missed Functions  Executed       Lines      Missed Lines     Cover    Branches   Missed Branches     Cover
-PiKillRing.swift                      16                 0   100.00%           7                 0   100.00%          25                 0   100.00%
-PiTUIANSITerminal.swift               22                 4    81.82%          16                 2    87.50%          56                 8    85.71%
-PiTUIANSIText.swift                  108                23    78.70%          16                 0   100.00%         187                30    83.96%
-PiTUIAutocomplete.swift              167                45    73.05%          43                 6    86.05%         271                39    85.61%
-PiTUIComponent.swift                  11                 6    45.45%           9                 4    55.56%          21                12    42.86%
-PiTUIEditorComponent.swift            74                 9    87.84%          20                 3    85.00%         152                16    89.47%
-PiTUIEditorHistory.swift              32                 1    96.88%          14                 1    92.86%          50                 4    92.00%
-PiTUIEditorKeybindings.swift          16                 3    81.25%          12                 2    83.33%          37                 4    89.19%
-PiTUIEditorModel.swift                67                15    77.61%          28                 4    85.71%         173                 9    94.80%
-PiTUIImage.swift                      24                 4    83.33%          11                 3    72.73%          80                 7    91.25%
-PiTUIInputComponent.swift             37                 3    91.89%          16                 2    87.50%          69                 2    97.10%
-PiTUIInputModel.swift                186                59    68.28%          54                 8    85.19%         385                78    79.74%
-PiTUIKeys.swift                       99                 4    95.96%          20                 1    95.00%         136                 2    98.53%
-PiTUIMarkdown.swift                   73                 8    89.04%          19                 0   100.00%         150                 6    96.00%
-PiTUIOverlayLayout.swift              51                 5    90.20%          23                 4    82.61%         138                 5    96.38%
-PiTUIProcessTerminal.swift            39                15    61.54%          26                12    53.85%         108                30    72.22%
-PiTUIRenderBuffer.swift               33                 3    90.91%          12                 0   100.00%          78                 4    94.87%
-PiTUIRenderScheduler.swift             9                 0   100.00%           7                 0   100.00%          19                 0   100.00%
-PiTUISelectList.swift                 65                11    83.08%          24                 3    87.50%         138                12    91.30%
-PiTUISettingsList.swift              136                30    77.94%          42                12    71.43%         289                29    89.97%
-PiTUIStdinBuffer.swift               113                20    82.30%          28                 2    92.86%         186                18    90.32%
-PiTUITerminal.swift                   27                 6    77.78%          17                 1    94.12%          70                 6    91.43%
-PiTUITerminalImage.swift              39                 5    87.18%          12                 2    83.33%          80                 6    92.50%
-PiUndoStack.swift                      7                 0   100.00%           7                 0   100.00%          17                 0   100.00%
-TUI.swift                            164                34    79.27%          39                 3    92.31%         329                27    91.79%
-TOTAL                               1615               313    80.62%         522                75    85.63%        3244               354    89.09%
-```
+| File | Regions | Functions | Lines |
+|------|---------|-----------|-------|
+| PiKillRing.swift | 100.00% | 100.00% | 100.00% |
+| PiTUIANSITerminal.swift | 81.82% | 87.50% | 85.71% |
+| PiTUIANSIText.swift | 82.41% | 100.00% | 88.24% |
+| PiTUIAutocomplete.swift | 73.05% | 86.05% | 85.61% |
+| PiTUIComponent.swift | 45.45% | 55.56% | 42.86% |
+| PiTUIEditorComponent.swift | 87.84% | 85.00% | 89.47% |
+| PiTUIEditorHistory.swift | 96.88% | 92.86% | 92.00% |
+| PiTUIEditorKeybindings.swift | 81.25% | 83.33% | 89.19% |
+| PiTUIEditorModel.swift | 77.61% | 85.71% | 94.80% |
+| PiTUIImage.swift | 83.33% | 72.73% | 91.25% |
+| PiTUIInputComponent.swift | 91.89% | 87.50% | 97.10% |
+| PiTUIInputModel.swift | 68.28% | 85.19% | 79.74% |
+| PiTUIKeys.swift | 95.96% | 95.00% | 98.53% |
+| PiTUIMarkdown.swift | 89.04% | 100.00% | 96.00% |
+| PiTUIOverlayLayout.swift | 90.20% | 82.61% | 96.38% |
+| PiTUIProcessTerminal.swift | 61.54% | 53.85% | 72.22% |
+| PiTUIRenderBuffer.swift | 100.00% | 100.00% | 100.00% |
+| PiTUIRenderScheduler.swift | 100.00% | 100.00% | 100.00% |
+| PiTUISelectList.swift | 86.15% | 87.50% | 91.30% |
+| PiTUISettingsList.swift | 78.68% | 73.81% | 91.35% |
+| PiTUIStdinBuffer.swift | 82.30% | 92.86% | 90.32% |
+| PiTUITerminal.swift | 77.78% | 94.12% | 91.43% |
+| PiTUITerminalImage.swift | 87.18% | 83.33% | 92.50% |
+| PiUndoStack.swift | 100.00% | 100.00% | 100.00% |
+| TUI.swift | 79.27% | 92.31% | 91.79% |
+
+## P7 Changes
+
+- Bounded kill ring (`PiKillRing`) and bounded undo stack (`PiUndoStack`) — added capacity limits with automatic eviction, maintaining 100% coverage
+- `PiTUIRenderBuffer` reached 100% coverage (up from 90.91% regions, 94.87% lines)
+- `PiTUIANSIText` improved to 82.41% regions (from 78.70%) and 88.24% lines (from 83.96%)
+- `PiTUISettingsList` improved to 73.81% functions (from 71.43%) and 91.35% lines (from 89.97%)

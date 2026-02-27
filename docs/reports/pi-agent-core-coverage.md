@@ -1,6 +1,6 @@
 # PiAgentCore Coverage Report
 
-Date: 2026-02-23
+Date: 2026-02-27
 
 ## Command
 
@@ -16,16 +16,16 @@ xcrun llvm-cov report \
 
 ## Coverage Snapshot (`Sources/PiAgentCore/*`)
 
-- Regions: `90.68%`
-- Functions: `96.72%`
-- Lines: `92.55%`
+- Regions: `90.91%` (310/341)
+- Functions: `95.71%` (67/70)
+- Lines: `93.52%` (1024/1095)
 
 ## Per-file Highlights
 
 - `Sources/PiAgentCore/AgentLoop.swift`
-  - Regions: `86.90%`
-  - Functions: `97.87%`
-  - Lines: `91.86%`
+  - Regions: `87.88%`
+  - Functions: `96.43%`
+  - Lines: `93.21%`
 - `Sources/PiAgentCore/Types.swift`
   - Regions: `95.10%`
   - Functions: `92.86%`
@@ -41,3 +41,7 @@ xcrun llvm-cov report \
   - loop/tool-triggered abort
   - request-options plumbing (`reasoning`, `sessionId`, `thinkingBudgets`)
   - custom-message filtering and `transformContext -> convertToLLM` ordering
+
+## P7 Changes
+
+- Parallel tool execution support in `AgentLoop` — concurrent tool dispatch with structured concurrency, improving region/line counts

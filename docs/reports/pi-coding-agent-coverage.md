@@ -1,6 +1,6 @@
 # PiCodingAgent Coverage Report
 
-Date: 2026-02-24
+Date: 2026-02-27
 
 ## Commands
 
@@ -12,33 +12,51 @@ xcrun llvm-cov report \
   Sources/PiCodingAgent/*.swift
 ```
 
-## Coverage Snapshot (`Sources/PiCodingAgent/*`)
+## Summary
 
-- Regions: `76.49%`
-- Functions: `83.89%`
-- Lines: `86.02%`
+| Metric | Covered | Total | Percentage |
+|--------|---------|-------|------------|
+| Regions | 1232 | 1595 | 77.26% |
+| Functions | 396 | 465 | 85.17% |
+| Lines | 2519 | 2899 | 86.90% |
 
-## Per-file Highlights
+## Per-File Breakdown
 
-- Strong coverage areas
-  - `Resources.swift`: Regions `84.19%`, Functions `90.00%`, Lines `92.92%`
-  - `Settings.swift`: Regions `85.38%`, Functions `92.59%`, Lines `88.76%`
-  - `InteractiveMode.swift`: Regions `74.02%`, Functions `87.23%`, Lines `91.36%`
-  - `Tools.swift`: Regions `78.72%`, Functions `87.88%`, Lines `85.20%`
-- `P5-10` additions
-  - `FileProcessor.swift`: Regions `72.22%`, Functions `85.71%`, Lines `89.16%`
-  - `HTMLExporter.swift`: Regions `75.00%`, Functions `84.62%`, Lines `88.38%`
-  - `CLIArgs.swift` (with `--export`): Regions `82.98%`, Functions `100.00%`, Lines `95.35%`
-  - `CLIApp.swift` (with export action routing): Regions `93.33%`, Functions `100.00%`, Lines `98.31%`
+| File | Regions | Functions | Lines |
+|------|---------|-----------|-------|
+| AuthStorage.swift | 62.83% | 70.27% | 70.72% |
+| CLIApp.swift | 93.33% | 100.00% | 98.31% |
+| CLIArgs.swift | 82.98% | 100.00% | 95.35% |
+| CLIExecutor.swift | 80.00% | 66.67% | 88.89% |
+| Compaction.swift | 60.53% | 70.73% | 72.87% |
+| FileProcessor.swift | 72.22% | 85.71% | 89.16% |
+| HTMLExporter.swift | 75.00% | 84.62% | 88.38% |
+| InteractiveMode.swift | 74.02% | 87.23% | 91.36% |
+| InteractiveSession.swift | 60.00% | 60.00% | 63.16% |
+| ModelResolver.swift | 77.78% | 89.66% | 89.30% |
+| Modes.swift | 72.88% | 77.42% | 83.98% |
+| PiCodingAgent.swift | 100.00% | 100.00% | 100.00% |
+| Resources.swift | 84.19% | 90.00% | 92.92% |
+| SessionStore.swift | 79.25% | 83.33% | 85.59% |
+| SessionTree.swift | 80.00% | 94.12% | 90.27% |
+| Settings.swift | 85.38% | 92.59% | 88.76% |
+| Tools.swift | 81.12% | 91.67% | 90.75% |
 
-## Notable Remaining Gaps (Future Coverage Push)
+## Notable Remaining Gaps
 
-- `Compaction.swift` line coverage remains low relative to module average (`71.84%`)
+- `Compaction.swift` line coverage remains low relative to module average (`72.87%`)
 - `AuthStorage.swift` line coverage remains below target (`70.72%`)
-- `InteractiveSession.swift` line coverage is low (`63.16%`) due limited runtime-path coverage
-- `CLIExecutor.swift` missing failure-path coverage beyond export and invalid-RPC cases
+- `InteractiveSession.swift` line coverage is low (`63.16%`) due to limited runtime-path coverage
+- `CLIExecutor.swift` function coverage is low (`66.67%`) — missing failure-path coverage beyond export and invalid-RPC cases
+
+## P7 Changes
+
+- Async tool execution with structured concurrency in `Tools.swift` — improved regions from 78.72% to 81.12% and functions from 87.88% to 91.67%
+- Token estimation utilities added, improving `Compaction.swift` coverage (regions 60.53%, lines 72.87%)
+- Overflow fix propagated from PiAI, touching `InteractiveMode.swift` and `Modes.swift`
+- `CLIExecutor.swift` improved regions from previous baseline to 80.00%
 
 ## Notes
 
-- This report completes `P5-11` by establishing a reproducible module-wide coverage baseline and documenting the current regression surface for `PiCodingAgent`.
-- The next major plan step shifts to `P6` platform/peripheral migrations rather than forcing more `P5`-only test expansion in the same slice.
+- 366 tests total across all modules
+- The next major plan step shifts to P7+ platform/peripheral migrations rather than forcing more test expansion in the same slice
