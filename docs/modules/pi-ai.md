@@ -381,6 +381,47 @@ Verification:
 
 - `swift test` passed (366 tests) on 2026-02-27
 
+## P8-1: OpenAI-compatible HTTP adapter foundation
+
+Files:
+
+- `Sources/PiAI/Providers/OpenAICompatibleHTTPAdapter.swift`
+- `Tests/PiAITests/PiAIOpenAICompatibleHTTPProviderTests.swift`
+
+Implemented behavior:
+
+- Added real transport-backed provider for OpenAI-compatible chat completions:
+  - `PiAIOpenAICompatibleHTTPModel`
+  - `PiAIOpenAICompatibleHTTPProvider`
+  - `PiAIOpenAICompatibleHTTPTransport` protocol + default `URLSession` implementation
+- Added request/response types and explicit error mapping:
+  - invalid URL
+  - transport errors
+  - non-2xx status with response body propagation
+  - invalid response payload shape
+- Request path:
+  - POST `${baseURL}/v1/chat/completions` (customizable path)
+  - serializes `PiAIContext` messages/tools into OpenAI-compatible payload
+  - supports optional Bearer auth header + custom headers
+- Response path:
+  - parses non-streaming `choices[0].message`
+  - supports `content` as string or content-part array
+  - maps `tool_calls` arguments JSON into `PiAIToolCallContent.arguments`
+  - maps finish reason to `PiAIStopReason`
+  - emits normalized assistant event lifecycle (`start`, text/tool events, `done`)
+
+Tests added:
+
+- request payload + auth headers + event order + tool-call argument mapping
+- non-2xx error response emits terminal `.error`
+- alternate `content: [parts]` parsing
+
+Verification:
+
+- `swift test --filter PiAIOpenAICompatibleHTTPProviderTests` passed (3 tests) on 2026-02-27
+- `swift test --filter PiAITests` passed (37 tests) on 2026-02-27
+- `swift build` passed on 2026-02-27
+
 ## Next Step
 
-- `P3-1`: `pi-agent-core` AgentState / AgentMessage / AgentEvent types
+- `P8-2`: wire local provider/model defaults into `pi-coding-agent` model resolver/settings flow

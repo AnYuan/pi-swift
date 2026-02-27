@@ -749,6 +749,44 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Regression: All existing tests pass with actor-isolated types
   - Docs updated: `docs/modules/pi-agent-core.md`, `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
+## P8 Local Model Runtime Integration (OpenAI-compatible bridge for MLX)
+
+### P8-1: `pi-ai` OpenAI-compatible HTTP adapter foundation
+- Status: DONE
+- Depends On: P2-8, P7-10
+- Scope:
+  - Add a real HTTP transport-backed provider adapter for OpenAI-compatible `/v1/chat/completions`
+  - Support non-streaming assistant text and tool-call output mapping into `PiAIAssistantMessageEventStream`
+  - Add request/response parsing with robust error-path handling
+- Test Plan:
+  - Request-payload and event-order tests with a mock transport
+  - Non-2xx error mapping tests
+  - Alternate content-shape parsing tests (`content: string` and `content: [parts]`)
+- Verification:
+  - Tests: `swift test --filter PiAIOpenAICompatibleHTTPProviderTests` passed (3 tests) on 2026-02-27
+  - Tests: `swift test --filter PiAITests` passed (37 tests) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: Existing provider adapter tests remain passing
+  - Docs updated: `docs/modules/pi-ai.md`, `docs/PLAN.md`
+
+### P8-2: `pi-coding-agent` local provider/model wiring for MLX endpoint
+- Status: TODO
+- Depends On: P8-1
+- Scope:
+  - Add local provider/model defaults for OpenAI-compatible endpoint usage
+  - Add resolver/settings coverage for local provider selection
+- Test Plan:
+  - Model resolver and settings tests for local provider defaults and explicit overrides
+
+### P8-3: end-to-end local-model smoke path (non-interactive)
+- Status: TODO
+- Depends On: P8-2
+- Scope:
+  - Add executable smoke path (mock transport) proving CLI-mode execution can drive the new adapter
+  - Document how to point `pi-swift` at MLX OpenAI-compatible server
+- Test Plan:
+  - Non-interactive integration tests with deterministic mock transport + fixture response
+
 ## 6. Documentation Sync Tasks (Continuous)
 
 After any task is completed, append/update the corresponding module doc (recommended):
@@ -770,4 +808,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-All P7 tasks are DONE. The codebase now uses Swift actors for concurrency, async tool protocol, parallel tool execution, and comprehensive code quality improvements. Next steps could include real HTTP provider integration, Slack Socket Mode runtime, or additional feature work.
+Next recommended task: `P8-2` (`pi-coding-agent` local provider/model wiring for MLX endpoint).
