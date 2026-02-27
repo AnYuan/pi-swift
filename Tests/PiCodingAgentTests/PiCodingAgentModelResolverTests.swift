@@ -7,6 +7,7 @@ final class PiCodingAgentModelResolverTests: XCTestCase {
         .init(provider: "anthropic", id: "claude-sonnet-4-5", displayName: "Claude Sonnet 4.5"),
         .init(provider: "anthropic", id: "claude-sonnet-4-5-20250929", displayName: "Claude Sonnet 4.5 Dated"),
         .init(provider: "openai", id: "gpt-4o", displayName: "GPT-4o"),
+        .init(provider: "openai-compatible", id: "mlx-community/Qwen3.5-35B-A3B-bf16", displayName: "Qwen 3.5 35B A3B (MLX)"),
         .init(provider: "openrouter", id: "qwen/qwen3-coder:exacto", displayName: "Qwen Exacto"),
     ]
 
@@ -59,6 +60,15 @@ final class PiCodingAgentModelResolverTests: XCTestCase {
         XCTAssertEqual(providerSlash.model?.provider, "openrouter")
         XCTAssertEqual(providerSlash.model?.id, "qwen/qwen3-coder:exacto")
         XCTAssertEqual(providerSlash.thinkingLevel, .high)
+
+        let localExplicit = PiCodingAgentModelResolver.resolveCLIModel(
+            cliProvider: "openai-compatible-local",
+            cliModel: "mlx-community/Qwen3.5-35B-A3B-bf16",
+            registry: registry
+        )
+        XCTAssertNil(localExplicit.error)
+        XCTAssertEqual(localExplicit.model?.provider, "openai-compatible")
+        XCTAssertEqual(localExplicit.model?.id, "mlx-community/Qwen3.5-35B-A3B-bf16")
     }
 
     func testResolveCLIModelReturnsUnknownProviderError() {
@@ -101,5 +111,16 @@ final class PiCodingAgentModelResolverTests: XCTestCase {
         settings2.setDefaultProvider("anthropic")
         let initial2 = PiCodingAgentModelResolver.findInitialModel(settings: settings2, registry: registry)
         XCTAssertEqual(initial2?.qualifiedID, "anthropic/claude-sonnet-4-5")
+
+        let settings3 = PiCodingAgentSettingsManager(storage: PiCodingAgentInMemorySettingsStorage())
+        settings3.setDefaultProvider("openai-compatible")
+        let initial3 = PiCodingAgentModelResolver.findInitialModel(settings: settings3, registry: registry)
+        XCTAssertEqual(initial3?.qualifiedID, "openai-compatible/mlx-community/Qwen3.5-35B-A3B-bf16")
+
+        let settings4 = PiCodingAgentSettingsManager(storage: PiCodingAgentInMemorySettingsStorage())
+        settings4.setDefaultProvider("openai-compatible-local")
+        settings4.setLocalOpenAIModelID("mlx-community/Qwen3.5-35B-A3B-bf16")
+        let initial4 = PiCodingAgentModelResolver.findInitialModel(settings: settings4, registry: registry)
+        XCTAssertEqual(initial4?.qualifiedID, "openai-compatible/mlx-community/Qwen3.5-35B-A3B-bf16")
     }
 }

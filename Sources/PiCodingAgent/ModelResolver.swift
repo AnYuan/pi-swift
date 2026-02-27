@@ -69,9 +69,16 @@ public struct PiCodingAgentModelRegistry: Sendable {
 }
 
 public enum PiCodingAgentModelResolver {
+    private static let openAICompatibleProviderAliases = [
+        "openai-compatible",
+        "openai-compatible-local",
+    ]
+
     public static let defaultModelPerProvider: [String: String] = [
         "anthropic": "claude-sonnet-4-5",
         "openai": "gpt-4o",
+        "openai-compatible": "mlx-community/Qwen3.5-35B-A3B-bf16",
+        "openai-compatible-local": "mlx-community/Qwen3.5-35B-A3B-bf16",
         "openrouter": "openai/gpt-4o",
         "google": "gemini-2.5-pro",
         "google-vertex": "gemini-2.5-pro",
@@ -132,6 +139,7 @@ public enum PiCodingAgentModelResolver {
         for model in models where canonicalProviderMap[model.provider.lowercased()] == nil {
             canonicalProviderMap[model.provider.lowercased()] = model.provider
         }
+        unifyOpenAICompatibleProviderAliases(in: &canonicalProviderMap)
         let resolvedProvider = cliProvider.flatMap { canonicalProviderMap[$0.lowercased()] }
         if let cliProvider, resolvedProvider == nil {
             return .init(model: nil, thinkingLevel: nil, warning: nil, error: "Unknown provider \"\(cliProvider)\".")
@@ -174,12 +182,50 @@ public enum PiCodingAgentModelResolver {
         }
 
         if let provider = settings.getDefaultProvider(),
+           let localModelID = localOpenAIModelID(provider: provider, settings: settings),
+           let localModel = resolveModel(provider: provider, id: localModelID, registry: registry) {
+            return localModel
+        }
+
+        if let provider = settings.getDefaultProvider(),
            let defaultID = defaultModelPerProvider[provider.lowercased()],
-           let model = registry.model(provider: provider, id: defaultID) {
+           let model = resolveModel(provider: provider, id: defaultID, registry: registry) {
             return model
         }
 
         return registry.getAvailable().first ?? registry.getAll().first
+    }
+
+    private static func localOpenAIModelID(provider: String, settings: PiCodingAgentSettingsManager) -> String? {
+        guard openAICompatibleProviderAliases.contains(provider.lowercased()) else { return nil }
+        guard let configured = settings.getLocalOpenAIModelID()?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !configured.isEmpty else {
+            return nil
+        }
+        return configured
+    }
+
+    private static func resolveModel(provider: String, id: String, registry: PiCodingAgentModelRegistry) -> PiAIModel? {
+        if let model = registry.model(provider: provider, id: id) {
+            return model
+        }
+
+        let normalized = provider.lowercased()
+        if normalized == "openai-compatible-local" {
+            return registry.model(provider: "openai-compatible", id: id)
+        }
+        if normalized == "openai-compatible" {
+            return registry.model(provider: "openai-compatible-local", id: id)
+        }
+        return nil
+    }
+
+    private static func unifyOpenAICompatibleProviderAliases(in map: inout [String: String]) {
+        let canonical = openAICompatibleProviderAliases.compactMap { map[$0] }.first
+        guard let canonical else { return }
+        for alias in openAICompatibleProviderAliases {
+            map[alias] = canonical
+        }
     }
 
     private static func exactModelMatch(query: String, models: [PiAIModel]) -> PiAIModel? {

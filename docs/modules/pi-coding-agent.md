@@ -856,3 +856,36 @@ Implemented behavior:
 Verification:
 
 - `swift test` passed (365 tests) on 2026-02-27
+
+### P8-2: Local provider/model wiring for OpenAI-compatible MLX endpoint
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Settings.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/ModelResolver.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentSettingsTests.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentModelResolverTests.swift`
+
+Implemented behavior:
+
+- Added persisted local endpoint settings:
+  - `localOpenAIBaseURL`
+  - `localOpenAIModelID`
+- Added OpenAI-compatible defaults in model resolver:
+  - `openai-compatible -> mlx-community/Qwen3.5-35B-A3B-bf16`
+  - `openai-compatible-local -> mlx-community/Qwen3.5-35B-A3B-bf16`
+- Added provider alias wiring between `openai-compatible` and `openai-compatible-local` so model resolution remains stable when only one alias exists in registry data
+- `findInitialModel` now reads `localOpenAIModelID` when default provider is OpenAI-compatible, then falls back to provider default model if no explicit local override is configured
+
+Tests added/updated:
+
+- settings persistence and reload for local OpenAI-compatible fields
+- explicit resolver override test for `openai-compatible-local`
+- initial-model resolution test for OpenAI-compatible local default provider + configured local model ID
+
+Verification:
+
+- `swift test --filter PiCodingAgentModelResolverTests` passed (7 tests) on 2026-02-27
+- `swift test --filter PiCodingAgentSettingsTests` passed (7 tests) on 2026-02-27
+- `swift test --filter PiCodingAgentTests` passed (109 tests) on 2026-02-27
+- `swift build` passed on 2026-02-27

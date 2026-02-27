@@ -141,6 +141,22 @@ public final class PiCodingAgentSettingsManager: @unchecked Sendable {
         set(value.map(JSONValue.string), forKey: "defaultModel", scope: scope)
     }
 
+    public func getLocalOpenAIBaseURL() -> String? {
+        stringValue(forKey: "localOpenAIBaseURL")
+    }
+
+    public func setLocalOpenAIBaseURL(_ value: String?, scope: PiCodingAgentSettingsScope = .global) {
+        set(value.map(JSONValue.string), forKey: "localOpenAIBaseURL", scope: scope)
+    }
+
+    public func getLocalOpenAIModelID() -> String? {
+        stringValue(forKey: "localOpenAIModelID")
+    }
+
+    public func setLocalOpenAIModelID(_ value: String?, scope: PiCodingAgentSettingsScope = .global) {
+        set(value.map(JSONValue.string), forKey: "localOpenAIModelID", scope: scope)
+    }
+
     public func getDefaultThinkingLevel() -> String? {
         stringValue(forKey: "defaultThinkingLevel")
     }

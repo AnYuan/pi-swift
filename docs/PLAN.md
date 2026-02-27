@@ -770,13 +770,20 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-ai.md`, `docs/PLAN.md`
 
 ### P8-2: `pi-coding-agent` local provider/model wiring for MLX endpoint
-- Status: TODO
+- Status: DONE
 - Depends On: P8-1
 - Scope:
   - Add local provider/model defaults for OpenAI-compatible endpoint usage
   - Add resolver/settings coverage for local provider selection
 - Test Plan:
   - Model resolver and settings tests for local provider defaults and explicit overrides
+- Verification:
+  - Tests: `swift test --filter PiCodingAgentModelResolverTests` passed (7 tests) on 2026-02-27
+  - Tests: `swift test --filter PiCodingAgentSettingsTests` passed (7 tests) on 2026-02-27
+  - Tests: `swift test --filter PiCodingAgentTests` passed (109 tests) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: Existing `pi-coding-agent` CLI/mode/tool/session tests remain passing
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`, `README.md`
 
 ### P8-3: end-to-end local-model smoke path (non-interactive)
 - Status: TODO
@@ -808,4 +815,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P8-2` (`pi-coding-agent` local provider/model wiring for MLX endpoint).
+Next recommended task: `P8-3` (end-to-end local-model smoke path for non-interactive CLI/RPC).

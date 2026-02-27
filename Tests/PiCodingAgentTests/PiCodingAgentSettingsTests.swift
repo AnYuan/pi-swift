@@ -165,6 +165,22 @@ final class PiCodingAgentSettingsTests: XCTestCase {
         XCTAssertEqual(manager.getBlockImages(), true)
     }
 
+    func testLocalOpenAISettingsPersistAndReload() throws {
+        let storage = PiCodingAgentInMemorySettingsStorage()
+        let manager = PiCodingAgentSettingsManager(storage: storage)
+
+        manager.setLocalOpenAIBaseURL("http://127.0.0.1:1234")
+        manager.setLocalOpenAIModelID("mlx-community/Qwen3.5-35B-A3B-bf16")
+        try manager.flush()
+
+        XCTAssertEqual(manager.getLocalOpenAIBaseURL(), "http://127.0.0.1:1234")
+        XCTAssertEqual(manager.getLocalOpenAIModelID(), "mlx-community/Qwen3.5-35B-A3B-bf16")
+
+        let reloaded = PiCodingAgentSettingsManager(storage: storage)
+        XCTAssertEqual(reloaded.getLocalOpenAIBaseURL(), "http://127.0.0.1:1234")
+        XCTAssertEqual(reloaded.getLocalOpenAIModelID(), "mlx-community/Qwen3.5-35B-A3B-bf16")
+    }
+
     private func writeJSON(_ object: [String: Any], to path: String) throws {
         let data = try JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted, .sortedKeys])
         try FileManager.default.createDirectory(atPath: (path as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
