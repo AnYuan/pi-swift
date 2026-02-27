@@ -1,5 +1,6 @@
 import XCTest
 import Foundation
+import PiAI
 @testable import PiCodingAgent
 
 final class PiCodingAgentModesTests: XCTestCase {
@@ -126,6 +127,47 @@ final class PiCodingAgentModesTests: XCTestCase {
             arguments: .object(["path": .string("sdk.txt"), "content": .string("abc")])
         ))
         XCTAssertTrue((extractText(result) ?? "").contains("Wrote"))
+    }
+
+    func testRPCRunLocalUsesOpenAICompatibleRuntimeAndReturnsAssistantOutput() async throws {
+        let transport = PiCodingAgentRecordingOpenAICompatibleTransport(responses: [
+            makeOpenAICompatibleChatCompletionResponse(content: "local response")
+        ])
+        let runtime = PiCodingAgentOpenAICompatibleRuntime(
+            provider: .init(transport: transport),
+            timestamp: { 1_710_000_111 }
+        )
+        let runner = PiCodingAgentModeRunner(version: "pi-swift test", localRuntime: runtime)
+        let request = #"""
+        {
+          "id": "local-1",
+          "method": "run.local",
+          "params": {
+            "prompt": "hello local",
+            "baseURL": "http://127.0.0.1:1234",
+            "model": "mlx-community/Qwen3.5-35B-A3B-bf16",
+            "apiKey": "sk-local"
+          }
+        }
+        """#
+
+        let response = try await runner.handleRPC(request)
+        let object = try parseObject(response)
+        let result = try XCTUnwrap(object["result"] as? [String: Any])
+        XCTAssertEqual(result["output"] as? String, "local response")
+        XCTAssertEqual(result["provider"] as? String, "openai-compatible")
+        XCTAssertEqual(result["model"] as? String, "mlx-community/Qwen3.5-35B-A3B-bf16")
+
+        let capturedRequest = await transport.lastRequest()
+        XCTAssertEqual(capturedRequest?.url.absoluteString, "http://127.0.0.1:1234/v1/chat/completions")
+        XCTAssertEqual(capturedRequest?.headers["Authorization"], "Bearer sk-local")
+        let bodyData = try XCTUnwrap(capturedRequest?.body)
+        let payload = try XCTUnwrap(try JSONSerialization.jsonObject(with: bodyData) as? [String: Any])
+        XCTAssertEqual(payload["model"] as? String, "mlx-community/Qwen3.5-35B-A3B-bf16")
+        let messages = try XCTUnwrap(payload["messages"] as? [[String: Any]])
+        XCTAssertEqual(messages.count, 1)
+        XCTAssertEqual(messages[0]["role"] as? String, "user")
+        XCTAssertEqual(messages[0]["content"] as? String, "hello local")
     }
 
     private func parseObject(_ json: String) throws -> [String: Any] {

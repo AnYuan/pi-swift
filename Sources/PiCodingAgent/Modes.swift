@@ -1,5 +1,6 @@
 import Foundation
 import PiCoreTypes
+import PiAI
 
 public struct PiCodingAgentModeInput: Equatable, Sendable {
     public var prompt: String?
@@ -37,10 +38,16 @@ public final class PiCodingAgentModeRunner {
     public let version: String
     private let encoder: JSONEncoder
     private let toolRegistry: PiCodingAgentToolRegistry?
+    private let localRuntime: PiCodingAgentOpenAICompatibleRuntime
 
-    public init(version: String = PiCodingAgentCLIApp.versionString, toolRegistry: PiCodingAgentToolRegistry? = nil) {
+    public init(
+        version: String = PiCodingAgentCLIApp.versionString,
+        toolRegistry: PiCodingAgentToolRegistry? = nil,
+        localRuntime: PiCodingAgentOpenAICompatibleRuntime = .init()
+    ) {
         self.version = version
         self.toolRegistry = toolRegistry
+        self.localRuntime = localRuntime
         self.encoder = JSONEncoder()
         self.encoder.outputFormatting = [.sortedKeys]
     }
@@ -107,6 +114,50 @@ public final class PiCodingAgentModeRunner {
             response = .init(id: request.id, result: [
                 "output": .string(runJSON(input))
             ], error: nil)
+        case "run.local":
+            guard let prompt = request.params?["prompt"]?.stringValue, !prompt.isEmpty else {
+                response = .init(id: request.id, result: nil, error: .init(code: "invalid_params", message: "Missing run.local param: prompt"))
+                break
+            }
+            let provider = request.params?["provider"]?.stringValue ?? "openai-compatible"
+            let modelID = request.params?["model"]?.stringValue
+                ?? PiCodingAgentModelResolver.defaultModelPerProvider["openai-compatible"]
+                ?? "mlx-community/Qwen3.5-35B-A3B-bf16"
+            let baseURL = request.params?["baseURL"]?.stringValue ?? "http://127.0.0.1:1234"
+            let path = request.params?["path"]?.stringValue ?? "/v1/chat/completions"
+            let apiKey = request.params?["apiKey"]?.stringValue
+            let systemPrompt = request.params?["systemPrompt"]?.stringValue
+
+            let model = PiAIOpenAICompatibleHTTPModel(
+                provider: provider,
+                id: modelID,
+                baseURL: baseURL,
+                completionsPath: path
+            )
+            let message = await localRuntime.run(
+                prompt: prompt,
+                systemPrompt: systemPrompt,
+                model: model,
+                apiKey: apiKey
+            )
+            if message.stopReason == .error {
+                response = .init(
+                    id: request.id,
+                    result: nil,
+                    error: .init(code: "local_runtime_error", message: message.errorMessage ?? "Local model request failed")
+                )
+            } else {
+                response = .init(
+                    id: request.id,
+                    result: [
+                        "output": .string(extractAssistantText(message)),
+                        "provider": .string(message.provider),
+                        "model": .string(message.model),
+                        "stopReason": .string(message.stopReason.rawValue),
+                    ],
+                    error: nil
+                )
+            }
         case "tools.list":
             let definitions = toolRegistry?.listDefinitions() ?? []
             response = .init(id: request.id, result: [
@@ -193,6 +244,13 @@ extension PiCodingAgentModeRunner {
 
 private func extractToolText(_ result: PiCodingAgentToolResult) -> String {
     result.content.compactMap { part -> String? in
+        if case .text(let content) = part { return content.text }
+        return nil
+    }.joined(separator: "\n")
+}
+
+private func extractAssistantText(_ message: PiAIAssistantMessage) -> String {
+    message.content.compactMap { part -> String? in
         if case .text(let content) = part { return content.text }
         return nil
     }.joined(separator: "\n")

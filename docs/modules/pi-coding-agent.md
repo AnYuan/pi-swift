@@ -889,3 +889,37 @@ Verification:
 - `swift test --filter PiCodingAgentSettingsTests` passed (7 tests) on 2026-02-27
 - `swift test --filter PiCodingAgentTests` passed (109 tests) on 2026-02-27
 - `swift build` passed on 2026-02-27
+
+### P8-3: Non-interactive local-model smoke path (CLI/RPC)
+
+Files:
+
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/LocalModelRuntime.swift`
+- `/Users/anyuan/Development/pi-swift/Sources/PiCodingAgent/Modes.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentOpenAICompatibleTestSupport.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentModesTests.swift`
+- `/Users/anyuan/Development/pi-swift/Tests/PiCodingAgentTests/PiCodingAgentCLIExecutionTests.swift`
+
+Implemented behavior:
+
+- Added `PiCodingAgentOpenAICompatibleRuntime` to execute a single-turn prompt against `PiAI` OpenAI-compatible HTTP provider
+- Added RPC method `run.local` in non-interactive runner:
+  - required param: `prompt`
+  - optional params: `provider`, `model`, `baseURL`, `path`, `apiKey`, `systemPrompt`
+  - default provider/model/path are OpenAI-compatible MLX-oriented values
+- `run.local` maps adapter output into structured RPC result (`output`, `provider`, `model`, `stopReason`)
+- runtime/model errors are surfaced as RPC error envelope (`code: local_runtime_error`)
+
+Smoke usage example:
+
+```bash
+echo '{"id":"1","method":"run.local","params":{"prompt":"hello","baseURL":"http://127.0.0.1:1234","model":"mlx-community/Qwen3.5-35B-A3B-bf16"}}' \
+  | swift run pi-swift --mode rpc
+```
+
+Verification:
+
+- `swift test --filter PiCodingAgentModesTests` passed (10 tests) on 2026-02-27
+- `swift test --filter PiCodingAgentCLIExecutionTests` passed (6 tests) on 2026-02-27
+- `swift test --filter PiCodingAgentTests` passed (111 tests) on 2026-02-27
+- `swift build` passed on 2026-02-27

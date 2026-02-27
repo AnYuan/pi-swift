@@ -58,6 +58,42 @@ final class PiCodingAgentCLIExecutionTests: XCTestCase {
         XCTAssertTrue(result.stdout.contains("invalid_request"))
     }
 
+    func testExecuteRPCModeRunLocalBridgesOpenAICompatibleAdapter() async throws {
+        let transport = PiCodingAgentRecordingOpenAICompatibleTransport(responses: [
+            makeOpenAICompatibleChatCompletionResponse(content: "smoke ok")
+        ])
+        let runtime = PiCodingAgentOpenAICompatibleRuntime(
+            provider: .init(transport: transport),
+            timestamp: { 1_710_001_234 }
+        )
+        let runner = PiCodingAgentModeRunner(version: "pi-swift test", localRuntime: runtime)
+        let rpcRequest = #"""
+        {
+          "id": "smoke-1",
+          "method": "run.local",
+          "params": {
+            "prompt": "smoke prompt",
+            "baseURL": "http://127.0.0.1:1234",
+            "model": "mlx-community/Qwen3.5-35B-A3B-bf16"
+          }
+        }
+        """#
+
+        let result = await PiCodingAgentCLIExecutor.execute(
+            argv: ["--mode", "rpc"],
+            env: .init(stdinIsTTY: false, pipedStdin: rpcRequest),
+            modeRunner: runner
+        )
+
+        XCTAssertEqual(result.exitCode, 0)
+        XCTAssertEqual(result.action, .startRPC)
+        XCTAssertTrue(result.stdout.contains("\"id\":\"smoke-1\""))
+        XCTAssertTrue(result.stdout.contains("\"output\":\"smoke ok\""))
+
+        let request = await transport.lastRequest()
+        XCTAssertEqual(request?.url.absoluteString, "http://127.0.0.1:1234/v1/chat/completions")
+    }
+
     func testExecuteExportModeWritesHTMLAndPrintsOutputPath() async throws {
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)

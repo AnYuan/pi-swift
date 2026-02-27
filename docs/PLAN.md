@@ -786,13 +786,20 @@ Note: By default only one task should be `IN_PROGRESS` at a time to reduce regre
   - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`, `README.md`
 
 ### P8-3: end-to-end local-model smoke path (non-interactive)
-- Status: TODO
+- Status: DONE
 - Depends On: P8-2
 - Scope:
   - Add executable smoke path (mock transport) proving CLI-mode execution can drive the new adapter
   - Document how to point `pi-swift` at MLX OpenAI-compatible server
 - Test Plan:
   - Non-interactive integration tests with deterministic mock transport + fixture response
+- Verification:
+  - Tests: `swift test --filter PiCodingAgentModesTests` passed (10 tests) on 2026-02-27
+  - Tests: `swift test --filter PiCodingAgentCLIExecutionTests` passed (6 tests) on 2026-02-27
+  - Tests: `swift test --filter PiCodingAgentTests` passed (111 tests) on 2026-02-27
+  - Build: `swift build` passed on 2026-02-27
+  - Regression: Existing non-interactive CLI/RPC and tool execution tests remain passing
+  - Docs updated: `docs/modules/pi-coding-agent.md`, `docs/PLAN.md`, `README.md`
 
 ## 6. Documentation Sync Tasks (Continuous)
 
@@ -815,4 +822,4 @@ These docs should include at least:
 
 ## 7. Current Entry Point (Next Step)
 
-Next recommended task: `P8-3` (end-to-end local-model smoke path for non-interactive CLI/RPC).
+All currently planned tasks in `docs/PLAN.md` are `DONE`. Next step is to track new parity gaps from `../pi-mono` updates and add new tasks before implementation.
