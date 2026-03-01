@@ -61,9 +61,14 @@ public actor MLXLocalClient {
                 
                 var buffer = ""
                 var inToolBlock = false
-                let startTag = "```json\n"
+                let hasShellTool = (context.tools ?? []).contains { $0.name == "shell" }
+                var startTags = ["```json\n"]
+                if hasShellTool {
+                    startTags.append(contentsOf: ["```bash\n", "```sh\n", "```shell\n"])
+                }
                 let endTag = "```"
                 var contentIndex = 0
+                var currentActiveBlockTag: String? = nil
                 
                 await stream.push(.textStart(contentIndex: contentIndex, partial: output))
                 
@@ -72,32 +77,47 @@ public actor MLXLocalClient {
                     buffer += chunk
                     
                     if !inToolBlock {
-                        if let startIndex = buffer.range(of: startTag) {
-                            let before = String(buffer[..<startIndex.lowerBound])
+                        var bestRange: Range<String.Index>?
+                        var bestTag: String?
+                        for tag in startTags {
+                            if let range = buffer.range(of: tag) {
+                                if bestRange == nil || range.lowerBound < bestRange!.lowerBound {
+                                    bestRange = range
+                                    bestTag = tag
+                                }
+                            }
+                        }
+                        
+                        if let range = bestRange, let tag = bestTag {
+                            let before = String(buffer[..<range.lowerBound])
                             if !before.isEmpty {
                                 await stream.push(.textDelta(contentIndex: contentIndex, delta: before, partial: output))
                             }
                             inToolBlock = true
-                            buffer = String(buffer[startIndex.upperBound...])
+                            currentActiveBlockTag = tag
+                            buffer = String(buffer[range.upperBound...])
                         } else {
-                            var matched = false
-                            let maxSuffixLen = min(buffer.count, startTag.count - 1)
-                            if maxSuffixLen > 0 {
-                                for i in stride(from: maxSuffixLen, through: 1, by: -1) {
-                                    let tempSuffix = String(buffer.suffix(i))
-                                    if startTag.hasPrefix(tempSuffix) {
-                                        let safeCount = buffer.count - i
-                                        if safeCount > 0 {
-                                            await stream.push(.textDelta(contentIndex: contentIndex, delta: String(buffer.prefix(safeCount)), partial: output))
-                                            buffer = tempSuffix
+                            var matchedPartial = false
+                            for tag in startTags {
+                                let maxSuffixLen = min(buffer.count, tag.count - 1)
+                                if maxSuffixLen > 0 {
+                                    for i in stride(from: maxSuffixLen, through: 1, by: -1) {
+                                        let tempSuffix = String(buffer.suffix(i))
+                                        if tag.hasPrefix(tempSuffix) {
+                                            let safeCount = buffer.count - i
+                                            if safeCount > 0 {
+                                                await stream.push(.textDelta(contentIndex: contentIndex, delta: String(buffer.prefix(safeCount)), partial: output))
+                                                buffer = tempSuffix
+                                            }
+                                            matchedPartial = true
+                                            break
                                         }
-                                        matched = true
-                                        break
                                     }
                                 }
+                                if matchedPartial { break }
                             }
                             
-                            if !matched {
+                            if !matchedPartial {
                                 await stream.push(.textDelta(contentIndex: contentIndex, delta: buffer, partial: output))
                                 buffer = ""
                             }
@@ -109,24 +129,27 @@ public actor MLXLocalClient {
                             var toolName: String?
                             var jsonArgs: [String: PiCoreTypes.JSONValue] = [:]
                             
-                            if let data = toolBody.data(using: .utf8),
-                               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                                
-                                toolName = (dict["tool_name"] as? String) ?? (dict["name"] as? String) ?? (dict["tool"] as? String)
-                                
-                                if let argsDict = dict["arguments"] as? [String: Any] {
-                                    for (k, v) in argsDict {
-                                        if let strVal = v as? String {
-                                            jsonArgs[k] = .string(strVal)
-                                        } else if let intVal = v as? Int {
-                                            jsonArgs[k] = .number(Double(intVal))
-                                        } else if let doubleVal = v as? Double {
-                                            jsonArgs[k] = .number(doubleVal)
-                                        } else if let boolVal = v as? Bool {
-                                            jsonArgs[k] = .bool(boolVal)
+                            if currentActiveBlockTag == "```json\n" {
+                                if let data = toolBody.data(using: .utf8),
+                                   let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                                    toolName = (dict["tool_name"] as? String) ?? (dict["name"] as? String) ?? (dict["tool"] as? String)
+                                    if let argsDict = dict["arguments"] as? [String: Any] {
+                                        for (k, v) in argsDict {
+                                            if let strVal = v as? String {
+                                                jsonArgs[k] = .string(strVal)
+                                            } else if let intVal = v as? Int {
+                                                jsonArgs[k] = .number(Double(intVal))
+                                            } else if let doubleVal = v as? Double {
+                                                jsonArgs[k] = .number(doubleVal)
+                                            } else if let boolVal = v as? Bool {
+                                                jsonArgs[k] = .bool(boolVal)
+                                            }
                                         }
                                     }
                                 }
+                            } else {
+                                toolName = "shell"
+                                jsonArgs["command"] = .string(toolBody)
                             }
                             
                             if let name = toolName {
@@ -140,11 +163,12 @@ public actor MLXLocalClient {
                                 contentIndex += 1
                                 await stream.push(.textStart(contentIndex: contentIndex, partial: output))
                             } else {
-                                // If it wasn't a valid tool JSON or we couldn't parse it, yield it as normal text.
-                                await stream.push(.textDelta(contentIndex: contentIndex, delta: startTag + toolBody + endTag, partial: output))
+                                let reconstructedTag = currentActiveBlockTag ?? "```json\n"
+                                await stream.push(.textDelta(contentIndex: contentIndex, delta: reconstructedTag + toolBody + endTag, partial: output))
                             }
                             
                             inToolBlock = false
+                            currentActiveBlockTag = nil
                             buffer = String(buffer[endIndex.upperBound...])
                         }
                     }
