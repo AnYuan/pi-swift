@@ -62,7 +62,8 @@ public actor MLXLocalClient {
                 var buffer = ""
                 var inToolBlock = false
                 let startTag = "<tool_code>"
-                let endTag = "</tool_code>"
+                let startTag = "```json\n"
+                let endTag = "```"
                 var contentIndex = 0
                 
                 await stream.push(.textStart(contentIndex: contentIndex, partial: output))
@@ -106,46 +107,42 @@ public actor MLXLocalClient {
                         if let endIndex = buffer.range(of: endTag) {
                             let toolBody = String(buffer[..<endIndex.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
                             
-                            if let openParen = toolBody.firstIndex(of: "("),
-                               let closeParen = toolBody.lastIndex(of: ")") {
+                            var toolName: String?
+                            var jsonArgs: [String: PiCoreTypes.JSONValue] = [:]
+                            
+                            if let data = toolBody.data(using: .utf8),
+                               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                                 
-                                let toolName = String(toolBody[..<openParen]).trimmingCharacters(in: .whitespaces)
-                                let argsString = String(toolBody[toolBody.index(after: openParen)..<closeParen])
+                                toolName = (dict["tool_name"] as? String) ?? (dict["name"] as? String) ?? (dict["tool"] as? String)
                                 
-                                var arguments: [String: String] = [:]
-                                var currentArg = ""
-                                var inQuotes = false
-                                for char in argsString {
-                                    if char == "\"" || char == "'" {
-                                        inQuotes.toggle()
-                                        currentArg.append(char)
-                                    } else if char == "," && !inQuotes {
-                                        parseAndAddArgument(currentArg, to: &arguments)
-                                        currentArg = ""
-                                    } else {
-                                        currentArg.append(char)
+                                if let argsDict = dict["arguments"] as? [String: Any] {
+                                    for (k, v) in argsDict {
+                                        if let strVal = v as? String {
+                                            jsonArgs[k] = .string(strVal)
+                                        } else if let intVal = v as? Int {
+                                            jsonArgs[k] = .integer(intVal)
+                                        } else if let doubleVal = v as? Double {
+                                            jsonArgs[k] = .number(doubleVal)
+                                        } else if let boolVal = v as? Bool {
+                                            jsonArgs[k] = .boolean(boolVal)
+                                        }
                                     }
                                 }
-                                if !currentArg.isEmpty {
-                                    parseAndAddArgument(currentArg, to: &arguments)
-                                }
-                                
-                                var jsonArgs: [String: PiCoreTypes.JSONValue] = [:]
-                                for (k, v) in arguments {
-                                    jsonArgs[k] = PiCoreTypes.JSONValue.string(v)
-                                }
-                                
+                            }
+                            
+                            if let name = toolName {
                                 let toolCallId = UUID().uuidString
-                                let toolCallContent = PiAIToolCallContent(id: toolCallId, name: toolName, arguments: jsonArgs)
+                                let toolCallContent = PiAIToolCallContent(id: toolCallId, name: name, arguments: jsonArgs)
                                 
                                 await stream.push(.textEnd(contentIndex: contentIndex, content: "", partial: output))
                                 contentIndex += 1
                                 await stream.push(.toolCallStart(contentIndex: contentIndex, partial: output))
-                                // Assuming we pass an empty delta or JSON representation if needed, 
-                                // but for PiCoreTypes, toolCallEnd with the actual toolCall is sufficient.
                                 await stream.push(.toolCallEnd(contentIndex: contentIndex, toolCall: toolCallContent, partial: output))
                                 contentIndex += 1
                                 await stream.push(.textStart(contentIndex: contentIndex, partial: output))
+                            } else {
+                                // If it wasn't a valid tool JSON or we couldn't parse it, yield it as normal text.
+                                await stream.push(.textDelta(contentIndex: contentIndex, delta: startTag + toolBody + endTag, partial: output))
                             }
                             
                             inToolBlock = false
@@ -178,11 +175,16 @@ public actor MLXLocalClient {
         var systemContent = ""
         
         if !tools.isEmpty {
-            systemContent += "You are a helpful assistant with access to tools. To use a tool, YOU MUST output EXACTLY in the following XML format:\n"
-            systemContent += "<tool_code> tool_name(arg_name=\"arg_value\") </tool_code>\n"
-            systemContent += "For example, to execute a shell command:\n"
-            systemContent += "<tool_code> shell(command=\"ls -la\") </tool_code>\n\n"
-            systemContent += "You may think step-by-step or output reasoning before calling the tool. However, the tool call itself MUST NOT be wrapped in markdown blocks (like ```) and MUST use the exact <tool_code> tags.\n\n"
+            systemContent += "You are a helpful assistant with access to tools. To use a tool, YOU MUST output EXACTLY in the following JSON format inside a markdown block:\n"
+            systemContent += "```json\n"
+            systemContent += "{\n"
+            systemContent += "  \"tool_name\": \"shell\",\n"
+            systemContent += "  \"arguments\": {\n"
+            systemContent += "    \"command\": \"ls -la\"\n"
+            systemContent += "  }\n"
+            systemContent += "}\n"
+            systemContent += "```\n\n"
+            systemContent += "You may think step-by-step before calling the tool. Do NOT output plain text commands.\n\n"
             systemContent += "Available Tools:\n"
             for tool in tools {
                 systemContent += "- \(tool.name): \(tool.description)\n"
