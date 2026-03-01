@@ -39,6 +39,7 @@ public actor MLXLocalClient {
                 model: model.id,
                 usage: .zero,
                 stopReason: .stop,
+                errorMessage: nil,
                 timestamp: Int64(Date().timeIntervalSince1970 * 1000)
             )
             
@@ -129,9 +130,9 @@ public actor MLXLocalClient {
                                     parseAndAddArgument(currentArg, to: &arguments)
                                 }
                                 
-                                var jsonArgs: [String: JSONValue] = [:]
+                                var jsonArgs: [String: PiCoreTypes.JSONValue] = [:]
                                 for (k, v) in arguments {
-                                    jsonArgs[k] = .string(v)
+                                    jsonArgs[k] = PiCoreTypes.JSONValue.string(v)
                                 }
                                 
                                 let toolCallId = UUID().uuidString
@@ -180,7 +181,7 @@ public actor MLXLocalClient {
             systemContent += "You have the following tools available. To use a tool, output exactly:\n<tool_code> tool_name(arg_name=\"arg_value\") </tool_code>\n\nTools:\n"
             for tool in tools {
                 systemContent += "- \(tool.name): \(tool.description)\n"
-                let argKeys = tool.inputSchema?["properties"]?.objectValue?.keys.map { String($0) } ?? []
+                let argKeys = tool.parameters.properties?.keys.map { String($0) } ?? []
                 systemContent += "  Arguments: " + argKeys.joined(separator: ", ") + "\n"
             }
             systemContent += "\n"
