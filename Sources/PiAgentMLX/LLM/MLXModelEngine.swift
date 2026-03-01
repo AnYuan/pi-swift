@@ -13,10 +13,16 @@ public actor MLXModelEngineActor {
 public class MLXModelEngine {
     private var modelContainer: ModelContainer?
     private var isLoaded: Bool = false
+    private var loadedModelId: String?
     
     public init() {}
     
     public func load(modelId: String) async throws {
+        // Skip reload if the same model is already loaded
+        if isLoaded, loadedModelId == modelId, modelContainer != nil {
+            return
+        }
+        
         let resolvedPath = (modelId as NSString).expandingTildeInPath
         let modelConfiguration: ModelConfiguration
         
@@ -30,6 +36,7 @@ public class MLXModelEngine {
         let container = try await MLXLMCommon.loadModelContainer(configuration: modelConfiguration)
         self.modelContainer = container
         self.isLoaded = true
+        self.loadedModelId = modelId
     }
     
     public func unload() {
