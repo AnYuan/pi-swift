@@ -61,7 +61,6 @@ public actor MLXLocalClient {
                 
                 var buffer = ""
                 var inToolBlock = false
-                let startTag = "<tool_code>"
                 let startTag = "```json\n"
                 let endTag = "```"
                 var contentIndex = 0
@@ -120,11 +119,11 @@ public actor MLXLocalClient {
                                         if let strVal = v as? String {
                                             jsonArgs[k] = .string(strVal)
                                         } else if let intVal = v as? Int {
-                                            jsonArgs[k] = .integer(intVal)
+                                            jsonArgs[k] = .number(Double(intVal))
                                         } else if let doubleVal = v as? Double {
                                             jsonArgs[k] = .number(doubleVal)
                                         } else if let boolVal = v as? Bool {
-                                            jsonArgs[k] = .boolean(boolVal)
+                                            jsonArgs[k] = .bool(boolVal)
                                         }
                                     }
                                 }
