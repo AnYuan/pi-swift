@@ -17,7 +17,16 @@ public class MLXModelEngine {
     public init() {}
     
     public func load(modelId: String) async throws {
-        let modelConfiguration = ModelConfiguration(id: modelId)
+        let resolvedPath = (modelId as NSString).expandingTildeInPath
+        let modelConfiguration: ModelConfiguration
+        
+        var isDirectory: ObjCBool = false
+        if FileManager.default.fileExists(atPath: resolvedPath, isDirectory: &isDirectory), isDirectory.boolValue {
+            modelConfiguration = ModelConfiguration(directory: URL(fileURLWithPath: resolvedPath))
+        } else {
+            modelConfiguration = ModelConfiguration(id: modelId)
+        }
+        
         let container = try await MLXLMCommon.loadModelContainer(configuration: modelConfiguration)
         self.modelContainer = container
         self.isLoaded = true
