@@ -16,7 +16,12 @@ let package = Package(
         .library(name: "PiPods", targets: ["PiPods"]),
         .library(name: "PiWebUIBridge", targets: ["PiWebUIBridge"]),
         .library(name: "PiTestSupport", targets: ["PiTestSupport"]),
+        .library(name: "PiAgentMLX", targets: ["PiAgentMLX"]),
         .executable(name: "pi-swift", targets: ["PiSwiftCLI"]),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/ml-explore/mlx-swift.git", from: "0.30.0"),
+        .package(url: "https://github.com/ml-explore/mlx-swift-lm.git", branch: "main")
     ],
     targets: [
         .target(name: "PiCoreTypes"),
@@ -28,6 +33,20 @@ let package = Package(
         .target(
             name: "PiAgentCore",
             dependencies: ["PiCoreTypes", "PiAI"]
+        ),
+        .target(
+            name: "PiAgentMLX",
+            dependencies: [
+                "PiCoreTypes",
+                "PiAI",
+                "PiAgentCore",
+                .product(name: "MLX", package: "mlx-swift"),
+                .product(name: "MLXLLM", package: "mlx-swift-lm"),
+                .product(name: "MLXLMCommon", package: "mlx-swift-lm")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]
         ),
         .target(
             name: "PiTUI",
@@ -51,7 +70,7 @@ let package = Package(
         ),
         .executableTarget(
             name: "PiSwiftCLI",
-            dependencies: ["PiCodingAgent"]
+            dependencies: ["PiCodingAgent", "PiAgentMLX"]
         ),
         .testTarget(name: "PiCoreTypesTests", dependencies: ["PiCoreTypes", "PiTestSupport"]),
         .testTarget(name: "PiAITests", dependencies: ["PiAI", "PiTestSupport"]),

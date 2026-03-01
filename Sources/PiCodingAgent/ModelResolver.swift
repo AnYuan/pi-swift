@@ -82,6 +82,7 @@ public enum PiCodingAgentModelResolver {
         "openrouter": "openai/gpt-4o",
         "google": "gemini-2.5-pro",
         "google-vertex": "gemini-2.5-pro",
+        "mlx-native": "mlx-community/Qwen2.5-0.5B-Instruct",
     ]
 
     public static func parseModelPattern(
