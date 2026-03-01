@@ -178,7 +178,12 @@ public actor MLXLocalClient {
         var systemContent = ""
         
         if !tools.isEmpty {
-            systemContent += "You have the following tools available. To use a tool, output exactly:\n<tool_code> tool_name(arg_name=\"arg_value\") </tool_code>\n\nTools:\n"
+            systemContent += "You are a helpful assistant with access to tools. To use a tool, YOU MUST output EXACTLY in the following XML format:\n"
+            systemContent += "<tool_code> tool_name(arg_name=\"arg_value\") </tool_code>\n"
+            systemContent += "For example, to execute a shell command:\n"
+            systemContent += "<tool_code> shell(command=\"ls -la\") </tool_code>\n\n"
+            systemContent += "You may think step-by-step or output reasoning before calling the tool. However, the tool call itself MUST NOT be wrapped in markdown blocks (like ```) and MUST use the exact <tool_code> tags.\n\n"
+            systemContent += "Available Tools:\n"
             for tool in tools {
                 systemContent += "- \(tool.name): \(tool.description)\n"
                 let argKeys = tool.parameters.properties?.keys.map { String($0) } ?? []
