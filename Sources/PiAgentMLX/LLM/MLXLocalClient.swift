@@ -32,7 +32,7 @@ public actor MLXLocalClient {
         let stream = PiAIAssistantMessageEventStream()
         
         Task {
-            let output = PiAIAssistantMessage(
+            var output = PiAIAssistantMessage(
                 content: [],
                 api: provider,
                 provider: model.provider,
@@ -69,6 +69,7 @@ public actor MLXLocalClient {
                 let endTag = "```"
                 var contentIndex = 0
                 var currentActiveBlockTag: String? = nil
+                var currentTextAccumulator = ""
                 
                 await stream.push(.textStart(contentIndex: contentIndex, partial: output))
                 
@@ -91,6 +92,7 @@ public actor MLXLocalClient {
                         if let range = bestRange, let tag = bestTag {
                             let before = String(buffer[..<range.lowerBound])
                             if !before.isEmpty {
+                                currentTextAccumulator += before
                                 await stream.push(.textDelta(contentIndex: contentIndex, delta: before, partial: output))
                             }
                             inToolBlock = true
@@ -106,7 +108,9 @@ public actor MLXLocalClient {
                                         if tag.hasPrefix(tempSuffix) {
                                             let safeCount = buffer.count - i
                                             if safeCount > 0 {
-                                                await stream.push(.textDelta(contentIndex: contentIndex, delta: String(buffer.prefix(safeCount)), partial: output))
+                                                let emitText = String(buffer.prefix(safeCount))
+                                                currentTextAccumulator += emitText
+                                                await stream.push(.textDelta(contentIndex: contentIndex, delta: emitText, partial: output))
                                                 buffer = tempSuffix
                                             }
                                             matchedPartial = true
@@ -118,6 +122,7 @@ public actor MLXLocalClient {
                             }
                             
                             if !matchedPartial {
+                                currentTextAccumulator += buffer
                                 await stream.push(.textDelta(contentIndex: contentIndex, delta: buffer, partial: output))
                                 buffer = ""
                             }
@@ -153,8 +158,17 @@ public actor MLXLocalClient {
                             }
                             
                             if let name = toolName {
+                                // Finalize the current text segment
+                                let trimmedText = currentTextAccumulator.trimmingCharacters(in: .whitespacesAndNewlines)
+                                if !trimmedText.isEmpty {
+                                    output.content.append(.text(.init(text: trimmedText)))
+                                }
+                                currentTextAccumulator = ""
+                                
                                 let toolCallId = UUID().uuidString
                                 let toolCallContent = PiAIToolCallContent(id: toolCallId, name: name, arguments: jsonArgs)
+                                output.content.append(.toolCall(toolCallContent))
+                                output.stopReason = .toolUse
                                 
                                 await stream.push(.textEnd(contentIndex: contentIndex, content: "", partial: output))
                                 contentIndex += 1
@@ -164,7 +178,9 @@ public actor MLXLocalClient {
                                 await stream.push(.textStart(contentIndex: contentIndex, partial: output))
                             } else {
                                 let reconstructedTag = currentActiveBlockTag ?? "```json\n"
-                                await stream.push(.textDelta(contentIndex: contentIndex, delta: reconstructedTag + toolBody + endTag, partial: output))
+                                let fallbackText = reconstructedTag + toolBody + endTag
+                                currentTextAccumulator += fallbackText
+                                await stream.push(.textDelta(contentIndex: contentIndex, delta: fallbackText, partial: output))
                             }
                             
                             inToolBlock = false
@@ -175,10 +191,18 @@ public actor MLXLocalClient {
                 }
                 
                 if !buffer.isEmpty && !inToolBlock {
+                    currentTextAccumulator += buffer
                     await stream.push(.textDelta(contentIndex: contentIndex, delta: buffer, partial: output))
                 }
+                
+                // Finalize any remaining text
+                let finalText = currentTextAccumulator.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !finalText.isEmpty {
+                    output.content.append(.text(.init(text: finalText)))
+                }
+                
                 await stream.push(.textEnd(contentIndex: contentIndex, content: "", partial: output))
-                await stream.push(.done(reason: .stop, message: output))
+                await stream.push(.done(reason: output.stopReason, message: output))
                 
             } catch {
                 let errOutput = PiAIAssistantMessage(
