@@ -204,6 +204,23 @@ public actor MLXLocalClient {
                 for part in a.content {
                     if case .text(let t) = part {
                         text += t.text
+                    } else if case .toolCall(let tc) = part {
+                        text += "```json\n"
+                        var argDict: [String: Any] = [:]
+                        for (k, v) in tc.arguments {
+                            argDict[k] = jsonValueToAny(v)
+                        }
+                        let jsonDict: [String: Any] = [
+                            "tool_name": tc.name, // Use 'tool_name' as instructed
+                            "arguments": argDict
+                        ]
+                        if let data = try? JSONSerialization.data(withJSONObject: jsonDict, options: [.prettyPrinted, .withoutEscapingSlashes]),
+                           let jsonStr = String(data: data, encoding: .utf8) {
+                            text += jsonStr + "\n"
+                        } else {
+                            text += "{\n  \"tool_name\": \"\(tc.name)\",\n  \"arguments\": {}\n}\n"
+                        }
+                        text += "```\n"
                     }
                 }
                 prompt += "<|im_start|>assistant\n\(text)<|im_end|>\n"
@@ -215,6 +232,8 @@ public actor MLXLocalClient {
                     }
                 }
                 prompt += "<|im_start|>tool\n\(text)<|im_end|>\n"
+            default:
+                break
             }
         }
         
@@ -238,6 +257,17 @@ public actor MLXLocalClient {
             if !key.isEmpty {
                 arguments[key] = value
             }
+        }
+    }
+
+    private func jsonValueToAny(_ value: PiCoreTypes.JSONValue) -> Any {
+        switch value {
+        case .null: return NSNull()
+        case .bool(let b): return b
+        case .number(let n): return n
+        case .string(let s): return s
+        case .array(let a): return a.map { jsonValueToAny($0) }
+        case .object(let o): return o.mapValues { jsonValueToAny($0) }
         }
     }
 }
